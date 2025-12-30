@@ -1,0 +1,41 @@
+{
+    "Index": {
+        "title": "Supabase 基础项目",
+        "description": "基于 Next.js 14, Supabase 和 Ant Design 的企业级启动模板",
+        "getStarted": "开始使用",
+        "doc": "查看文档",
+        "features": {
+            "title": "功能特性",
+            "auth": "身份认证",
+            "authDesc": "基于 Supabase Auth 的安全用户认证。",
+            "db": "数据库",
+            "dbDesc": "由 Supabase 托管的可扩展 PostgreSQL 数据库。",
+            "ui": "UI 组件库",
+            "uiDesc": "基于 Ant Design 的美观且无障碍的组件。",
+            "i18n": "国际化",
+            "i18nDesc": "内置多语言支持。"
+        }
+    },
+    "Nav": {
+        "login": "登录",
+        "logout": "退出登录",
+        "profile": "个人资料",
+        "apiDocs": "API 文档"
+    },
+    "Profile": {
+        "title": "个人资料",
+        "basicInfo": "基本信息",
+        "email": "电子邮箱",
+        "lastSignIn": "上次登录时间",
+        "userId": "用户 ID",
+        "security": "账户安全",
+        "sessionDetails": "会话详情 (开发者信息)",
+        "signOut": "退出登录",
+        "notSignedIn": "您尚未登录。"
+    },
+    "Login": {
+        "title": "欢迎回来",
+        "subtitle": "使用魔术链接登录您的账户",
+        "magicLinkSuccess": "请检查您的邮箱以获取登录链接！"
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "Index": {
+        "title": "Supabase Base Project",
+        "description": "Enterprise-grade starter kit with Next.js 14, Supabase, and Ant Design",
+        "getStarted": "Get Started",
+        "doc": "Documentation",
+        "features": {
+            "title": "Features",
+            "auth": "Authentication",
+            "authDesc": "Secure user authentication with Supabase Auth.",
+            "db": "Database",
+            "dbDesc": "Scalable PostgreSQL database hosted by Supabase.",
+            "ui": "UI Components",
+            "uiDesc": "Beautiful and accessible components by Ant Design.",
+            "i18n": "Internationalization",
+            "i18nDesc": "Built-in multi-language support."
+        }
+    },
+    "Nav": {
+        "login": "Login",
+        "logout": "Logout",
+        "profile": "Profile",
+        "apiDocs": "API Docs"
+    },
+    "Profile": {
+        "title": "User Profile",
+        "basicInfo": "Basic Information",
+        "email": "Email",
+        "lastSignIn": "Last Sign In",
+        "userId": "User ID",
+        "security": "Security",
+        "sessionDetails": "Session Details (Developer Info)",
+        "signOut": "Sign Out",
+        "notSignedIn": "You are not signed in."
+    },
+    "Login": {
+        "title": "Welcome Back",
+        "subtitle": "Sign in to your account with a magic link",
+        "magicLinkSuccess": "Check your email for the login link!"
+    }
+}
