@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     transpilePackages: [
+        'antd',
         '@ant-design/icons',
         '@ant-design/nextjs-registry',
         'rc-util',
@@ -13,9 +14,6 @@ const nextConfig = {
         'rc-tree',
         'rc-table',
     ],
-    experimental: {
-        optimizePackageImports: ['antd'],
-    },
 };
 
 export default withNextIntl(nextConfig);
