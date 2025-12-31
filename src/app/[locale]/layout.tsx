@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import StyledComponentsRegistry from "@/lib/AntdRegistry";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { I18nProvider } from "@/i18n/context";
 import MainLayout from "@/components/common/MainLayout";
 import { createClient } from "@/utils/supabase/server";
 import { Locale, locales } from '@/i18n/config';
-
 import { getURL } from "@/utils/url";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -15,7 +13,6 @@ const inter = Inter({ subsets: ["latin"] });
 export async function generateStaticParams() {
   return locales.map((locale: string) => ({ locale }));
 }
-
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
@@ -45,21 +42,19 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }>) {
-  setRequestLocale(locale);
-  const messages = await getMessages();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <html lang={locale}>
       <body className={inter.className}>
-        <NextIntlClientProvider messages={messages}>
+        <I18nProvider locale={locale as Locale}>
           <StyledComponentsRegistry locale={locale as Locale}>
             <MainLayout user={user}>
               {children}
             </MainLayout>
           </StyledComponentsRegistry>
-        </NextIntlClientProvider>
+        </I18nProvider>
       </body>
     </html>
   );

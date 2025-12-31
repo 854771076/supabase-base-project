@@ -3,7 +3,7 @@
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/utils/supabase/client'
-import { useLocale } from 'next-intl';
+import { useLocale } from '@/i18n/context';
 import { getURL } from '@/utils/url';
 
 export default function AuthForm() {

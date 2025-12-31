@@ -1,42 +1,73 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+/**
+ * 防止样式闪烁的关键样式
+ */
+html {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/**
+ * Ant Design 样式稳定性优化
+ */
+.ant-btn,
+.ant-input,
+.ant-select,
+.ant-table,
+.ant-pagination,
+.ant-tree,
+.ant-checkbox,
+.ant-menu {
+  /* 防止组件渲染时的闪烁 */
+  transition: none !important;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* 确保 Ant Design 组件的基础样式立即可用 */
+.ant-btn {
+  line-height: 1.5715;
+  position: relative;
+  display: inline-block;
+  font-weight: 400;
+  white-space: nowrap;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  user-select: none;
+  touch-action: manipulation;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.ant-input {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+  line-height: 1.5715;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+/* 其他 Ant Design 样式覆盖 */
+.ant-pagination-item-active {
+  border-color: #02bb91 !important;
+}
+
+.ant-pagination-item-active a {
+  color: #02bb91 !important;
+}
+
+/* 防止水合不匹配导致的样式闪烁 */
+[data-nextjs-scroll-focus-boundary] {
+  display: contents;
 }

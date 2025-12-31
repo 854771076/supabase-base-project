@@ -1,14 +1,17 @@
 import LoginContent from '@/components/auth/LoginContent';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
-import React from 'react';
+
+import enMessages from '@/messages/en.json';
+import zhMessages from '@/messages/zh.json';
+
+const messages = { en: enMessages, zh: zhMessages };
 
 export default async function LoginPage({
     params: { locale }
 }: {
     params: { locale: string };
 }) {
-    setRequestLocale(locale);
-    const t = await getTranslations('Login');
+    const m = messages[locale as keyof typeof messages] || messages.en;
+    const t = m.Login;
 
-    return <LoginContent title={t('title')} subtitle={t('subtitle')} />;
+    return <LoginContent title={t.title} subtitle={t.subtitle} />;
 }

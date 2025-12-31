@@ -4,7 +4,7 @@ import React from 'react';
 import { Layout, Menu, Button, Dropdown, Avatar, Space, Typography } from 'antd';
 import { UserOutlined, GlobalOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from '@/i18n/context';
 import { Locale } from '@/i18n/config';
 import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@/utils/supabase/client';
@@ -19,6 +19,7 @@ interface HeaderProps {
 
 export default function Header({ user }: HeaderProps) {
     const t = useTranslations('Nav');
+    const currentLocale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -29,7 +30,8 @@ export default function Header({ user }: HeaderProps) {
     };
 
     const handleLanguageChange = ({ key }: { key: string }) => {
-        router.replace(pathname, { locale: key as Locale });
+        // Navigate to the same path but with the new locale
+        window.location.href = `/${key}${pathname}`;
     };
 
     const languageMenu = {
@@ -67,7 +69,7 @@ export default function Header({ user }: HeaderProps) {
         },
         {
             key: 'docs',
-            label: <Link href="/api-docs">{t('apiDocs')}</Link>,
+            label: <Link href="/zh/api-docs">{t('apiDocs')}</Link>,
         },
     ];
 

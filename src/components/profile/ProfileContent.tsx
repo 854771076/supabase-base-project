@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, Descriptions, Avatar, Tag, Button, Typography, Space, Divider, Collapse } from 'antd';
 import { UserOutlined, CodeOutlined, LogoutOutlined } from '@ant-design/icons';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@/i18n/context';
 import { User, Session } from '@supabase/supabase-js';
 
 const { Title, Text } = Typography;
