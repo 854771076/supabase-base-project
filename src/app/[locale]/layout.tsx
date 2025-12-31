@@ -16,6 +16,8 @@ export async function generateStaticParams() {
   return locales.map((locale: string) => ({ locale }));
 }
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: {
