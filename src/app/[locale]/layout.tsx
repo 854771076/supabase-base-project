@@ -8,11 +8,29 @@ import MainLayout from "@/components/common/MainLayout";
 import { createClient } from "@/utils/supabase/server";
 import { Locale } from '@/i18n/config';
 
+import { getURL } from "@/utils/url";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Supabase Base Project",
-  description: "Built with Next.js, Supabase, and Ant Design",
+  metadataBase: new URL(getURL()),
+  title: {
+    template: '%s | Supabase Base Project',
+    default: 'Supabase Base Project',
+  },
+  description: "Enterprise-grade starter kit with Next.js 14, Supabase, and Ant Design",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-icon.png',
+  },
+  openGraph: {
+    title: 'Supabase Base Project',
+    description: 'Build your project faster with our full-stack template.',
+    url: getURL(),
+    siteName: 'Supabase Base Project',
+    locale: 'en_US',
+    type: 'website',
+  },
 };
 
 export default async function LocaleLayout({

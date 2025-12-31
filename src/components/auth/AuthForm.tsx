@@ -4,12 +4,14 @@ import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/utils/supabase/client'
 import { useLocale } from 'next-intl';
+import { getURL } from '@/utils/url';
 
 export default function AuthForm() {
     const supabase = createClient()
     const locale = useLocale();
 
     const localization = locale === 'zh' ? {
+        // ... (omitted for brevity in instruction, will be included in ReplacementContent)
         variables: {
             magic_link: {
                 email_input_label: '电子邮箱地址',
@@ -51,7 +53,7 @@ export default function AuthForm() {
                 showLinks={false}
                 providers={['google']} // Restored Google login provider
                 localization={localization}
-                redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/v1/auth/callback`}
+                redirectTo={`${getURL()}api/v1/auth/callback`}
             />
         </div>
     )
