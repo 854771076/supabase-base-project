@@ -17,7 +17,6 @@ export async function generateStaticParams() {
 }
 
 
-
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: {
