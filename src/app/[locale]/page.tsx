@@ -1,7 +1,5 @@
-'use client';
-
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Typography, Button, Space, Card, Row, Col } from 'antd';
 import {
   RocketOutlined,
@@ -13,8 +11,13 @@ import {
 
 const { Title, Paragraph } = Typography;
 
-export default function Home() {
-  const t = useTranslations('Index');
+export default async function Home({
+  params: { locale }
+}: {
+  params: { locale: string };
+}) {
+  setRequestLocale(locale);
+  const t = await getTranslations('Index');
 
   const features = [
     {

@@ -13,12 +13,8 @@ const processEnv = {
 
 const parsed = envSchema.safeParse(processEnv);
 
-if (!parsed.success && process.env.NODE_ENV === 'production') {
-    console.error('❌ Invalid environment variables:', parsed.error.format());
-    // Only throw in production if we are not in a build environment or if you strictly want it to fail
-    // For Vercel build, sometimes it's better to log and let the build continue 
-    // if the variables aren't used for static generation.
-    // However, Supabase URL is usually required.
+if (!parsed.success) {
+    console.warn('⚠️ Invalid environment variables:', parsed.error.format());
 }
 
 export const env = parsed.success

@@ -7,6 +7,7 @@ import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Locale } from '@/i18n/config';
 import { createBrowserClient } from '@supabase/ssr';
+import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
 const { Header: AntHeader } = Layout;
@@ -22,10 +23,7 @@ export default function Header({ user }: HeaderProps) {
     const pathname = usePathname();
 
     const handleLogout = async () => {
-        const supabase = createBrowserClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
+        const supabase = createClient();
         await supabase.auth.signOut();
         router.refresh();
     };

@@ -3,14 +3,18 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import StyledComponentsRegistry from "@/lib/AntdRegistry";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import MainLayout from "@/components/common/MainLayout";
 import { createClient } from "@/utils/supabase/server";
-import { Locale } from '@/i18n/config';
+import { Locale, locales } from '@/i18n/config';
 
 import { getURL } from "@/utils/url";
 
 const inter = Inter({ subsets: ["latin"] });
+
+export async function generateStaticParams() {
+  return locales.map((locale: string) => ({ locale }));
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
@@ -40,6 +44,7 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }>) {
+  setRequestLocale(locale);
   const messages = await getMessages();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

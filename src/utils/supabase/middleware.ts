@@ -12,42 +12,17 @@ export async function updateSession(request: NextRequest, response?: NextRespons
         env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         {
             cookies: {
-                get(name: string) {
-                    return request.cookies.get(name)?.value
+                getAll() {
+                    return request.cookies.getAll()
                 },
-                set(name: string, value: string, options: any) {
-                    request.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    })
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
                     supabaseResponse = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
+                        request,
                     })
-                    supabaseResponse.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    })
-                },
-                remove(name: string, options: any) {
-                    request.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    })
-                    supabaseResponse = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
-                    })
-                    supabaseResponse.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    })
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        supabaseResponse.cookies.set(name, value, options)
+                    )
                 },
             },
         }
@@ -78,3 +53,4 @@ export async function updateSession(request: NextRequest, response?: NextRespons
 
     return supabaseResponse
 }
+
