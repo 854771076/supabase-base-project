@@ -12,7 +12,7 @@ export const getApiDocs = async () => {
       },
       servers: [
         {
-          url: getURL(),
+          url: '/',
           description: 'Current environment server',
         },
       ],
