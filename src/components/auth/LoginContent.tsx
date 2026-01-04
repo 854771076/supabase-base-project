@@ -26,7 +26,8 @@ export default function LoginContent({ title, subtitle }: LoginContentProps) {
                     maxWidth: 400,
                     width: '100%',
                     boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                    borderRadius: '12px'
+                    borderRadius: '12px',
+                    margin: '0 auto'
                 }}
             >
                 <Space direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>

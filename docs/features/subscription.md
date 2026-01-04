@@ -44,7 +44,12 @@ erDiagram
 2. **Quota Check**: Compare `usage_records.current_usage` with `plans.quotas`.
 3. **Usage Tracking**: Increment `usage_records` after successful feature operation.
 
+## Demo and Verification
+1. **Demo Page**: Accessible at `/dashboard/demo`.
+2. **Quota Tracking**: The demo page shows real-time usage of `api_request` features.
+3. **Reset Mechanism**: A SQL function `reset_daily_quotas()` handles the daily reset of usage counts.
+
 ## Security (RLS)
 - `plans`: Readable by all users.
 - `subscriptions`: Users can only read their own subscription.
-- `usage_records`: Users can read their own usage, but modifications are handled by Server Actions (Admin privilege where necessary).
+- `usage_records`: Users can read their own usage, but modifications are handled by Server Actions or specific functions (`increment_usage`).

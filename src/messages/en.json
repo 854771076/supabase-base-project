@@ -22,7 +22,8 @@
         "logout": "Logout",
         "profile": "Profile",
         "apiDocs": "API Docs",
-        "pricing": "Pricing"
+        "pricing": "Pricing",
+        "demo": "Demo"
     },
     "Profile": {
         "title": "User Profile",
@@ -61,5 +62,16 @@
         "currentPlan": "Current Plan",
         "alreadySubscribed": "Already Subscribed",
         "subscribeSuccess": "Successfully subscribed to the plan!"
+    },
+    "Demo": {
+        "title": "Feature Demo",
+        "subtitle": "Test your subscription permissions and quota limits here.",
+        "simulateRequest": "Simulate API Request",
+        "requestSuccess": "Request successful!",
+        "currentUsage": "Current Usage",
+        "limit": "Quota Limit",
+        "accessDenied": "Access Denied",
+        "upgradeRequired": "Your plan does not have this permission, please upgrade.",
+        "quotaExceeded": "Quota exceeded, please try again later or upgrade."
     }
 }
