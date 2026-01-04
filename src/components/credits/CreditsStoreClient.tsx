@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Card, Row, Col, Typography, Button, Space, Statistic, message } from 'antd';
 import { ShoppingCartOutlined, WalletOutlined } from '@ant-design/icons';
-import { PayPalButtons } from "@paypal/react-paypal-js";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useRouter } from 'next/navigation';
 
 const { Title, Text, Paragraph } = Typography;
@@ -63,71 +63,77 @@ export default function CreditsStoreClient({
     };
 
     return (
-        <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-                <Title level={2}>{t.title}</Title>
-                <Paragraph type="secondary" style={{ fontSize: '16px' }}>
-                    {t.subtitle}
-                </Paragraph>
+        <PayPalScriptProvider options={{
+            clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
+            currency: "USD",
+            intent: "capture"
+        }}>
+            <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                    <Title level={2}>{t.title}</Title>
+                    <Paragraph type="secondary" style={{ fontSize: '16px' }}>
+                        {t.subtitle}
+                    </Paragraph>
 
-                <Card style={{ maxWidth: '300px', margin: '24px auto', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                    <Statistic
-                        title={t.balance}
-                        value={balance}
-                        prefix={<WalletOutlined />}
-                        valueStyle={{ color: '#1890ff' }}
-                    />
-                </Card>
+                    <Card style={{ maxWidth: '300px', margin: '24px auto', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                        <Statistic
+                            title={t.balance}
+                            value={balance}
+                            prefix={<WalletOutlined />}
+                            valueStyle={{ color: '#1890ff' }}
+                        />
+                    </Card>
+                </div>
+
+                <Row gutter={[24, 24]} justify="center">
+                    {products.map((product) => (
+                        <Col xs={24} sm={12} lg={8} key={product.id}>
+                            <Card
+                                hoverable
+                                title={
+                                    <Space>
+                                        <ShoppingCartOutlined />
+                                        <span>{product.name}</span>
+                                    </Space>
+                                }
+                                style={{ borderRadius: '12px', textAlign: 'center' }}
+                            >
+                                <Title level={3} style={{ margin: '12px 0' }}>
+                                    ${(product.price_cents / 100).toFixed(2)}
+                                </Title>
+                                <Paragraph>
+                                    <Text strong style={{ fontSize: '18px' }}>
+                                        {product.credits_amount}
+                                    </Text>
+                                    <Text type="secondary"> Credits</Text>
+                                </Paragraph>
+
+                                <div style={{ marginTop: '24px' }}>
+                                    <PayPalButtons
+                                        style={{ layout: "vertical", shape: "rect", label: "buynow" }}
+                                        createOrder={async () => {
+                                            const response = await fetch('/api/v1/credits/create-order', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ productId: product.id }),
+                                            });
+                                            const order = await response.json();
+                                            return order.id;
+                                        }}
+                                        onApprove={async (data) => {
+                                            await handleCapture(data.orderID, product.id);
+                                        }}
+                                        onError={(err) => {
+                                            console.error('PayPal Credits Error:', err);
+                                            message.error(t.error);
+                                        }}
+                                    />
+                                </div>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
             </div>
-
-            <Row gutter={[24, 24]} justify="center">
-                {products.map((product) => (
-                    <Col xs={24} sm={12} lg={8} key={product.id}>
-                        <Card
-                            hoverable
-                            title={
-                                <Space>
-                                    <ShoppingCartOutlined />
-                                    <span>{product.name}</span>
-                                </Space>
-                            }
-                            style={{ borderRadius: '12px', textAlign: 'center' }}
-                        >
-                            <Title level={3} style={{ margin: '12px 0' }}>
-                                ${(product.price_cents / 100).toFixed(2)}
-                            </Title>
-                            <Paragraph>
-                                <Text strong style={{ fontSize: '18px' }}>
-                                    {product.credits_amount}
-                                </Text>
-                                <Text type="secondary"> Credits</Text>
-                            </Paragraph>
-
-                            <div style={{ marginTop: '24px' }}>
-                                <PayPalButtons
-                                    style={{ layout: "vertical", shape: "rect", label: "buynow" }}
-                                    createOrder={async () => {
-                                        const response = await fetch('/api/v1/credits/create-order', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ productId: product.id }),
-                                        });
-                                        const order = await response.json();
-                                        return order.id;
-                                    }}
-                                    onApprove={async (data) => {
-                                        await handleCapture(data.orderID, product.id);
-                                    }}
-                                    onError={(err) => {
-                                        console.error('PayPal Credits Error:', err);
-                                        message.error(t.error);
-                                    }}
-                                />
-                            </div>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
-        </div>
+        </PayPalScriptProvider>
     );
 }
