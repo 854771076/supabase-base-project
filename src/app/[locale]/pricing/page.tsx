@@ -19,7 +19,7 @@ export default async function PricingPage(props: {
     const subscription = await getUserSubscription();
 
     return (
-        <div style={{ padding: '40px 24px', maxWidth: '1200px' }} className="flex justify-center">
+        <div style={{ padding: '40px 24px', maxWidth: '1200px', width: '100%', margin: '0 auto' }} className="flex justify-center">
             <PricingClient
                 plans={plans}
                 currentSubscription={subscription}

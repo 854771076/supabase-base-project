@@ -48,6 +48,8 @@
         "inactive": "Inactive",
         "used": "used",
         "expiresAt": "Expires at",
+        "creditsBalance": "Credits Balance",
+        "buyCredits": "Buy Credits",
         "quotaFormat": "{usage} / {limit} {label}"
     },
     "Login": {

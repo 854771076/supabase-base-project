@@ -48,6 +48,8 @@
         "inactive": "已失效",
         "used": "已使用",
         "expiresAt": "到期时间",
+        "creditsBalance": "剩余点数",
+        "buyCredits": "充值点数",
         "quotaFormat": "{usage} / {limit} {label}"
     },
     "Login": {

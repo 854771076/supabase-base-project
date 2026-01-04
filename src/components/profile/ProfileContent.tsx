@@ -14,9 +14,10 @@ interface ProfileContentProps {
     session: Session | null;
     subscription: any;
     usage: any[];
+    creditsBalance: number;
 }
 
-export default function ProfileContent({ user, session, subscription, usage }: ProfileContentProps) {
+export default function ProfileContent({ user, session, subscription, usage, creditsBalance }: ProfileContentProps) {
     const t = useTranslations('Profile');
     const router = useRouter();
     const locale = useLocale();
@@ -60,6 +61,18 @@ export default function ProfileContent({ user, session, subscription, usage }: P
                             {t('expiresAt')}: {new Date(subscription.current_period_end).toLocaleDateString()}
                         </Text>
                     )}
+                </Space>
+            ),
+        },
+        {
+            key: '5',
+            label: t('creditsBalance'),
+            children: (
+                <Space>
+                    <Text strong style={{ fontSize: '16px', color: '#1890ff' }}>{creditsBalance}</Text>
+                    <Button type="link" size="small" onClick={() => router.push(`/${locale}/credits`)}>
+                        {t('buyCredits')}
+                    </Button>
                 </Space>
             ),
         }
