@@ -11,19 +11,22 @@ export async function GET(request: Request) {
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+            const forwardedHost = request.headers.get('x-forwarded-host')
             const isLocalEnv = process.env.NODE_ENV === 'development'
-            if (isLocalEnv) {
-                // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-                return NextResponse.redirect(`${origin}${next}`)
-            } else if (forwardedHost) {
-                return NextResponse.redirect(`https://${forwardedHost}${next}`)
-            } else {
-                return NextResponse.redirect(`${origin}${next}`)
+
+            let redirectUrl = new URL(next, origin)
+
+            if (!isLocalEnv && forwardedHost) {
+                redirectUrl.host = forwardedHost
+                redirectUrl.protocol = 'https:'
             }
+
+            return NextResponse.redirect(redirectUrl.toString())
+        } else {
+            console.error('Auth callback exchange error:', error)
         }
     }
 
     // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+    return NextResponse.redirect(new URL('/auth/auth-code-error', origin).toString())
 }

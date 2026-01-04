@@ -1,7 +1,7 @@
 {
     "Index": {
         "title": "Supabase Base Project",
-        "description": "Enterprise-grade starter kit with Next.js 14, Supabase, and Ant Design",
+        "description": "Enterprise-grade starter kit with Next.js 15, Supabase, and Ant Design",
         "getStarted": "Get Started",
         "doc": "Documentation",
         "features": {

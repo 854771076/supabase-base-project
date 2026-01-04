@@ -1,7 +1,7 @@
 {
     "Index": {
         "title": "Supabase 基础项目",
-        "description": "基于 Next.js 14, Supabase 和 Ant Design 的企业级启动模板",
+        "description": "基于 Next.js 15, Supabase 和 Ant Design 的企业级启动模板",
         "getStarted": "开始使用",
         "doc": "查看文档",
         "features": {
