@@ -11,9 +11,10 @@ const { Title, Text } = Typography;
 interface ProfileContentProps {
     user: User;
     session: Session | null;
+    subscription: any;
 }
 
-export default function ProfileContent({ user, session }: ProfileContentProps) {
+export default function ProfileContent({ user, session, subscription }: ProfileContentProps) {
     const t = useTranslations('Profile');
 
     const items = [
@@ -37,7 +38,24 @@ export default function ProfileContent({ user, session }: ProfileContentProps) {
             label: t('lastSignIn'),
             children: user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : '-',
         },
+        {
+            key: '4',
+            label: t('subscription'),
+            children: (
+                <Space>
+                    <Tag color={subscription?.plans?.name === 'Pro' ? 'gold' : 'blue'}>
+                        {subscription?.plans?.name || 'Free'}
+                    </Tag>
+                    <Text type="secondary">
+                        {subscription?.status === 'active' ? t('active') : t('inactive')}
+                    </Text>
+                </Space>
+            ),
+        }
     ];
+
+    const planFeatures = subscription?.plans?.features || {};
+    const planQuotas = subscription?.plans?.quotas || {};
 
     const sessionItems = [
         {
@@ -84,6 +102,25 @@ export default function ProfileContent({ user, session }: ProfileContentProps) {
                         </Descriptions.Item>
                     ))}
                 </Descriptions>
+
+                <div style={{ marginTop: '24px' }}>
+                    <Title level={4}>{t('planFeatures')}</Title>
+                    <Card size="small" style={{ backgroundColor: '#fafafa' }}>
+                        <Descriptions column={1} size="small">
+                            <Descriptions.Item label={t('apiAccess')}>
+                                {planFeatures.api_access ? <Tag color="success">{t('enabled')}</Tag> : <Tag>{t('disabled')}</Tag>}
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('dailyRequests')}>
+                                <Text strong>{planQuotas.daily_requests || 0}</Text>
+                            </Descriptions.Item>
+                            {planFeatures.advanced_features && (
+                                <Descriptions.Item label={t('advancedFeatures')}>
+                                    <Tag color="success">{t('enabled')}</Tag>
+                                </Descriptions.Item>
+                            )}
+                        </Descriptions>
+                    </Card>
+                </div>
 
                 <div style={{ marginTop: '24px' }}>
                     <Collapse ghost items={sessionItems} />

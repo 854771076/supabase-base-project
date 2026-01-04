@@ -32,7 +32,16 @@
         "security": "账户安全",
         "sessionDetails": "会话详情 (开发者信息)",
         "signOut": "退出登录",
-        "notSignedIn": "您尚未登录。"
+        "notSignedIn": "您尚未登录。",
+        "subscription": "订阅计划",
+        "planFeatures": "计划功能与限制",
+        "apiAccess": "API 访问权",
+        "dailyRequests": "每日请求配额",
+        "advancedFeatures": "高级功能",
+        "enabled": "已开启",
+        "disabled": "未开启",
+        "active": "生效中",
+        "inactive": "已失效"
     },
     "Login": {
         "title": "欢迎回来",

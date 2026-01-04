@@ -32,7 +32,16 @@
         "security": "Security",
         "sessionDetails": "Session Details (Developer Info)",
         "signOut": "Sign Out",
-        "notSignedIn": "You are not signed in."
+        "notSignedIn": "You are not signed in.",
+        "subscription": "Subscription",
+        "planFeatures": "Plan Features & Limits",
+        "apiAccess": "API Access",
+        "dailyRequests": "Daily Requests",
+        "advancedFeatures": "Advanced Features",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "active": "Active",
+        "inactive": "Inactive"
     },
     "Login": {
         "title": "Welcome Back",
