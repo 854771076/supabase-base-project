@@ -35,13 +35,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function LocaleLayout({
-  children,
-  params: { locale }
-}: Readonly<{
+export default async function LocaleLayout(props: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
+  const { children } = props;
+  const { locale } = await props.params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

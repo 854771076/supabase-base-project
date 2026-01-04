@@ -5,11 +5,10 @@ import zhMessages from '@/messages/zh.json';
 
 const messages = { en: enMessages, zh: zhMessages };
 
-export default async function Home({
-  params: { locale }
-}: {
-  params: { locale: string };
+export default async function Home(props: {
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await props.params;
   const m = messages[locale as keyof typeof messages] || messages.en;
   const t = m.Index;
 

@@ -3,11 +3,10 @@ import { redirect } from 'next/navigation';
 import React from 'react';
 import ProfileContent from '@/components/profile/ProfileContent';
 
-export default async function ProfilePage({
-    params: { locale }
-}: {
-    params: { locale: string };
+export default async function ProfilePage(props: {
+    params: Promise<{ locale: string }>;
 }) {
+    const { locale } = await props.params;
     const supabase = await createClient();
 
     const {
