@@ -3,12 +3,18 @@ import { z } from 'zod';
 const envSchema = z.object({
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
+    NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string().optional(),
+    PAYPAL_SECRET: z.string().optional(),
+    PAYPAL_API_BASE: z.string().url().default('https://api-m.sandbox.paypal.com'),
 });
 
 // Provide default values or allow undefined during build/linting to prevent crash
 const processEnv = {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+    PAYPAL_SECRET: process.env.PAYPAL_SECRET,
+    PAYPAL_API_BASE: process.env.PAYPAL_API_BASE,
 };
 
 const parsed = envSchema.safeParse(processEnv);

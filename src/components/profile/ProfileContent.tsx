@@ -3,8 +3,9 @@
 import React from 'react';
 import { Card, Descriptions, Avatar, Tag, Button, Typography, Space, Divider, Collapse } from 'antd';
 import { UserOutlined, CodeOutlined, LogoutOutlined } from '@ant-design/icons';
-import { useTranslations } from '@/i18n/context';
+import { useTranslations, useLocale } from '@/i18n/context';
 import { User, Session } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
 
@@ -12,10 +13,13 @@ interface ProfileContentProps {
     user: User;
     session: Session | null;
     subscription: any;
+    usage: any[];
 }
 
-export default function ProfileContent({ user, session, subscription }: ProfileContentProps) {
+export default function ProfileContent({ user, session, subscription, usage }: ProfileContentProps) {
     const t = useTranslations('Profile');
+    const router = useRouter();
+    const locale = useLocale();
 
     const items = [
         {
@@ -56,6 +60,18 @@ export default function ProfileContent({ user, session, subscription }: ProfileC
 
     const planFeatures = subscription?.plans?.features || {};
     const planQuotas = subscription?.plans?.quotas || {};
+
+    const getUsage = (featureName: string) => {
+        const record = usage.find(r => r.feature_name === featureName);
+        return record?.usage_count || 0;
+    };
+
+    const formatQuota = (label: string, usageCount: number, limit: number) => {
+        return t('quotaFormat')
+            .replace('{usage}', usageCount.toString())
+            .replace('{limit}', limit.toString())
+            .replace('{label}', label);
+    };
 
     const sessionItems = [
         {
@@ -111,7 +127,9 @@ export default function ProfileContent({ user, session, subscription }: ProfileC
                                 {planFeatures.api_access ? <Tag color="success">{t('enabled')}</Tag> : <Tag>{t('disabled')}</Tag>}
                             </Descriptions.Item>
                             <Descriptions.Item label={t('dailyRequests')}>
-                                <Text strong>{planQuotas.daily_requests || 0}</Text>
+                                <Text strong>
+                                    {formatQuota(t('used'), getUsage('api_request'), planQuotas.daily_requests || 0)}
+                                </Text>
                             </Descriptions.Item>
                             {planFeatures.advanced_features && (
                                 <Descriptions.Item label={t('advancedFeatures')}>
@@ -128,7 +146,10 @@ export default function ProfileContent({ user, session, subscription }: ProfileC
 
                 <Divider />
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                    <Button type="primary" ghost size="large" onClick={() => router.push(`/${locale}/pricing`)}>
+                        {t('upgrade')}
+                    </Button>
                     <form action="/auth/signout" method="post">
                         <Button type="primary" danger icon={<LogoutOutlined />} htmlType="submit" size="large">
                             {t('signOut')}

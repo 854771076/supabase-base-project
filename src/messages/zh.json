@@ -21,7 +21,8 @@
         "login": "登录",
         "logout": "退出登录",
         "profile": "个人资料",
-        "apiDocs": "API 文档"
+        "apiDocs": "API 文档",
+        "pricing": "价格"
     },
     "Profile": {
         "title": "个人资料",
@@ -33,6 +34,7 @@
         "sessionDetails": "会话详情 (开发者信息)",
         "signOut": "退出登录",
         "notSignedIn": "您尚未登录。",
+        "upgrade": "升级计划",
         "subscription": "订阅计划",
         "planFeatures": "计划功能与限制",
         "apiAccess": "API 访问权",
@@ -41,11 +43,23 @@
         "enabled": "已开启",
         "disabled": "未开启",
         "active": "生效中",
-        "inactive": "已失效"
+        "inactive": "已失效",
+        "used": "已使用",
+        "quotaFormat": "{usage} / {limit} {label}"
     },
     "Login": {
         "title": "欢迎回来",
         "subtitle": "使用魔术链接登录您的账户",
         "magicLinkSuccess": "请检查您的邮箱以获取登录链接！"
+    },
+    "Pricing": {
+        "title": "简单透明的价格",
+        "subtitle": "选择最适合您业务的计划。",
+        "month": "月",
+        "featuresIncluded": "包含的功能：",
+        "getStarted": "立即开始",
+        "currentPlan": "当前计划",
+        "alreadySubscribed": "已订阅",
+        "subscribeSuccess": "成功订阅该计划！"
     }
 }

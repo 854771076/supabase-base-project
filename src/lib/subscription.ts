@@ -81,6 +81,52 @@ export async function checkQuota(featureName: string, quotaKey: keyof PlanQuotas
 }
 
 /**
+ * Get all available plans
+ */
+export async function getPlans() {
+    const supabase = await createClient();
+    const { data: plans, error } = await supabase
+        .from('plans')
+        .select('*')
+        .order('price_cents', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching plans:', error);
+        return [];
+    }
+
+    return plans;
+}
+
+/**
+ * Update the current user's subscription to a new plan
+ */
+export async function updateUserSubscription(planId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('Unauthorized');
+
+    const { data: subscription, error } = await supabase
+        .from('subscriptions')
+        .upsert({
+            user_id: user.id,
+            plan_id: planId,
+            status: 'active',
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' })
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error updating subscription:', error);
+        throw error;
+    }
+
+    return subscription;
+}
+
+/**
  * Increment the usage count for a feature
  */
 export async function incrementUsage(featureName: string) {
@@ -121,4 +167,25 @@ export async function incrementUsage(featureName: string) {
                 });
         }
     }
+}
+/**
+ * Get the current user's usage records
+ */
+export async function getUserUsage() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    const { data: usage, error } = await supabase
+        .from('usage_records')
+        .select('*')
+        .eq('user_id', user.id);
+
+    if (error) {
+        console.error('Error fetching usage records:', error);
+        return [];
+    }
+
+    return usage;
 }

@@ -68,6 +68,10 @@ export default function Header({ user }: HeaderProps) {
             label: <Link href={`/${currentLocale}`}>{t('home')}</Link>,
         },
         {
+            key: 'pricing',
+            label: <Link href={`/${currentLocale}/pricing`}>{t('pricing')}</Link>,
+        },
+        {
             key: 'docs',
             label: <Link href={`/${currentLocale}/api-docs`}>{t('apiDocs')}</Link>,
         },

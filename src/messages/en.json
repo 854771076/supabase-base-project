@@ -21,7 +21,8 @@
         "login": "Login",
         "logout": "Logout",
         "profile": "Profile",
-        "apiDocs": "API Docs"
+        "apiDocs": "API Docs",
+        "pricing": "Pricing"
     },
     "Profile": {
         "title": "User Profile",
@@ -33,6 +34,7 @@
         "sessionDetails": "Session Details (Developer Info)",
         "signOut": "Sign Out",
         "notSignedIn": "You are not signed in.",
+        "upgrade": "Upgrade Plan",
         "subscription": "Subscription",
         "planFeatures": "Plan Features & Limits",
         "apiAccess": "API Access",
@@ -41,11 +43,23 @@
         "enabled": "Enabled",
         "disabled": "Disabled",
         "active": "Active",
-        "inactive": "Inactive"
+        "inactive": "Inactive",
+        "used": "used",
+        "quotaFormat": "{usage} / {limit} {label}"
     },
     "Login": {
         "title": "Welcome Back",
         "subtitle": "Sign in to your account with a magic link",
         "magicLinkSuccess": "Check your email for the login link!"
+    },
+    "Pricing": {
+        "title": "Simple, Transparent Pricing",
+        "subtitle": "Choose the plan that's right for your business.",
+        "month": "month",
+        "featuresIncluded": "Features Included:",
+        "getStarted": "Get Started",
+        "currentPlan": "Current Plan",
+        "alreadySubscribed": "Already Subscribed",
+        "subscribeSuccess": "Successfully subscribed to the plan!"
     }
 }

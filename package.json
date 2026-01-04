@@ -9,30 +9,31 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^15.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "antd": "^5.22.2",
-    "@ant-design/nextjs-registry": "^1.0.1",
     "@ant-design/cssinjs": "^1.21.1",
-    "@supabase/supabase-js": "^2.47.10",
-    "@supabase/ssr": "^0.5.2",
+    "@ant-design/nextjs-registry": "^1.0.1",
+    "@paypal/react-paypal-js": "^8.9.2",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
-    "zod": "^3.24.1",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
+    "antd": "^5.22.2",
+    "next": "^15.1.0",
+    "next-swagger-doc": "0.4.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "swagger-ui-react": "^5.18.2",
-    "next-swagger-doc": "0.4.0"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^20.17.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/swagger-ui-react": "^4.18.3",
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
-    "postcss": "^8.4.49",
     "eslint": "^9.16.0",
-    "eslint-config-next": "^15.1.0"
+    "eslint-config-next": "^15.1.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2"
   }
 }
