@@ -4,7 +4,6 @@
         "description": "基于 Next.js 14, Supabase 和 Ant Design 的企业级启动模板",
         "getStarted": "开始使用",
         "doc": "查看文档",
-        "home": "首页",
         "features": {
             "title": "功能特性",
             "auth": "身份认证",
@@ -18,6 +17,7 @@
         }
     },
     "Nav": {
+        "home": "首页",
         "login": "登录",
         "logout": "退出登录",
         "profile": "个人资料",

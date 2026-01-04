@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: '%s | Supabase Base Project',
     default: 'Supabase Base Project',
   },
-  description: "Enterprise-grade starter kit with Next.js 14, Supabase, and Ant Design",
+  description: "Enterprise-grade starter kit with Next.js 15, Supabase, and Ant Design",
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-icon.png',
