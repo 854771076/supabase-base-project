@@ -5,6 +5,7 @@
 /**
  * 防止样式闪烁的关键样式
  */
+
 html {
   visibility: visible !important;
   opacity: 1 !important;
@@ -13,6 +14,7 @@ html {
 body {
   visibility: visible !important;
   opacity: 1 !important;
+  margin: 0 !important;
 }
 
 /**

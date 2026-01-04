@@ -96,9 +96,10 @@ export default function PricingClient({ plans, currentSubscription, locale }: Pr
                         }));
 
                         return (
-                            <Col xs={24} md={12} lg={8} key={plan.id}>
+                            <Col xs={24} sm={18} md={10} lg={8} xl={7} key={plan.id}>
                                 <Card
                                     hoverable
+                                    styles={{ body: { padding: '32px 24px', flex: 1, display: 'flex', flexDirection: 'column' } }}
                                     style={{
                                         height: '100%',
                                         display: 'flex',
