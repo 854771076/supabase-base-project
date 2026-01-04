@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getURL } from '@/utils/url'
 import { locales } from '@/i18n/config'
-export const dynamic = 'force-dynamic';
 export default function sitemap(): MetadataRoute.Sitemap {
     const url = getURL()
     const routes = ['', '/login', '/profile', '/api-docs'].flatMap((route) =>

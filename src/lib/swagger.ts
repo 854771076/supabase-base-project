@@ -6,9 +6,9 @@ export const getApiDocs = async () => {
     definition: {
       openapi: '3.0.0',
       info: {
-        title: 'AI-Drama Studio API',
+        title: 'API Documentation',
         version: '1.0.0',
-        description: 'AI-Drama Studio backend API documentation',
+        description: 'backend API documentation',
       },
       servers: [
         {
