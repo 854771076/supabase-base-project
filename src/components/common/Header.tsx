@@ -82,6 +82,10 @@ export default function Header({ user }: HeaderProps) {
             key: 'demo',
             label: <Link href={`/${currentLocale}/dashboard/demo`} onClick={() => setDrawerVisible(false)}>{t('demo')}</Link>,
         },
+        {
+            key: 'credits',
+            label: <Link href={`/${currentLocale}/credits`} onClick={() => setDrawerVisible(false)}>{t('credits')}</Link>,
+        },
     ];
 
     return (

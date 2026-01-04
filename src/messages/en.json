@@ -23,7 +23,8 @@
         "profile": "Profile",
         "apiDocs": "API Docs",
         "pricing": "Pricing",
-        "demo": "Demo"
+        "demo": "Demo",
+        "credits": "Credits Store"
     },
     "Profile": {
         "title": "User Profile",
@@ -46,6 +47,7 @@
         "active": "Active",
         "inactive": "Inactive",
         "used": "used",
+        "expiresAt": "Expires at",
         "quotaFormat": "{usage} / {limit} {label}"
     },
     "Login": {
@@ -73,5 +75,13 @@
         "accessDenied": "Access Denied",
         "upgradeRequired": "Your plan does not have this permission, please upgrade.",
         "quotaExceeded": "Quota exceeded, please try again later or upgrade."
+    },
+    "Credits": {
+        "title": "Credits Store",
+        "subtitle": "Purchase additional API request credits",
+        "balance": "Current Balance",
+        "buyNow": "Buy Now",
+        "success": "Purchase successful! Credits added to your account.",
+        "error": "Purchase failed, please try again."
     }
 }

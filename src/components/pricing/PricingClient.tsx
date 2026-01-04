@@ -175,10 +175,11 @@ export default function PricingClient({ plans, currentSubscription, locale }: Pr
                                             size="large"
                                             block
                                             loading={loading === plan.id}
+                                            disabled={currentSubscription?.plans?.price_cents > 0}
                                             onClick={() => handleFreeSubscribe(plan.id)}
                                             style={{ borderRadius: '8px', height: '48px' }}
                                         >
-                                            {t('getStarted')}
+                                            {currentSubscription?.plans?.price_cents > 0 ? t('alreadySubscribed') : t('getStarted')}
                                         </Button>
                                     )}
                                 </Card>

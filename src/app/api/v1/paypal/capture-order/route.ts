@@ -25,8 +25,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Payment not completed' }, { status: 400 });
         }
 
-        // Update the user's subscription
-        const subscription = await updateUserSubscription(planId);
+        // Update the user's subscription with verified payment flag
+        const subscription = await updateUserSubscription(planId, true);
 
         return NextResponse.json({ success: true, subscription });
     } catch (error: any) {

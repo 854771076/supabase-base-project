@@ -46,13 +46,20 @@ export default function ProfileContent({ user, session, subscription, usage }: P
             key: '4',
             label: t('subscription'),
             children: (
-                <Space>
-                    <Tag color={subscription?.plans?.name === 'Pro' ? 'gold' : 'blue'}>
-                        {subscription?.plans?.name || 'Free'}
-                    </Tag>
-                    <Text type="secondary">
-                        {subscription?.status === 'active' ? t('active') : t('inactive')}
-                    </Text>
+                <Space direction="vertical" size={0}>
+                    <Space>
+                        <Tag color={subscription?.plans?.name === 'Pro' ? 'gold' : 'blue'}>
+                            {subscription?.plans?.name || 'Free'}
+                        </Tag>
+                        <Text type="secondary">
+                            {subscription?.status === 'active' ? t('active') : t('inactive')}
+                        </Text>
+                    </Space>
+                    {subscription?.current_period_end && (
+                        <Text type="secondary" style={{ fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                            {t('expiresAt')}: {new Date(subscription.current_period_end).toLocaleDateString()}
+                        </Text>
+                    )}
                 </Space>
             ),
         }
