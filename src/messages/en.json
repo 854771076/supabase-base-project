@@ -4,6 +4,7 @@
         "description": "Enterprise-grade starter kit with Next.js 14, Supabase, and Ant Design",
         "getStarted": "Get Started",
         "doc": "Documentation",
+        "home": "Home",
         "features": {
             "title": "Features",
             "auth": "Authentication",

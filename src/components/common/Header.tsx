@@ -65,11 +65,11 @@ export default function Header({ user }: HeaderProps) {
     const menuItems = [
         {
             key: 'home',
-            label: <Link href="/">Home</Link>,
+            label: <Link href={`/${currentLocale}`}>{t('home')}</Link>,
         },
         {
             key: 'docs',
-            label: <Link href="/zh/api-docs">{t('apiDocs')}</Link>,
+            label: <Link href={`/${currentLocale}/api-docs`}>{t('apiDocs')}</Link>,
         },
     ];
 
