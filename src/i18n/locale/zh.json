@@ -86,5 +86,14 @@
         "buyNow": "立即购买",
         "success": "购买成功！点数已存入您的账户。",
         "error": "购买失败，请稍后重试。"
+    },
+    "Auth": {
+        "magic_link": {
+            "email_input_label": "电子邮箱地址",
+            "email_input_placeholder": "您的电子邮箱地址",
+            "button_label": "发送魔术链接",
+            "link_text": "使用魔术链接登录",
+            "confirmation_text": "检查您的邮箱以获取登录链接"
+        }
     }
 }

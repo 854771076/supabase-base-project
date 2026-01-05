@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Table, Tag, Select, Space, Typography, Empty, Row, Col, Statistic } from 'antd';
-import { ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, DollarOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Select, Space, Typography, Empty, Row, Col, Statistic, Divider } from 'antd';
+import { ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, DollarOutlined, FilterOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -70,29 +70,43 @@ export default function OrderHistory({ orders, initialType = 'all' }: OrderHisto
             title: 'Type',
             dataIndex: 'type',
             key: 'type',
+            width: 120,
             render: (type: string) => {
                 const config = getTypeConfig(type);
-                return <Tag color={config.color}>{config.text}</Tag>;
+                return (
+                    <Space>
+                        <Tag 
+                            color={config.color} 
+                            style={{ borderRadius: '16px', padding: '2px 12px', fontWeight: 500 }}
+                        >
+                            {config.text}
+                        </Tag>
+                    </Space>
+                );
             }
         },
         {
             title: 'Product',
             dataIndex: 'product_name',
             key: 'product_name',
-            render: (name: string) => <Text strong>{name}</Text>
+            width: 200,
+            render: (name: string) => (
+                <Text strong style={{ fontSize: '14px' }}>{name}</Text>
+            )
         },
         {
             title: 'Amount',
             dataIndex: ['amount_cents', 'currency'],
             key: 'amount',
+            width: 150,
             render: (value: [number, string]) => {
                 const [amountCents, currency] = value;
                 const amount = (amountCents / 100).toFixed(2);
                 return (
                     <Space>
-                        <DollarOutlined />
-                        <Text strong>{amount}</Text>
-                        <Text type="secondary">{currency}</Text>
+                        <DollarOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
+                        <Text strong style={{ fontSize: '16px', color: '#52c41a' }}>{amount}</Text>
+                        <Text type="secondary" style={{ fontSize: '14px' }}>{currency}</Text>
                     </Space>
                 );
             },
@@ -102,12 +116,18 @@ export default function OrderHistory({ orders, initialType = 'all' }: OrderHisto
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
+            width: 160,
             render: (status: string) => {
                 const config = getStatusConfig(status);
                 return (
-                    <Space>
+                    <Space size="middle">
                         {config.icon}
-                        <Tag color={config.color}>{config.text}</Tag>
+                        <Tag 
+                            color={config.color} 
+                            style={{ borderRadius: '16px', padding: '2px 12px', fontWeight: 500 }}
+                        >
+                            {config.text}
+                        </Tag>
                     </Space>
                 );
             }
@@ -116,7 +136,10 @@ export default function OrderHistory({ orders, initialType = 'all' }: OrderHisto
             title: 'Created At',
             dataIndex: 'created_at',
             key: 'created_at',
-            render: (date: string) => new Date(date).toLocaleString(),
+            width: 200,
+            render: (date: string) => (
+                <Text style={{ fontSize: '14px' }}>{new Date(date).toLocaleString()}</Text>
+            ),
             sorter: (a: Order, b: Order) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
             defaultSortOrder: 'descend' as const
         },
@@ -124,96 +147,173 @@ export default function OrderHistory({ orders, initialType = 'all' }: OrderHisto
             title: 'Completed At',
             dataIndex: 'completed_at',
             key: 'completed_at',
-            render: (date?: string) => date ? new Date(date).toLocaleString() : '-'
+            width: 200,
+            render: (date?: string) => (
+                <Text style={{ fontSize: '14px', opacity: date ? 1 : 0.5 }}>
+                    {date ? new Date(date).toLocaleString() : '-'} 
+                </Text>
+            )
         }
     ];
 
     return (
-        <div style={{ padding: '24px 0' }}>
-            <Title level={4} style={{ marginBottom: '24px' }}>Order History</Title>
+        <div style={{ padding: '24px 0', maxWidth: '1200px', margin: '0 auto' }}>
+            {/* Page Header */}
+            <div style={{ marginBottom: '32px' }}>
+                <Title level={3} style={{ marginBottom: '8px', fontWeight: 600 }}>
+                    Order History
+                </Title>
+                <Text type="secondary" style={{ fontSize: '16px' }}>
+                    Track all your payment activity
+                </Text>
+            </div>
             
             {/* Statistics Cards */}
-            <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+            <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
                 <Col xs={24} sm={12} md={8}>
-                    <Card size="small">
+                    <Card 
+                        size="small" 
+                        style={{ 
+                            borderRadius: '12px', 
+                            border: '1px solid #e8e8e8',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
+                        }}
+                    >
                         <Statistic
-                            title="Total Orders"
+                            title={<Text style={{ fontSize: '14px', color: '#666' }}>Total Orders</Text>}
                             value={totalOrders}
-                            prefix={<ClockCircleOutlined />}
-                            valueStyle={{ color: '#1890ff' }}
+                            prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
+                            valueStyle={{ color: '#1890ff', fontSize: '28px', fontWeight: 600 }}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} md={8}>
-                    <Card size="small">
+                    <Card 
+                        size="small" 
+                        style={{ 
+                            borderRadius: '12px', 
+                            border: '1px solid #e8e8e8',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
+                        }}
+                    >
                         <Statistic
-                            title="Total Spent"
+                            title={<Text style={{ fontSize: '14px', color: '#666' }}>Total Spent</Text>}
                             value={(totalSpent / 100).toFixed(2)}
-                            prefix={<DollarOutlined />}
+                            prefix={<DollarOutlined style={{ color: '#52c41a' }} />}
                             suffix="USD"
-                            valueStyle={{ color: '#52c41a' }}
+                            valueStyle={{ color: '#52c41a', fontSize: '28px', fontWeight: 600 }}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} md={8}>
-                    <Card size="small">
+                    <Card 
+                        size="small" 
+                        style={{ 
+                            borderRadius: '12px', 
+                            border: '1px solid #e8e8e8',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
+                        }}
+                    >
                         <Statistic
-                            title="Completed Orders"
+                            title={<Text style={{ fontSize: '14px', color: '#666' }}>Completed Orders</Text>}
                             value={completedOrders.length}
-                            prefix={<CheckCircleOutlined />}
-                            valueStyle={{ color: '#722ed1' }}
+                            prefix={<CheckCircleOutlined style={{ color: '#722ed1' }} />}
+                            valueStyle={{ color: '#722ed1', fontSize: '28px', fontWeight: 600 }}
                         />
                     </Card>
                 </Col>
             </Row>
             
-            <Card>
-                {/* Filter and Controls */}
-                <Space style={{ marginBottom: '16px' }}>
-                    <Text strong>Filter by Type:</Text>
+            {/* Main Content Card */}
+            <Card 
+                style={{ 
+                    borderRadius: '12px', 
+                    border: '1px solid #e8e8e8',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                    overflow: 'hidden'
+                }}
+            >
+                {/* Filter Header */}
+                <div style={{ 
+                    padding: '16px 24px', 
+                    backgroundColor: '#fafafa', 
+                    borderBottom: '1px solid #e8e8e8',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '16px'
+                }}>
+                    <Space>
+                        <FilterOutlined style={{ color: '#1890ff' }} />
+                        <Text strong style={{ fontSize: '14px' }}>Filter Orders</Text>
+                    </Space>
+                    
                     <Select
                         value={filterType}
                         onChange={setFilterType}
-                        style={{ width: 180 }}
+                        style={{ width: 200 }}
+                        size="large"
+                        placeholder="Filter by type"
                     >
                         <Option value="all">All Orders</Option>
                         <Option value="subscription">Subscriptions</Option>
                         <Option value="credits">Credits</Option>
                     </Select>
-                </Space>
+                </div>
                 
-                {/* Orders Table */}
-                {paginatedOrders.length > 0 ? (
-                    <>
-                        <Table
-                            columns={columns}
-                            dataSource={paginatedOrders.map(order => ({ ...order, key: order.id }))}
-                            pagination={{
-                                current: page,
-                                pageSize,
-                                total,
-                                onChange: setPage,
-                                showSizeChanger: false,
-                                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} orders`
-                            }}
-                            scroll={{ x: 800 }}
-                            bordered
-                            size="middle"
+                <div style={{ padding: '24px' }}>
+                    {/* Orders Table */}
+                    {paginatedOrders.length > 0 ? (
+                        <>
+                            <Table
+                                columns={columns}
+                                dataSource={paginatedOrders.map(order => ({ ...order, key: order.id }))}
+                                pagination={{
+                                    current: page,
+                                    pageSize,
+                                    total,
+                                    onChange: setPage,
+                                    showSizeChanger: true,
+                                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} orders`,
+                                    pageSizeOptions: ['10', '20', '50', '100'],
+                                    size: 'default'
+                                }}
+                                scroll={{ x: 800 }}
+                                bordered={false}
+                                size="middle"
+                                style={{ borderRadius: '8px', overflow: 'hidden' }}
+                                onRow={(record, index) => ({
+                                    style: {
+                                        borderRadius: '8px',
+                                        transition: 'all 0.3s ease',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            backgroundColor: '#fafafa'
+                                        }
+                                    }
+                                })}
+                                tableLayout="fixed"
+                            />
+                            
+                            {/* Summary */}
+                            <Divider style={{ margin: '24px 0 0' }} />
+                            <div style={{ 
+                                marginTop: '16px', 
+                                textAlign: 'right',
+                                color: '#666',
+                                fontSize: '14px'
+                            }}>
+                                Showing <Text strong>{startIndex + 1}</Text> to <Text strong>{Math.min(endIndex, total)}</Text> of <Text strong>{total}</Text> orders
+                            </div>
+                        </>
+                    ) : (
+                        <Empty
+                            description={<Text type="secondary">No orders found</Text>}
+                            style={{ padding: '64px 0' }}
                         />
-                        
-                        {/* Summary */}
-                        <div style={{ marginTop: '16px', textAlign: 'right' }}>
-                            <Text type="secondary">
-                                Showing {startIndex + 1} to {Math.min(endIndex, total)} of {total} orders
-                            </Text>
-                        </div>
-                    </>
-                ) : (
-                    <Empty
-                        description="No orders found"
-                        style={{ padding: '48px 0' }}
-                    />
-                )}
+                    )}
+                </div>
             </Card>
         </div>
     );

@@ -10,56 +10,39 @@ import {
     GlobalOutlined,
     ReadOutlined
 } from '@ant-design/icons';
+import { useTranslations } from '@/i18n/context';
 
 const { Title, Paragraph } = Typography;
 
-interface HomeClientProps {
-    translations: {
-        title: string;
-        description: string;
-        getStarted: string;
-        doc: string;
-        featuresTitle: string;
-        features: {
-            auth: string;
-            authDesc: string;
-            db: string;
-            dbDesc: string;
-            ui: string;
-            uiDesc: string;
-            i18n: string;
-            i18nDesc: string;
-        };
-    };
-}
+export default function HomeClient() {
+    const t = useTranslations('Index');
 
-export default function HomeClient({ translations: t }: HomeClientProps) {
     const screens = useBreakpoint();
     const isMobile = !!(screens.xs || (screens.sm && !screens.md));
 
     const features = [
         {
             key: 'auth',
-            title: t.features.auth,
-            desc: t.features.authDesc,
+            title: t('features.auth'),
+            desc: t('features.authDesc'),
             icon: <SafetyCertificateOutlined style={{ fontSize: isMobile ? '24px' : '32px', color: '#1890ff' }} />,
         },
         {
             key: 'db',
-            title: t.features.db,
-            desc: t.features.dbDesc,
+            title: t('features.db'),
+            desc: t('features.dbDesc'),
             icon: <DatabaseOutlined style={{ fontSize: isMobile ? '24px' : '32px', color: '#52c41a' }} />,
         },
         {
             key: 'ui',
-            title: t.features.ui,
-            desc: t.features.uiDesc,
+            title: t('features.ui'),
+            desc: t('features.uiDesc'),
             icon: <RocketOutlined style={{ fontSize: isMobile ? '24px' : '32px', color: '#faad14' }} />,
         },
         {
             key: 'i18n',
-            title: t.features.i18n,
-            desc: t.features.i18nDesc,
+            title: t('features.i18n'),
+            desc: t('features.i18nDesc'),
             icon: <GlobalOutlined style={{ fontSize: isMobile ? '24px' : '32px', color: '#eb2f96' }} />,
         },
     ];
@@ -70,20 +53,20 @@ export default function HomeClient({ translations: t }: HomeClientProps) {
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '40px' : '80px' }}>
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     <Title level={1} style={{ fontSize: isMobile ? '32px' : '48px', marginBottom: 0 }}>
-                        {t.title}
+                        {t('title')}
                     </Title>
                     <Paragraph type="secondary" style={{ fontSize: isMobile ? '16px' : '20px', maxWidth: 600, margin: '0 auto' }}>
-                        {t.description}
+                        {t('description')}
                     </Paragraph>
                     <Space size="middle" style={{ marginTop: '24px', width: '100%', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <Link href="/login">
                             <Button type="primary" size="large" icon={<RocketOutlined />} style={{ width: isMobile ? '100%' : 'auto' }}>
-                                {t.getStarted}
+                                {t('getStarted')}
                             </Button>
                         </Link>
                         <Link href="/api-docs">
                             <Button size="large" icon={<ReadOutlined />} style={{ width: isMobile ? '100%' : 'auto' }}>
-                                {t.doc}
+                                {t('doc')}
                             </Button>
                         </Link>
                     </Space>
@@ -93,7 +76,7 @@ export default function HomeClient({ translations: t }: HomeClientProps) {
             {/* Features Section */}
             <div style={{ marginBottom: '48px' }}>
                 <Title level={2} style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '48px', fontSize: isMobile ? '24px' : '30px' }}>
-                    {t.featuresTitle}
+                    {t('featuresTitle')}
                 </Title>
                 <Row gutter={[24, 24]}>
                     {features.map((feature) => (

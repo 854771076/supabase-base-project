@@ -3,15 +3,13 @@
 import React from 'react';
 import { Card, Typography, Space } from 'antd';
 import AuthForm from './AuthForm';
+import { useTranslations } from '@/i18n/context';
 
 const { Title, Text } = Typography;
 
-interface LoginContentProps {
-    title: string;
-    subtitle: string;
-}
+export default function LoginContent() {
+    const t = useTranslations('Login');
 
-export default function LoginContent({ title, subtitle }: LoginContentProps) {
     return (
         <div style={{
             display: 'flex',
@@ -32,8 +30,8 @@ export default function LoginContent({ title, subtitle }: LoginContentProps) {
             >
                 <Space direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
                     <div>
-                        <Title level={2} style={{ marginBottom: 8 }}>{title}</Title>
-                        <Text type="secondary">{subtitle}</Text>
+                        <Title level={2} style={{ marginBottom: 8 }}>{t('title')}</Title>
+                        <Text type="secondary">{t('subtitle')}</Text>
                     </div>
 
                     <AuthForm />

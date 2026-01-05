@@ -88,5 +88,14 @@
         "buyNow": "Buy Now",
         "success": "Purchase successful! Credits added to your account.",
         "error": "Purchase failed, please try again."
+    },
+    "Auth": {
+        "magic_link": {
+            "email_input_label": "Email address",
+            "email_input_placeholder": "Your email address",
+            "button_label": "Send magic link",
+            "link_text": "Use magic link to login",
+            "confirmation_text": "Check your email for the login link!"
+        }
     }
 }

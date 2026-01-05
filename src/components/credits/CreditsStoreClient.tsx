@@ -5,6 +5,7 @@ import { Card, Row, Col, Typography, Button, Space, Statistic, message } from 'a
 import { ShoppingCartOutlined, WalletOutlined } from '@ant-design/icons';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useRouter } from 'next/navigation';
+import { useTranslations } from '@/i18n/context';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -18,21 +19,14 @@ interface CreditProduct {
 interface CreditsStoreClientProps {
     products: CreditProduct[];
     initialBalance: number;
-    translations: {
-        title: string;
-        subtitle: string;
-        balance: string;
-        buyNow: string;
-        success: string;
-        error: string;
-    };
 }
 
 export default function CreditsStoreClient({
     products,
-    initialBalance,
-    translations: t
+    initialBalance
 }: CreditsStoreClientProps) {
+    const t = useTranslations('Credits');
+
     const [balance, setBalance] = useState(initialBalance);
     const [loading, setLoading] = useState<string | null>(null);
     const router = useRouter();
@@ -48,7 +42,7 @@ export default function CreditsStoreClient({
 
             const result = await response.json();
             if (result.success) {
-                message.success(t.success);
+                message.success(t('success'));
                 const found = products.find(p => p.id === productId);
                 if (found) {
                     setBalance(prev => prev + found.credits_amount);
@@ -57,11 +51,11 @@ export default function CreditsStoreClient({
                 }
                 router.refresh();
             } else {
-                message.error(result.error || t.error);
+                message.error(result.error || t('error'));
             }
         } catch (error) {
             console.error('Capture error:', error);
-            message.error(t.error);
+            message.error(t('error'));
         } finally {
             setLoading(null);
         }
@@ -75,14 +69,14 @@ export default function CreditsStoreClient({
         }}>
             <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
                 <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-                    <Title level={2}>{t.title}</Title>
+                    <Title level={2}>{t('title')}</Title>
                     <Paragraph type="secondary" style={{ fontSize: '16px' }}>
-                        {t.subtitle}
+                        {t('subtitle')}
                     </Paragraph>
 
                     <Card style={{ maxWidth: '300px', margin: '24px auto', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                         <Statistic
-                            title={t.balance}
+                            title={t('balance')}
                             value={balance}
                             prefix={<WalletOutlined />}
                             valueStyle={{ color: '#1890ff' }}
@@ -130,7 +124,7 @@ export default function CreditsStoreClient({
                                         }}
                                         onError={(err) => {
                                             console.error('PayPal Credits Error:', err);
-                                            message.error(t.error);
+                                            message.error(t('error'));
                                         }}
                                     />
                                 </div>
