@@ -7,10 +7,11 @@ import { createClient } from '@/utils/supabase/server';
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
+    const { id } = await params;
     
     // 获取当前登录用户
     const { data: { user } } = await supabase.auth.getUser();
@@ -20,8 +21,6 @@ export async function GET(
         { status: 401 }
       );
     }
-
-    const { id } = params;
 
     // 查询订单详情
     const { data: order, error } = await supabase
