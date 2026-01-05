@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Card, Descriptions, Tag, Typography, Button, Space, Row, Col, Divider, Result } from 'antd';
-import { 
-  ArrowLeftOutlined, 
-  ClockCircleOutlined, 
-  CheckCircleOutlined, 
-  CloseCircleOutlined, 
+import {
+  ArrowLeftOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
   SyncOutlined,
   CopyOutlined,
   PrinterOutlined,
@@ -48,9 +48,76 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
 
   const currentStatus = statusMap[order.status] || statusMap.pending;
 
+  const invoiceRef = useRef<HTMLDivElement>(null);
+
+  // 打印发票功能
+  const handlePrint = () => {
+    if (invoiceRef.current) {
+      const originalDisplay = invoiceRef.current.style.display;
+      invoiceRef.current.style.display = 'block';
+      window.print();
+      invoiceRef.current.style.display = originalDisplay;
+    }
+  };
+
+  // 下载发票功能 (简化版，实际项目中可能需要生成PDF)
+  const handleDownloadInvoice = () => {
+    alert(t('downloadInvoice'));
+    // 实际项目中可以使用 html2canvas + jspdf 生成PDF
+  };
+
   return (
     <div style={{ backgroundColor: '#f0f2f5', minHeight: '100vh', padding: '40px 20px' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>        
+        {/* 隐藏的发票模板 */}
+        <div 
+          ref={invoiceRef} 
+          style={{ 
+            display: 'none', 
+            backgroundColor: '#fff', 
+            padding: '40px', 
+            fontFamily: 'Arial, sans-serif' 
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <h1 style={{ margin: 0, color: '#1890ff' }}>INVOICE</h1>
+            <p style={{ margin: '10px 0' }}>Order Number: {order.id}</p>
+            <p style={{ margin: '5px 0' }}>Date: {new Date(order.created_at).toLocaleDateString()}</p>
+          </div>
+          
+          <div style={{ marginBottom: '30px' }}>
+            <h3 style={{ marginBottom: '15px', borderBottom: '1px solid #e8e8e8', paddingBottom: '5px' }}>Order Details</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <tbody>
+                <tr>
+                  <td style={{ padding: '8px', width: '150px', fontWeight: 'bold' }}>Product:</td>
+                  <td style={{ padding: '8px' }}>{order.product_name}</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>Type:</td>
+                  <td style={{ padding: '8px' }}>{order.type === 'subscription' ? t('subscriptionService') : t('creditsRecharge')}</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>Status:</td>
+                  <td style={{ padding: '8px' }}>
+                    <Tag color={currentStatus.color}>{currentStatus.text}</Tag>
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>Amount:</td>
+                  <td style={{ padding: '8px', fontSize: '18px', fontWeight: 'bold' }}>
+                    {order.currency.toUpperCase()} {(order.amount_cents / 100).toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div style={{ marginTop: '40px', textAlign: 'center', color: '#8c8c8c', fontSize: '12px' }}>
+            <p>Thank you for your business!</p>
+            <p>This is an electronic invoice. No signature required.</p>
+          </div>
+        </div>
         
         {/* 页眉导航 */}
         <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
@@ -66,8 +133,8 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
           </Col>
           <Col>
             <Space>
-              <Button icon={<PrinterOutlined />}>{t('print')}</Button>
-              {order.status === 'completed' && <Button type="primary">{t('downloadInvoice')}</Button>}
+              <Button icon={<PrinterOutlined />} onClick={handlePrint}>{t('print')}</Button>
+              {order.status === 'completed' && <Button type="primary" onClick={handleDownloadInvoice}>{t('downloadInvoice')}</Button>}
             </Space>
           </Col>
         </Row>
