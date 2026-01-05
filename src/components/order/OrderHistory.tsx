@@ -13,7 +13,7 @@ import {
     SyncOutlined, ArrowRightOutlined
 } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -36,6 +36,7 @@ export default function OrderHistory({ orders = [], locale }: { orders: Order[],
     const t = useTranslations('OrderHistory');
     const [filterType, setFilterType] = useState<string>('all');
     const { message } = App.useApp();
+    const router = useRouter();
     // 数据处理
     const filteredOrders = orders.filter(o => filterType === 'all' || o.type === filterType);
     const stats = {

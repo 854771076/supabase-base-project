@@ -2,7 +2,7 @@ import React from 'react';
 import { createClient } from '@/utils/supabase/server';
 import { notFound } from 'next/navigation';
 import { redirect } from 'next/navigation';
-import OrderHistory from '@/components/order/OrderHistory';
+import {OrderDetail} from '@/components/order/OrderDetail';
 
 export default async function OrderDetailPage({
   params,
@@ -31,6 +31,6 @@ export default async function OrderDetailPage({
   }
 
   return <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-    <OrderHistory orders={[order]} locale={locale} />
+    <OrderDetail order={order} locale={locale} />
   </div>;
 }
