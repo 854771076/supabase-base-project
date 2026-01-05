@@ -88,6 +88,11 @@
         "success": "购买成功！点数已存入您的账户。",
         "error": "购买失败，请稍后重试。"
     },
+    "Payment": {
+        "systemConfigSyncFailed": "系统配置同步失败",
+        "paymentSuccessProcessing": "支付成功，正在处理您的服务",
+        "paymentCaptureFailed": "捕获支付失败，请联系客服"
+    },
     "Auth": {
         "magic_link": {
             "email_input_label": "电子邮箱地址",
@@ -123,6 +128,7 @@
         "failed": "已失败",
         "cancelled": "已取消",
         "exportReportSuccess": "报告导出成功",
-        "exportReportError": "导出报告失败"
+        "exportReportError": "导出报告失败",
+        "noRecordsToExport": "暂无记录可导出"
     }
 }

@@ -26,10 +26,12 @@ export default function CreditsStoreClient({
     initialBalance
 }: CreditsStoreClientProps) {
     const t = useTranslations('Credits');
+    const tPayment = useTranslations('Payment');
 
     const [balance, setBalance] = useState(initialBalance);
     const [loading, setLoading] = useState<string | null>(null);
     const router = useRouter();
+    const [localOrderId, setLocalOrderId] = useState<string | null>(null);
 
     const handleCapture = async (orderId: string, productId: string) => {
         setLoading(productId);
@@ -110,17 +112,28 @@ export default function CreditsStoreClient({
                                 <div style={{ marginTop: '24px' }}>
                                     <PayPalButtons
                                         style={{ layout: "vertical", shape: "rect", label: "buynow" }}
+                                        onClick={() => setLocalOrderId(null)}
                                         createOrder={async () => {
                                             const response = await fetch('/api/v1/payments/create-order', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ type: 'credits', productId: product.id }),
                                             });
-                                            const { paypalOrder } = await response.json();
+                                            const { paypalOrder,order } = await response.json();
+                                            setLocalOrderId(order.id);
                                             return paypalOrder.id;
                                         }}
                                         onApprove={async (data) => {
-                                            await handleCapture(data.orderID, product.id);
+                                            if (!localOrderId) {
+                                                message.error({ content: tPayment('systemConfigSyncFailed'), duration: 3 });
+                                                return;
+                                            }
+                                            try {
+                                                await handleCapture(data.orderID, localOrderId);
+                                                message.success({ content: tPayment('paymentSuccessProcessing'), duration: 3 });
+                                            } catch (err) {
+                                                message.error({ content: tPayment('paymentCaptureFailed'), duration: 3 });
+                                            }
                                         }}
                                         onError={(err) => {
                                             console.error('PayPal Credits Error:', err);

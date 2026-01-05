@@ -7,7 +7,7 @@ import MainLayout from "@/components/common/MainLayout";
 import { createClient } from "@/utils/supabase/server";
 import { Locale, locales } from '@/i18n/config';
 import { getURL } from "@/utils/url";
-
+import { App } from 'antd';
 const inter = Inter({ subsets: ["latin"] });
 
 export async function generateStaticParams() {
@@ -49,9 +49,12 @@ export default async function LocaleLayout(props: Readonly<{
       <body className={inter.className}>
         <I18nProvider locale={locale as Locale}>
           <StyledComponentsRegistry locale={locale as Locale}>
-            <MainLayout user={user}>
-              {children}
-            </MainLayout>
+            <App style={{ minHeight: '100%' }}>
+              <MainLayout user={user}>
+                {children}
+              </MainLayout>
+            </App>
+
           </StyledComponentsRegistry>
         </I18nProvider>
       </body>

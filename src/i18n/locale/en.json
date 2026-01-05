@@ -90,6 +90,11 @@
         "success": "Purchase successful! Credits added to your account.",
         "error": "Purchase failed, please try again."
     },
+    "Payment": {
+        "systemConfigSyncFailed": "System configuration synchronization failed",
+        "paymentSuccessProcessing": "Payment successful, processing your service",
+        "paymentCaptureFailed": "Payment capture failed, please contact customer service"
+    },
     "Auth": {
         "magic_link": {
             "email_input_label": "Email address",
@@ -125,6 +130,7 @@
         "failed": "Failed",
         "cancelled": "Cancelled",
         "exportReportSuccess": "Report exported successfully",
-        "exportReportError": "Failed to export report"
+        "exportReportError": "Failed to export report",
+        "noRecordsToExport": "No records to export"
     }
 }

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import {
     Card, Table, Tag, Select, Space, Typography,
     Empty, Row, Col, Statistic, Divider, Button, Tooltip,
-    message
+    App
 } from 'antd';
 import {
     ClockCircleOutlined, CheckCircleOutlined,
@@ -34,7 +34,7 @@ interface Order {
 export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
     const t = useTranslations('OrderHistory');
     const [filterType, setFilterType] = useState<string>('all');
-
+    const { message } = App.useApp();
     // 数据处理
     const filteredOrders = orders.filter(o => filterType === 'all' || o.type === filterType);
     const stats = {
@@ -80,8 +80,9 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
     const handleExportReport = () => {
         try {
             if (filteredOrders.length === 0) {
-                message.info(t('exportReportError'));
-                console.log(t('exportReportError'))
+                console.log('No records to export, showing message...', message);
+                // 使用message的原始调用方式
+                message.info(t('noRecordsToExport'));
                 return;
             }
 
@@ -110,11 +111,11 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             link.click();
             document.body.removeChild(link);
 
+            console.log('Export success, showing message...');
             message.success(t('exportReportSuccess'));
-            console.log(t('exportReportSuccess'))
         } catch (error) {
+            console.error('Export error, showing message...', error);
             message.error(t('exportReportError'));
-            console.error(t('exportReportError'), error);
         }
     };
 

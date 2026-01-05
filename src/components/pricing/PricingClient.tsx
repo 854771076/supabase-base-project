@@ -18,6 +18,8 @@ interface PricingClientProps {
 
 export default function PricingClient({ plans, currentSubscription, locale }: PricingClientProps) {
     const t = useTranslations('Pricing');
+    const tPayment = useTranslations('Payment');
+    const [localOrderId, setLocalOrderId] = useState<string | null>(null);
     const { message } = App.useApp();
     const router = useRouter();
     const [loading, setLoading] = useState<string | null>(null);
@@ -46,12 +48,12 @@ export default function PricingClient({ plans, currentSubscription, locale }: Pr
         }
     };
 
-    const handlePayPalCapture = async (orderId: string, planId: string) => {
+    const handlePayPalCapture = async (orderId: string, providerOrderId: string) => {
         try {
             const response = await fetch('/api/v1/payments/capture-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, providerOrderId: orderId }),
+                body: JSON.stringify({ orderId, providerOrderId: providerOrderId }),
             });
 
             const result = await response.json();
@@ -152,17 +154,29 @@ export default function PricingClient({ plans, currentSubscription, locale }: Pr
                                     ) : isPaid ? (
                                         <PayPalButtons
                                             style={{ layout: "vertical", shape: "rect" }}
+                                            onClick={() => setLocalOrderId(null)}
                                             createOrder={async () => {
                                                 const response = await fetch('/api/v1/payments/create-order', {
                                                     method: 'POST',
                                                     headers: { 'Content-Type': 'application/json' },
                                                     body: JSON.stringify({ type: 'subscription', productId: plan.id }),
                                                 });
-                                                const { paypalOrder } = await response.json();
-                                                return paypalOrder.id;
+                                                const { paypalOrder, order } = await response.json();
+                                                setLocalOrderId(order.id);
+                                                return paypalOrder.id
                                             }}
                                             onApprove={async (data) => {
-                                                await handlePayPalCapture(data.orderID, plan.id);
+                                                if (!localOrderId) {
+                                                    message.error({ content: tPayment('systemConfigSyncFailed'), duration: 3 });
+                                                    return;
+                                                }
+
+                                                try {
+                                                    await handlePayPalCapture(data.orderID, localOrderId);
+                                                    message.success({ content: tPayment('paymentSuccessProcessing'), duration: 3 });
+                                                } catch (err) {
+                                                    message.error({ content: tPayment('paymentCaptureFailed'), duration: 3 });
+                                                }
                                             }}
                                             onError={(err) => {
                                                 console.error('PayPal Error:', err);
