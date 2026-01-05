@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Card, Descriptions, Tag, Typography, Button, Space, Row, Col, Divider, Result } from 'antd';
+import { Card, Descriptions, Tag, Typography, Button, Space, Row, Col, Divider, Result,App } from 'antd';
 import {
   ArrowLeftOutlined,
   ClockCircleOutlined,
@@ -14,6 +14,8 @@ import {
 } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const { Title, Text, Paragraph } = Typography;
 interface Order {
@@ -36,7 +38,7 @@ interface OrderDetailProps {
 export function OrderDetail({ order, locale }: OrderDetailProps) {
   const t = useTranslations('OrderHistory');
   const router = useRouter();
-
+  const { message } = App.useApp();
   // 1. 增强状态配置
   const statusMap: Record<string, { color: string; icon: React.ReactNode; text: string; bg: string }> = {
     pending: { color: '#faad14', icon: <ClockCircleOutlined />, text: t('pending'), bg: '#fffbe6' },
@@ -61,9 +63,39 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
   };
 
   // 下载发票功能 (简化版，实际项目中可能需要生成PDF)
-  const handleDownloadInvoice = () => {
-    alert(t('downloadInvoice'));
-    // 实际项目中可以使用 html2canvas + jspdf 生成PDF
+  const handleDownloadInvoice = async () => {
+    const element = invoiceRef.current;
+    if (!element) return;
+
+    const hideMessage = message.loading('正在生成发票...', 0);
+
+    try {
+      // 临时显示隐藏的发票层
+      element.style.display = 'block';
+      
+      const canvas = await html2canvas(element, {
+        scale: 2, // 提高清晰度
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Invoice_${order.id.slice(0, 8)}.pdf`);
+      
+      message.success('发票下载成功');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      message.error('发票生成失败');
+    } finally {
+      element.style.display = 'none'; // 重新隐藏
+      hideMessage();
+    }
   };
 
   return (

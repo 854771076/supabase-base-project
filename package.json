@@ -17,6 +17,8 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
     "antd": "^5.22.2",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.0.0",
     "next": "^15.1.0",
     "next-swagger-doc": "0.4.0",
     "react": "^19.0.0",

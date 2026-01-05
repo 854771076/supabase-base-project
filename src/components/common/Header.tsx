@@ -137,9 +137,9 @@ export default function Header({ user }: HeaderProps) {
 
                         {user ? (
                             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-                                <Space align="center" style={{ cursor: 'pointer', display: 'flex' }}>
+                                <Space align="center" style={{ cursor: 'pointer', display: 'flex', minWidth: 0 }}>
                                     <Avatar size="small" icon={<UserOutlined />} src={user.user_metadata?.avatar_url} />
-                                    <Text  >{user.email}</Text>
+                                    <Text style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</Text>
                                     <DownOutlined style={{ fontSize: '10px' }} />
                                 </Space>
                             </Dropdown>
