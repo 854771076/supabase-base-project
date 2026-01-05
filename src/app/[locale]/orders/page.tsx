@@ -29,7 +29,7 @@ export default async function OrdersPage(props: {
     return (
         <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
             <h1 style={{ marginBottom: '32px' }}>Order History</h1>
-            <OrderHistory orders={orders} initialType={type} />
+            <OrderHistory orders={orders} />
         </div>
     );
 }

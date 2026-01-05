@@ -1,12 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Table, Tag, Select, Space, Typography, Empty, Row, Col, Statistic, Divider } from 'antd';
-import { ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, DollarOutlined, FilterOutlined } from '@ant-design/icons';
+import { 
+    Card, Table, Tag, Select, Space, Typography, 
+    Empty, Row, Col, Statistic, Divider, Button, Tooltip 
+} from 'antd';
+import { 
+    ClockCircleOutlined, CheckCircleOutlined, 
+    CloseCircleOutlined, DollarOutlined, 
+    FilterOutlined, DownloadOutlined,
+    SyncOutlined, ArrowRightOutlined
+} from '@ant-design/icons';
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Title, Text, Paragraph } = Typography;
 
+// --- 类型统一定义 ---
 interface Order {
     id: string;
     type: 'subscription' | 'credits';
@@ -20,301 +28,163 @@ interface Order {
     completed_at?: string;
 }
 
-interface OrderHistoryProps {
-    orders: Order[];
-    initialType?: 'subscription' | 'credits' | 'all';
-}
-
-const getStatusConfig = (status: string) => {
-    const configs: Record<string, { color: string; text: string; icon: React.ReactNode }> = {
-        pending: { color: 'default', text: 'Pending', icon: <ClockCircleOutlined /> },
-        processing: { color: 'blue', text: 'Processing', icon: <ClockCircleOutlined spin /> },
-        completed: { color: 'success', text: 'Completed', icon: <CheckCircleOutlined /> },
-        failed: { color: 'error', text: 'Failed', icon: <CloseCircleOutlined /> },
-        cancelled: { color: 'warning', text: 'Cancelled', icon: <CloseCircleOutlined /> }
-    };
-    return configs[status] || { color: 'default', text: status, icon: <ClockCircleOutlined /> };
+// --- 样式配置抽取 ---
+const STATUS_MAP: Record<string, { color: string; text: string; icon: React.ReactNode; bg: string }> = {
+    pending: { color: '#8c8c8c', text: '待支付', icon: <ClockCircleOutlined />, bg: '#fafafa' },
+    processing: { color: '#1890ff', text: '处理中', icon: <SyncOutlined spin />, bg: '#e6f7ff' },
+    completed: { color: '#52c41a', text: '已完成', icon: <CheckCircleOutlined />, bg: '#f6ffed' },
+    failed: { color: '#f5222d', text: '已失败', icon: <CloseCircleOutlined />, bg: '#fff1f0' },
+    cancelled: { color: '#faad14', text: '已取消', icon: <CloseCircleOutlined />, bg: '#fffbe6' }
 };
 
-const getTypeConfig = (type: string) => {
-    const configs: Record<string, { color: string; text: string }> = {
-        subscription: { color: 'purple', text: 'Subscription' },
-        credits: { color: 'blue', text: 'Credits' }
+export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
+    const [filterType, setFilterType] = useState<string>('all');
+
+    // 数据处理
+    const filteredOrders = orders.filter(o => filterType === 'all' || o.type === filterType);
+    const stats = {
+        total: orders.length,
+        spent: orders.filter(o => o.status === 'completed').reduce((s, o) => s + o.amount_cents, 0) / 100,
+        successRate: orders.length ? Math.round((orders.filter(o => o.status === 'completed').length / orders.length) * 100) : 0
     };
-    return configs[type] || { color: 'default', text: type };
-};
-
-export default function OrderHistory({ orders, initialType = 'all' }: OrderHistoryProps) {
-    const [filterType, setFilterType] = useState<'all' | 'subscription' | 'credits'>(initialType);
-    const [page, setPage] = useState(1);
-    const pageSize = 10;
-
-    // Filter orders by type
-    const filteredOrders = filterType === 'all' 
-        ? orders 
-        : orders.filter(order => order.type === filterType);
-
-    // Calculate pagination
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
-    const total = filteredOrders.length;
-
-    // Calculate statistics
-    const completedOrders = orders.filter(o => o.status === 'completed');
-    const totalSpent = completedOrders.reduce((sum, order) => sum + order.amount_cents, 0);
-    const totalOrders = orders.length;
 
     const columns = [
         {
-            title: 'Type',
-            dataIndex: 'type',
-            key: 'type',
-            width: 120,
-            render: (type: string) => {
-                const config = getTypeConfig(type);
-                return (
-                    <Space>
-                        <Tag 
-                            color={config.color} 
-                            style={{ borderRadius: '16px', padding: '2px 12px', fontWeight: 500 }}
-                        >
-                            {config.text}
-                        </Tag>
-                    </Space>
-                );
-            }
-        },
-        {
-            title: 'Product',
-            dataIndex: 'product_name',
-            key: 'product_name',
-            width: 200,
-            render: (name: string) => (
-                <Text strong style={{ fontSize: '14px' }}>{name}</Text>
-            )
-        },
-        {
-            title: 'Amount',
-            dataIndex: ['amount_cents', 'currency'],
-            key: 'amount',
-            width: 150,
-            render: (value: [number, string]) => {
-                const [amountCents, currency] = value;
-                const amount = (amountCents / 100).toFixed(2);
-                return (
-                    <Space>
-                        <DollarOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
-                        <Text strong style={{ fontSize: '16px', color: '#52c41a' }}>{amount}</Text>
-                        <Text type="secondary" style={{ fontSize: '14px' }}>{currency}</Text>
-                    </Space>
-                );
-            },
-            sorter: (a: Order, b: Order) => a.amount_cents - b.amount_cents
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-            width: 160,
-            render: (status: string) => {
-                const config = getStatusConfig(status);
-                return (
-                    <Space size="middle">
-                        {config.icon}
-                        <Tag 
-                            color={config.color} 
-                            style={{ borderRadius: '16px', padding: '2px 12px', fontWeight: 500 }}
-                        >
-                            {config.text}
-                        </Tag>
-                    </Space>
-                );
-            }
-        },
-        {
-            title: 'Created At',
-            dataIndex: 'created_at',
-            key: 'created_at',
-            width: 200,
-            render: (date: string) => (
-                <Text style={{ fontSize: '14px' }}>{new Date(date).toLocaleString()}</Text>
+            title: '订单信息',
+            key: 'product',
+            render: (_: any, record: Order) => (
+                <Space direction="vertical" size={0}>
+                    <Text strong style={{ fontSize: '15px' }}>{record.product_name}</Text>
+                    <Text type="secondary" copyable={{ text: record.id }} style={{ fontSize: '12px' }}>
+                        ID: {record.id.slice(0, 8)}...
+                    </Text>
+                </Space>
             ),
-            sorter: (a: Order, b: Order) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-            defaultSortOrder: 'descend' as const
         },
         {
-            title: 'Completed At',
-            dataIndex: 'completed_at',
-            key: 'completed_at',
-            width: 200,
-            render: (date?: string) => (
-                <Text style={{ fontSize: '14px', opacity: date ? 1 : 0.5 }}>
-                    {date ? new Date(date).toLocaleString() : '-'} 
+            title: '分类',
+            dataIndex: 'type',
+            render: (type: string) => (
+                <Tag color={type === 'subscription' ? 'purple' : 'blue'} bordered={false} style={{ borderRadius: '4px' }}>
+                    {type.toUpperCase()}
+                </Tag>
+            ),
+        },
+        {
+            title: '金额',
+            dataIndex: 'amount_cents',
+            sorter: (a: Order, b: Order) => a.amount_cents - b.amount_cents,
+            render: (cents: number, record: Order) => (
+                <Text strong style={{ color: '#262626', fontSize: '16px' }}>
+                    {record.currency} {(cents / 100).toFixed(2)}
                 </Text>
-            )
+            ),
+        },
+        {
+            title: '状态',
+            dataIndex: 'status',
+            render: (status: string) => {
+                const cfg = STATUS_MAP[status] || STATUS_MAP.pending;
+                return (
+                    <Tag 
+                        icon={cfg.icon} 
+                        color={cfg.color} 
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                    >
+                        {cfg.text}
+                    </Tag>
+                );
+            }
+        },
+        {
+            title: '时间',
+            dataIndex: 'created_at',
+            render: (date: string) => (
+                <Tooltip title={new Date(date).toString()}>
+                    <Text type="secondary">{new Date(date).toLocaleDateString()}</Text>
+                </Tooltip>
+            ),
+        },
+        {
+            title: '操作',
+            key: 'action',
+            render: () => (
+                <Button type="link" size="small" icon={<ArrowRightOutlined />}>详情</Button>
+            ),
         }
     ];
 
     return (
-        <div style={{ padding: '24px 0', maxWidth: '1200px', margin: '0 auto' }}>
-            {/* Page Header */}
-            <div style={{ marginBottom: '32px' }}>
-                <Title level={3} style={{ marginBottom: '8px', fontWeight: 600 }}>
-                    Order History
-                </Title>
-                <Text type="secondary" style={{ fontSize: '16px' }}>
-                    Track all your payment activity
-                </Text>
-            </div>
-            
-            {/* Statistics Cards */}
-            <Row gutter={[24, 24]} style={{ marginBottom: '32px' }}>
-                <Col xs={24} sm={12} md={8}>
-                    <Card 
-                        size="small" 
-                        style={{ 
-                            borderRadius: '12px', 
-                            border: '1px solid #e8e8e8',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
-                        }}
-                    >
-                        <Statistic
-                            title={<Text style={{ fontSize: '14px', color: '#666' }}>Total Orders</Text>}
-                            value={totalOrders}
-                            prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
-                            valueStyle={{ color: '#1890ff', fontSize: '28px', fontWeight: 600 }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} md={8}>
-                    <Card 
-                        size="small" 
-                        style={{ 
-                            borderRadius: '12px', 
-                            border: '1px solid #e8e8e8',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
-                        }}
-                    >
-                        <Statistic
-                            title={<Text style={{ fontSize: '14px', color: '#666' }}>Total Spent</Text>}
-                            value={(totalSpent / 100).toFixed(2)}
-                            prefix={<DollarOutlined style={{ color: '#52c41a' }} />}
-                            suffix="USD"
-                            valueStyle={{ color: '#52c41a', fontSize: '28px', fontWeight: 600 }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} md={8}>
-                    <Card 
-                        size="small" 
-                        style={{ 
-                            borderRadius: '12px', 
-                            border: '1px solid #e8e8e8',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
-                        }}
-                    >
-                        <Statistic
-                            title={<Text style={{ fontSize: '14px', color: '#666' }}>Completed Orders</Text>}
-                            value={completedOrders.length}
-                            prefix={<CheckCircleOutlined style={{ color: '#722ed1' }} />}
-                            valueStyle={{ color: '#722ed1', fontSize: '28px', fontWeight: 600 }}
-                        />
-                    </Card>
-                </Col>
-            </Row>
-            
-            {/* Main Content Card */}
-            <Card 
-                style={{ 
-                    borderRadius: '12px', 
-                    border: '1px solid #e8e8e8',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-                    overflow: 'hidden'
-                }}
-            >
-                {/* Filter Header */}
-                <div style={{ 
-                    padding: '16px 24px', 
-                    backgroundColor: '#fafafa', 
-                    borderBottom: '1px solid #e8e8e8',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: '16px'
-                }}>
-                    <Space>
-                        <FilterOutlined style={{ color: '#1890ff' }} />
-                        <Text strong style={{ fontSize: '14px' }}>Filter Orders</Text>
-                    </Space>
-                    
-                    <Select
-                        value={filterType}
-                        onChange={setFilterType}
-                        style={{ width: 200 }}
-                        size="large"
-                        placeholder="Filter by type"
-                    >
-                        <Option value="all">All Orders</Option>
-                        <Option value="subscription">Subscriptions</Option>
-                        <Option value="credits">Credits</Option>
-                    </Select>
-                </div>
+        <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', padding: '40px 20px' }}>
+            <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
                 
-                <div style={{ padding: '24px' }}>
-                    {/* Orders Table */}
-                    {paginatedOrders.length > 0 ? (
-                        <>
-                            <Table
-                                columns={columns}
-                                dataSource={paginatedOrders.map(order => ({ ...order, key: order.id }))}
-                                pagination={{
-                                    current: page,
-                                    pageSize,
-                                    total,
-                                    onChange: setPage,
-                                    showSizeChanger: true,
-                                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} orders`,
-                                    pageSizeOptions: ['10', '20', '50', '100'],
-                                    size: 'default'
-                                }}
-                                scroll={{ x: 800 }}
-                                bordered={false}
-                                size="middle"
-                                style={{ borderRadius: '8px', overflow: 'hidden' }}
-                                onRow={(record, index) => ({
-                                    style: {
-                                        borderRadius: '8px',
-                                        transition: 'all 0.3s ease',
-                                        cursor: 'pointer',
-                                        '&:hover': {
-                                            backgroundColor: '#fafafa'
-                                        }
-                                    }
-                                })}
-                                tableLayout="fixed"
-                            />
-                            
-                            {/* Summary */}
-                            <Divider style={{ margin: '24px 0 0' }} />
-                            <div style={{ 
-                                marginTop: '16px', 
-                                textAlign: 'right',
-                                color: '#666',
-                                fontSize: '14px'
-                            }}>
-                                Showing <Text strong>{startIndex + 1}</Text> to <Text strong>{Math.min(endIndex, total)}</Text> of <Text strong>{total}</Text> orders
-                            </div>
-                        </>
-                    ) : (
-                        <Empty
-                            description={<Text type="secondary">No orders found</Text>}
-                            style={{ padding: '64px 0' }}
-                        />
-                    )}
-                </div>
-            </Card>
+                {/* Header Section */}
+                <Row justify="space-between" align="bottom" style={{ marginBottom: '32px' }}>
+                    <Col>
+                        <Title level={2} style={{ margin: 0, letterSpacing: '-0.5px' }}>账单与记录</Title>
+                        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                            管理您的订阅方案及消费记录
+                        </Paragraph>
+                    </Col>
+                    <Col>
+                        <Button icon={<DownloadOutlined />}>导出报告</Button>
+                    </Col>
+                </Row>
+
+                {/* Stats Section */}
+                <Row gutter={[20, 20]} style={{ marginBottom: '32px' }}>
+                    {[
+                        { title: '总订单数', value: stats.total, icon: <ClockCircleOutlined />, color: '#1890ff' },
+                        { title: '累计消费', value: `$${stats.spent}`, icon: <DollarOutlined />, color: '#52c41a' },
+                        { title: '支付成功率', value: `${stats.successRate}%`, icon: <CheckCircleOutlined />, color: '#722ed1' }
+                    ].map((item, i) => (
+                        <Col xs={24} sm={8} key={i}>
+                            <Card bordered={false} hoverable style={{ borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                                <Statistic 
+                                    title={<Text type="secondary">{item.title}</Text>}
+                                    value={item.value} 
+                                    valueStyle={{ color: item.color, fontWeight: 700 }}
+                                    prefix={item.icon}
+                                />
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+
+                {/* Table Section */}
+                <Card 
+                    bordered={false} 
+                    style={{ borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
+                    title={
+                        <Space>
+                            <FilterOutlined />
+                            <span>记录筛选</span>
+                            <Select 
+                                defaultValue="all" 
+                                variant="borderless"
+                                onChange={setFilterType}
+                                style={{ width: 120, marginLeft: '8px', color: '#1890ff', fontWeight: 600 }}
+                            >
+                                <Select.Option value="all">全部类型</Select.Option>
+                                <Select.Option value="subscription">订阅方案</Select.Option>
+                                <Select.Option value="credits">点数充值</Select.Option>
+                            </Select>
+                        </Space>
+                    }
+                >
+                    <Table 
+                        dataSource={filteredOrders.map(o => ({ ...o, key: o.id }))} 
+                        columns={columns} 
+                        pagination={{ 
+                            pageSize: 8, 
+                            showTotal: (t) => `共 ${t} 条记录`,
+                            size: 'small' 
+                        }}
+                        scroll={{ x: 'max-content' }}
+                        locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无消费记录" /> }}
+                    />
+                </Card>
+            </div>
         </div>
     );
 }
