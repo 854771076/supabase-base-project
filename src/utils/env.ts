@@ -6,6 +6,7 @@ const envSchema = z.object({
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string().optional(),
     PAYPAL_SECRET: z.string().optional(),
     PAYPAL_API_BASE: z.string().url().default('https://api-m.sandbox.paypal.com'),
+    SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
 });
 
 // Provide default values or allow undefined during build/linting to prevent crash
@@ -15,6 +16,7 @@ const processEnv = {
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
     PAYPAL_SECRET: process.env.PAYPAL_SECRET,
     PAYPAL_API_BASE: process.env.PAYPAL_API_BASE,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
 };
 
 const parsed = envSchema.safeParse(processEnv);

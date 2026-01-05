@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient, createAdminClient } from '@/utils/supabase/server';
 
 export type PlanFeatures = {
     api_access?: boolean;
@@ -145,7 +145,9 @@ export async function updateUserSubscription(planId: string, isPaidAction: boole
     const periodEnd = new Date();
     periodEnd.setDate(periodEnd.getDate() + 30);
 
-    const { data: subscription, error } = await supabase
+    // 5. Perform mutation using Admin Client to bypass RLS
+    const adminSupabase = await createAdminClient();
+    const { data: subscription, error } = await adminSupabase
         .from('subscriptions')
         .upsert({
             user_id: user.id,
@@ -195,6 +197,8 @@ export async function incrementUsage(featureName: string) {
     const quotaKey = featureName === 'api_request' ? 'daily_requests' : null;
     const limit = quotaKey ? (quotas[quotaKey] as number) : Infinity;
 
+    const adminSupabase = await createAdminClient();
+
     if (currentUsage >= limit) {
         // Use purchased credits
         const { data: credits, error: creditError } = await supabase
@@ -207,28 +211,29 @@ export async function incrementUsage(featureName: string) {
             throw new Error('Quota exceeded and no credits available');
         }
 
-        const { error: updateError } = await supabase
+        // Mutation via admin client
+        const { error: updateError } = await adminSupabase
             .from('user_credits')
             .update({ balance: credits.balance - 1, updated_at: new Date().toISOString() })
             .eq('user_id', user.id);
 
         if (updateError) throw updateError;
     } else {
-        // Increment daily usage
-        const { error } = await supabase.rpc('increment_usage', {
+        // Increment daily usage via admin client
+        const { error } = await adminSupabase.rpc('increment_usage', {
             user_id_param: user.id,
             feature_name_param: featureName
         });
 
         if (error) {
-            // Manual fallback if RPC fails
+            // Manual fallback if RPC fails (still using admin client)
             if (usageRecord) {
-                await supabase
+                await adminSupabase
                     .from('usage_records')
                     .update({ usage_count: usageRecord.usage_count + 1, updated_at: new Date().toISOString() })
                     .eq('id', usageRecord.id);
             } else {
-                await supabase
+                await adminSupabase
                     .from('usage_records')
                     .insert({ user_id: user.id, feature_name: featureName, usage_count: 1 });
             }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { capturePayPalOrder } from '@/lib/paypal';
-import { createClient } from '@/utils/supabase/server';
+import { createClient, createAdminClient } from '@/utils/supabase/server';
 
 export async function POST(request: Request) {
     try {
@@ -25,26 +25,35 @@ export async function POST(request: Request) {
         }
 
         // 2. Get product details to know how many credits to add
-        const { data: product } = await supabase
+        const { data: product, error: productError } = await supabase
             .from('credit_products')
             .select('credits_amount')
             .eq('id', productId)
-            .single();
+            .maybeSingle();
 
-        if (!product) {
-            throw new Error('Product not found after payment');
+        if (productError || !product) {
+            console.error('Product fetch error:', productError);
+            throw new Error('Product not found after payment. Please contact support.');
         }
 
-        // 3. Update the user's credit balance
-        const { data: currentCredits } = await supabase
+        // 3. Update the user's credit balance using Admin Client to bypass RLS
+        const adminSupabase = await createAdminClient();
+
+        // Fetch current credits with admin client to ensure we get the row
+        const { data: currentCredits, error: fetchError } = await adminSupabase
             .from('user_credits')
             .select('balance')
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle();
+
+        if (fetchError) {
+            console.error('Fetch credits error:', fetchError);
+            throw new Error('Failed to retrieve user credit balance');
+        }
 
         const currentBalance = currentCredits?.balance || 0;
 
-        const { data: updatedCredits, error } = await supabase
+        const { data: updatedCredits, error: updateError } = await adminSupabase
             .from('user_credits')
             .update({
                 balance: currentBalance + product.credits_amount,
@@ -54,7 +63,10 @@ export async function POST(request: Request) {
             .select()
             .single();
 
-        if (error) throw error;
+        if (updateError) {
+            console.error('Credits update error:', updateError);
+            throw updateError;
+        }
 
         return NextResponse.json({ success: true, balance: updatedCredits.balance });
     } catch (error: any) {
