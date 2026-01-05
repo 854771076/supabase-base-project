@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { 
     Card, Table, Tag, Select, Space, Typography, 
-    Empty, Row, Col, Statistic, Divider, Button, Tooltip 
+    Empty, Row, Col, Statistic, Divider, Button, Tooltip, 
+    message
 } from 'antd';
 import { 
     ClockCircleOutlined, CheckCircleOutlined, 
@@ -11,6 +12,7 @@ import {
     FilterOutlined, DownloadOutlined,
     SyncOutlined, ArrowRightOutlined
 } from '@ant-design/icons';
+import { useTranslations } from '@/i18n/context';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -29,15 +31,8 @@ interface Order {
 }
 
 // --- 样式配置抽取 ---
-const STATUS_MAP: Record<string, { color: string; text: string; icon: React.ReactNode; bg: string }> = {
-    pending: { color: '#8c8c8c', text: '待支付', icon: <ClockCircleOutlined />, bg: '#fafafa' },
-    processing: { color: '#1890ff', text: '处理中', icon: <SyncOutlined spin />, bg: '#e6f7ff' },
-    completed: { color: '#52c41a', text: '已完成', icon: <CheckCircleOutlined />, bg: '#f6ffed' },
-    failed: { color: '#f5222d', text: '已失败', icon: <CloseCircleOutlined />, bg: '#fff1f0' },
-    cancelled: { color: '#faad14', text: '已取消', icon: <CloseCircleOutlined />, bg: '#fffbe6' }
-};
-
 export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
+    const t = useTranslations('OrderHistory');
     const [filterType, setFilterType] = useState<string>('all');
 
     // 数据处理
@@ -48,9 +43,77 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
         successRate: orders.length ? Math.round((orders.filter(o => o.status === 'completed').length / orders.length) * 100) : 0
     };
 
+    // 获取状态配置
+    const getStatusConfig = (status: string) => {
+        const statusText = {
+            pending: t('pending'),
+            processing: t('processing'),
+            completed: t('completed'),
+            failed: t('failed'),
+            cancelled: t('cancelled')
+        };
+        
+        const statusColors: Record<string, string> = {
+            pending: '#8c8c8c',
+            processing: '#1890ff',
+            completed: '#52c41a',
+            failed: '#f5222d',
+            cancelled: '#faad14'
+        };
+        
+        const statusIcons: Record<string, React.ReactNode> = {
+            pending: <ClockCircleOutlined />,
+            processing: <SyncOutlined spin />,
+            completed: <CheckCircleOutlined />,
+            failed: <CloseCircleOutlined />,
+            cancelled: <CloseCircleOutlined />
+        };
+        
+        return {
+            text: statusText[status as keyof typeof statusText] || statusText.pending,
+            color: statusColors[status] || statusColors.pending,
+            icon: statusIcons[status] || statusIcons.pending
+        };
+    };
+
+    // 导出报告功能
+    const handleExportReport = () => {
+        if (filteredOrders.length === 0) {
+            message.info('暂无记录可导出');
+            return;
+        }
+        
+        // 简单的CSV导出实现
+        const headers = ['Order ID', 'Product Name', 'Type', 'Amount', 'Currency', 'Status', 'Created At', 'Completed At'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredOrders.map(order => [
+                order.id,
+                `"${order.product_name}"`,
+                order.type,
+                (order.amount_cents / 100).toFixed(2),
+                order.currency,
+                t(order.status as keyof typeof t),
+                new Date(order.created_at).toISOString(),
+                order.completed_at ? new Date(order.completed_at).toISOString() : ''
+            ].join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `order-history-${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        message.success('报告导出成功');
+    };
+
     const columns = [
         {
-            title: '订单信息',
+            title: t('orderInfo'),
             key: 'product',
             render: (_: any, record: Order) => (
                 <Space direction="vertical" size={0}>
@@ -62,16 +125,16 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             ),
         },
         {
-            title: '分类',
+            title: t('category'),
             dataIndex: 'type',
             render: (type: string) => (
                 <Tag color={type === 'subscription' ? 'purple' : 'blue'} bordered={false} style={{ borderRadius: '4px' }}>
-                    {type.toUpperCase()}
+                    {type === 'subscription' ? t('subscription') : t('credits')}
                 </Tag>
             ),
         },
         {
-            title: '金额',
+            title: t('amount'),
             dataIndex: 'amount_cents',
             sorter: (a: Order, b: Order) => a.amount_cents - b.amount_cents,
             render: (cents: number, record: Order) => (
@@ -81,10 +144,10 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             ),
         },
         {
-            title: '状态',
+            title: t('status'),
             dataIndex: 'status',
             render: (status: string) => {
-                const cfg = STATUS_MAP[status] || STATUS_MAP.pending;
+                const cfg = getStatusConfig(status);
                 return (
                     <Tag 
                         icon={cfg.icon} 
@@ -97,7 +160,7 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             }
         },
         {
-            title: '时间',
+            title: t('time'),
             dataIndex: 'created_at',
             render: (date: string) => (
                 <Tooltip title={new Date(date).toString()}>
@@ -106,10 +169,12 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             ),
         },
         {
-            title: '操作',
+            title: t('action'),
             key: 'action',
             render: () => (
-                <Button type="link" size="small" icon={<ArrowRightOutlined />}>详情</Button>
+                <Button type="link" size="small" icon={<ArrowRightOutlined />}>
+                    {t('details')}
+                </Button>
             ),
         }
     ];
@@ -121,22 +186,45 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
                 {/* Header Section */}
                 <Row justify="space-between" align="bottom" style={{ marginBottom: '32px' }}>
                     <Col>
-                        <Title level={2} style={{ margin: 0, letterSpacing: '-0.5px' }}>账单与记录</Title>
+                        <Title level={2} style={{ margin: 0, letterSpacing: '-0.5px' }}>
+                            {t('title')}
+                        </Title>
                         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                            管理您的订阅方案及消费记录
+                            {t('subtitle')}
                         </Paragraph>
                     </Col>
                     <Col>
-                        <Button icon={<DownloadOutlined />}>导出报告</Button>
+                        <Button 
+                            icon={<DownloadOutlined />} 
+                            onClick={handleExportReport}
+                            type="primary"
+                        >
+                            {t('exportReport')}
+                        </Button>
                     </Col>
                 </Row>
 
                 {/* Stats Section */}
                 <Row gutter={[20, 20]} style={{ marginBottom: '32px' }}>
                     {[
-                        { title: '总订单数', value: stats.total, icon: <ClockCircleOutlined />, color: '#1890ff' },
-                        { title: '累计消费', value: `$${stats.spent}`, icon: <DollarOutlined />, color: '#52c41a' },
-                        { title: '支付成功率', value: `${stats.successRate}%`, icon: <CheckCircleOutlined />, color: '#722ed1' }
+                        { 
+                            title: t('totalOrders'), 
+                            value: stats.total, 
+                            icon: <ClockCircleOutlined />, 
+                            color: '#1890ff' 
+                        },
+                        { 
+                            title: t('totalSpent'), 
+                            value: `$${stats.spent}`, 
+                            icon: <DollarOutlined />, 
+                            color: '#52c41a' 
+                        },
+                        { 
+                            title: t('successRate'), 
+                            value: `${stats.successRate}%`, 
+                            icon: <CheckCircleOutlined />, 
+                            color: '#722ed1' 
+                        }
                     ].map((item, i) => (
                         <Col xs={24} sm={8} key={i}>
                             <Card bordered={false} hoverable style={{ borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
@@ -158,16 +246,16 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
                     title={
                         <Space>
                             <FilterOutlined />
-                            <span>记录筛选</span>
+                            <span>{t('filterRecords')}</span>
                             <Select 
                                 defaultValue="all" 
                                 variant="borderless"
                                 onChange={setFilterType}
                                 style={{ width: 120, marginLeft: '8px', color: '#1890ff', fontWeight: 600 }}
                             >
-                                <Select.Option value="all">全部类型</Select.Option>
-                                <Select.Option value="subscription">订阅方案</Select.Option>
-                                <Select.Option value="credits">点数充值</Select.Option>
+                                <Select.Option value="all">{t('allTypes')}</Select.Option>
+                                <Select.Option value="subscription">{t('subscription')}</Select.Option>
+                                <Select.Option value="credits">{t('credits')}</Select.Option>
                             </Select>
                         </Space>
                     }
@@ -177,11 +265,16 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
                         columns={columns} 
                         pagination={{ 
                             pageSize: 8, 
-                            showTotal: (t) => `共 ${t} 条记录`,
+                            showTotal: (total) => t('totalRecords').replace('{total}',total.toString()),
                             size: 'small' 
                         }}
                         scroll={{ x: 'max-content' }}
-                        locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无消费记录" /> }}
+                        locale={{ 
+                            emptyText: <Empty 
+                                image={Empty.PRESENTED_IMAGE_SIMPLE} 
+                                description={t('noRecords')} 
+                            /> 
+                        }}
                     />
                 </Card>
             </div>

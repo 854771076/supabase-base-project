@@ -95,5 +95,31 @@
             "link_text": "使用魔术链接登录",
             "confirmation_text": "检查您的邮箱以获取登录链接"
         }
+    },
+    "OrderHistory": {
+        "title": "账单与记录",
+        "subtitle": "管理您的订阅方案及消费记录",
+        "exportReport": "导出报告",
+        "totalOrders": "总订单数",
+        "totalSpent": "累计消费",
+        "successRate": "支付成功率",
+        "filterRecords": "记录筛选",
+        "allTypes": "全部类型",
+        "subscription": "订阅方案",
+        "credits": "点数充值",
+        "orderInfo": "订单信息",
+        "category": "分类",
+        "amount": "金额",
+        "status": "状态",
+        "time": "时间",
+        "action": "操作",
+        "details": "详情",
+        "noRecords": "暂无消费记录",
+        "totalRecords": "共 {total} 条记录",
+        "pending": "待支付",
+        "processing": "处理中",
+        "completed": "已完成",
+        "failed": "已失败",
+        "cancelled": "已取消"
     }
 }

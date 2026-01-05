@@ -97,5 +97,31 @@
             "link_text": "Use magic link to login",
             "confirmation_text": "Check your email for the login link!"
         }
+    },
+    "OrderHistory": {
+        "title": "Billing & Records",
+        "subtitle": "Manage your subscription plans and consumption records",
+        "exportReport": "Export Report",
+        "totalOrders": "Total Orders",
+        "totalSpent": "Total Spent",
+        "successRate": "Payment Success Rate",
+        "filterRecords": "Filter Records",
+        "allTypes": "All Types",
+        "subscription": "Subscription",
+        "credits": "Credits Purchase",
+        "orderInfo": "Order Info",
+        "category": "Category",
+        "amount": "Amount",
+        "status": "Status",
+        "time": "Time",
+        "action": "Action",
+        "details": "Details",
+        "noRecords": "No consumption records",
+        "totalRecords": "Total {total} records",
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
     }
 }
