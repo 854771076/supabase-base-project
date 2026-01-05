@@ -185,7 +185,7 @@ export default function OrderHistory({ orders = [], locale }: { orders: Order[],
                     type="link" 
                     size="small" 
                     icon={<ArrowRightOutlined />}
-                    onClick={() => router.push(`/${locale}/profile/orders/${record.id}`)}
+                    onClick={() => router.push(`/${locale}/orders/${record.id}`)}
                 >
                     {t('details')}
                 </Button>
