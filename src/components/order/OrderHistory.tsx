@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-    Card, Table, Tag, Select, Space, Typography, 
-    Empty, Row, Col, Statistic, Divider, Button, Tooltip, 
+import {
+    Card, Table, Tag, Select, Space, Typography,
+    Empty, Row, Col, Statistic, Divider, Button, Tooltip,
     message
 } from 'antd';
-import { 
-    ClockCircleOutlined, CheckCircleOutlined, 
-    CloseCircleOutlined, DollarOutlined, 
+import {
+    ClockCircleOutlined, CheckCircleOutlined,
+    CloseCircleOutlined, DollarOutlined,
     FilterOutlined, DownloadOutlined,
     SyncOutlined, ArrowRightOutlined
 } from '@ant-design/icons';
@@ -52,7 +52,7 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             failed: t('failed'),
             cancelled: t('cancelled')
         };
-        
+
         const statusColors: Record<string, string> = {
             pending: '#8c8c8c',
             processing: '#1890ff',
@@ -60,7 +60,7 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             failed: '#f5222d',
             cancelled: '#faad14'
         };
-        
+
         const statusIcons: Record<string, React.ReactNode> = {
             pending: <ClockCircleOutlined />,
             processing: <SyncOutlined spin />,
@@ -68,7 +68,7 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             failed: <CloseCircleOutlined />,
             cancelled: <CloseCircleOutlined />
         };
-        
+
         return {
             text: statusText[status as keyof typeof statusText] || statusText.pending,
             color: statusColors[status] || statusColors.pending,
@@ -78,37 +78,44 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
 
     // 导出报告功能
     const handleExportReport = () => {
-        if (filteredOrders.length === 0) {
-            message.info('暂无记录可导出');
-            return;
+        try {
+            if (filteredOrders.length === 0) {
+                message.info(t('exportReportError'));
+                console.log(t('exportReportError'))
+                return;
+            }
+
+            // 简单的CSV导出实现
+            const headers = ['Order ID', 'Product Name', 'Type', 'Amount', 'Currency', 'Status', 'Created At', 'Completed At'];
+            const csvContent = [
+                headers.join(','),
+                ...filteredOrders.map(order => [
+                    order.id,
+                    `"${order.product_name}"`,
+                    order.type,
+                    (order.amount_cents / 100).toFixed(2),
+                    order.currency,
+                    t(order.status as keyof typeof t),
+                    new Date(order.created_at).toISOString(),
+                    order.completed_at ? new Date(order.completed_at).toISOString() : ''
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `order-history-${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            message.success(t('exportReportSuccess'));
+            console.log(t('exportReportSuccess'))
+        } catch (error) {
+            message.error(t('exportReportError'));
+            console.error(t('exportReportError'), error);
         }
-        
-        // 简单的CSV导出实现
-        const headers = ['Order ID', 'Product Name', 'Type', 'Amount', 'Currency', 'Status', 'Created At', 'Completed At'];
-        const csvContent = [
-            headers.join(','),
-            ...filteredOrders.map(order => [
-                order.id,
-                `"${order.product_name}"`,
-                order.type,
-                (order.amount_cents / 100).toFixed(2),
-                order.currency,
-                t(order.status as keyof typeof t),
-                new Date(order.created_at).toISOString(),
-                order.completed_at ? new Date(order.completed_at).toISOString() : ''
-            ].join(','))
-        ].join('\n');
-        
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `order-history-${new Date().toISOString().slice(0, 10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        message.success('报告导出成功');
     };
 
     const columns = [
@@ -149,9 +156,9 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
             render: (status: string) => {
                 const cfg = getStatusConfig(status);
                 return (
-                    <Tag 
-                        icon={cfg.icon} 
-                        color={cfg.color} 
+                    <Tag
+                        icon={cfg.icon}
+                        color={cfg.color}
                         style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
                         {cfg.text}
@@ -182,7 +189,7 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
     return (
         <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', padding: '40px 20px' }}>
             <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-                
+
                 {/* Header Section */}
                 <Row justify="space-between" align="bottom" style={{ marginBottom: '32px' }}>
                     <Col>
@@ -194,10 +201,9 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
                         </Paragraph>
                     </Col>
                     <Col>
-                        <Button 
-                            icon={<DownloadOutlined />} 
+                        <Button
+                            icon={<DownloadOutlined />}
                             onClick={handleExportReport}
-                            type="primary"
                         >
                             {t('exportReport')}
                         </Button>
@@ -207,30 +213,30 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
                 {/* Stats Section */}
                 <Row gutter={[20, 20]} style={{ marginBottom: '32px' }}>
                     {[
-                        { 
-                            title: t('totalOrders'), 
-                            value: stats.total, 
-                            icon: <ClockCircleOutlined />, 
-                            color: '#1890ff' 
+                        {
+                            title: t('totalOrders'),
+                            value: stats.total,
+                            icon: <ClockCircleOutlined />,
+                            color: '#1890ff'
                         },
-                        { 
-                            title: t('totalSpent'), 
-                            value: `$${stats.spent}`, 
-                            icon: <DollarOutlined />, 
-                            color: '#52c41a' 
+                        {
+                            title: t('totalSpent'),
+                            value: `$${stats.spent}`,
+                            icon: <DollarOutlined />,
+                            color: '#52c41a'
                         },
-                        { 
-                            title: t('successRate'), 
-                            value: `${stats.successRate}%`, 
-                            icon: <CheckCircleOutlined />, 
-                            color: '#722ed1' 
+                        {
+                            title: t('successRate'),
+                            value: `${stats.successRate}%`,
+                            icon: <CheckCircleOutlined />,
+                            color: '#722ed1'
                         }
                     ].map((item, i) => (
                         <Col xs={24} sm={8} key={i}>
                             <Card bordered={false} hoverable style={{ borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
-                                <Statistic 
+                                <Statistic
                                     title={<Text type="secondary">{item.title}</Text>}
-                                    value={item.value} 
+                                    value={item.value}
                                     valueStyle={{ color: item.color, fontWeight: 700 }}
                                     prefix={item.icon}
                                 />
@@ -240,15 +246,15 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
                 </Row>
 
                 {/* Table Section */}
-                <Card 
-                    bordered={false} 
+                <Card
+                    bordered={false}
                     style={{ borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
                     title={
                         <Space>
                             <FilterOutlined />
                             <span>{t('filterRecords')}</span>
-                            <Select 
-                                defaultValue="all" 
+                            <Select
+                                defaultValue="all"
                                 variant="borderless"
                                 onChange={setFilterType}
                                 style={{ width: 120, marginLeft: '8px', color: '#1890ff', fontWeight: 600 }}
@@ -260,20 +266,20 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
                         </Space>
                     }
                 >
-                    <Table 
-                        dataSource={filteredOrders.map(o => ({ ...o, key: o.id }))} 
-                        columns={columns} 
-                        pagination={{ 
-                            pageSize: 8, 
-                            showTotal: (total) => t('totalRecords').replace('{total}',total.toString()),
-                            size: 'small' 
+                    <Table
+                        dataSource={filteredOrders.map(o => ({ ...o, key: o.id }))}
+                        columns={columns}
+                        pagination={{
+                            pageSize: 8,
+                            showTotal: (total) => t('totalRecords').replace('{total}', total.toString()),
+                            size: 'small'
                         }}
                         scroll={{ x: 'max-content' }}
-                        locale={{ 
-                            emptyText: <Empty 
-                                image={Empty.PRESENTED_IMAGE_SIMPLE} 
-                                description={t('noRecords')} 
-                            /> 
+                        locale={{
+                            emptyText: <Empty
+                                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                description={t('noRecords')}
+                            />
                         }}
                     />
                 </Card>

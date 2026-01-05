@@ -131,7 +131,7 @@ export default function Header({ user }: HeaderProps) {
                     <>
                         <Dropdown menu={languageMenu} placement="bottomRight">
                             <Button type="text" icon={<GlobalOutlined />}>
-                                Language
+                                {t('language')}
                             </Button>
                         </Dropdown>
 

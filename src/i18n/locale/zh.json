@@ -25,7 +25,8 @@
         "pricing": "价格",
         "demo": "演示",
         "credits": "点数商城",
-        "orderHistory": "订单历史"
+        "orderHistory": "订单历史",
+        "language": "语言"
     },
     "Profile": {
         "title": "个人资料",
@@ -120,6 +121,8 @@
         "processing": "处理中",
         "completed": "已完成",
         "failed": "已失败",
-        "cancelled": "已取消"
+        "cancelled": "已取消",
+        "exportReportSuccess": "报告导出成功",
+        "exportReportError": "导出报告失败"
     }
 }

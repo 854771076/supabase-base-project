@@ -25,7 +25,8 @@
         "pricing": "Pricing",
         "demo": "Demo",
         "credits": "Credits Store",
-        "orderHistory": "Order History"
+        "orderHistory": "Order History",
+        "language": "Language"
 
 
     },
@@ -122,6 +123,8 @@
         "processing": "Processing",
         "completed": "Completed",
         "failed": "Failed",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "exportReportSuccess": "Report exported successfully",
+        "exportReportError": "Failed to export report"
     }
 }
