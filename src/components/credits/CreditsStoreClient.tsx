@@ -34,19 +34,19 @@ export default function CreditsStoreClient({
     const router = useRouter();
     const [localOrderId, setLocalOrderId] = useState<string | null>(null);
 
-    const handleCapture = async (orderId: string, productId: string) => {
-        setLoading(productId);
+    const handleCapture = async (orderId: string, providerOrderId: string) => {
+        setLoading(providerOrderId);
         try {
             const response = await fetch('/api/v1/payments/capture-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, providerOrderId: orderId }),
+                body: JSON.stringify({ orderId, providerOrderId: providerOrderId }),
             });
 
             const result = await response.json();
             if (result.success) {
                 message.success(t('success'));
-                const found = products.find(p => p.id === productId);
+                const found = products.find(p => p.id === providerOrderId);
                 if (found) {
                     setBalance(prev => prev + found.credits_amount);
                 } else {
@@ -130,7 +130,7 @@ export default function CreditsStoreClient({
                                                 return;
                                             }
                                             try {
-                                                await handleCapture(data.orderID, localOrderId);
+                                                await handleCapture(localOrderId, data.orderID);
                                                 message.success({ content: tPayment('paymentSuccessProcessing'), duration: 3 });
                                             } catch (err) {
                                                 message.error({ content: tPayment('paymentCaptureFailed'), duration: 3 });

@@ -172,7 +172,7 @@ export default function PricingClient({ plans, currentSubscription, locale }: Pr
                                                 }
 
                                                 try {
-                                                    await handlePayPalCapture(data.orderID, localOrderId);
+                                                    await handlePayPalCapture(localOrderId,data.orderID);
                                                     message.success({ content: tPayment('paymentSuccessProcessing'), duration: 3 });
                                                 } catch (err) {
                                                     message.error({ content: tPayment('paymentCaptureFailed'), duration: 3 });
