@@ -13,6 +13,7 @@ import {
     SyncOutlined, ArrowRightOutlined
 } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
+import router from 'next/router';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -31,7 +32,7 @@ interface Order {
 }
 
 // --- 样式配置抽取 ---
-export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
+export default function OrderHistory({ orders = [], locale }: { orders: Order[], locale: string }) {
     const t = useTranslations('OrderHistory');
     const [filterType, setFilterType] = useState<string>('all');
     const { message } = App.useApp();
@@ -179,8 +180,13 @@ export default function OrderHistory({ orders = [] }: { orders: Order[] }) {
         {
             title: t('action'),
             key: 'action',
-            render: () => (
-                <Button type="link" size="small" icon={<ArrowRightOutlined />}>
+            render: (_: any, record: Order) => (
+                <Button 
+                    type="link" 
+                    size="small" 
+                    icon={<ArrowRightOutlined />}
+                    onClick={() => router.push(`/${locale}/profile/orders/${record.id}`)}
+                >
                     {t('details')}
                 </Button>
             ),

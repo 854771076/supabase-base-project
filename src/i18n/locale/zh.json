@@ -129,6 +129,13 @@
         "cancelled": "已取消",
         "exportReportSuccess": "报告导出成功",
         "exportReportError": "导出报告失败",
-        "noRecordsToExport": "暂无记录可导出"
+        "noRecordsToExport": "暂无记录可导出",
+        "back": "返回",
+        "orderDetails": "订单详情",
+        "provider": "支付提供商",
+        "providerOrderId": "提供商订单ID",
+        "createdAt": "创建时间",
+        "completedAt": "完成时间",
+        "backToOrders": "返回订单列表"
     }
 }

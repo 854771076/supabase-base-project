@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Row, Col, Typography, Button, Space, Statistic, message } from 'antd';
+import { Card, Row, Col, Typography, Button, Space, Statistic, App } from 'antd';
 import { ShoppingCartOutlined, WalletOutlined } from '@ant-design/icons';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useRouter } from 'next/navigation';
@@ -27,6 +27,7 @@ export default function CreditsStoreClient({
 }: CreditsStoreClientProps) {
     const t = useTranslations('Credits');
     const tPayment = useTranslations('Payment');
+    const { message } = App.useApp();
 
     const [balance, setBalance] = useState(initialBalance);
     const [loading, setLoading] = useState<string | null>(null);

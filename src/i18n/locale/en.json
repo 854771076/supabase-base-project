@@ -131,6 +131,13 @@
         "cancelled": "Cancelled",
         "exportReportSuccess": "Report exported successfully",
         "exportReportError": "Failed to export report",
-        "noRecordsToExport": "No records to export"
+        "noRecordsToExport": "No records to export",
+        "back": "Back",
+        "orderDetails": "Order Details",
+        "provider": "Payment Provider",
+        "providerOrderId": "Provider Order ID",
+        "createdAt": "Created At",
+        "completedAt": "Completed At",
+        "backToOrders": "Back to Orders List"
     }
 }
