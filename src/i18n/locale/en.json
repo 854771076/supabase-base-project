@@ -105,6 +105,7 @@
         }
     },
     "OrderHistory": {
+        "orderId":"orderId",
         "title": "Billing & Records",
         "subtitle": "Manage your subscription plans and consumption records",
         "exportReport": "Export Report",
@@ -138,6 +139,16 @@
         "providerOrderId": "Provider Order ID",
         "createdAt": "Created At",
         "completedAt": "Completed At",
-        "backToOrders": "Back to Orders List"
+        "backToOrders": "Back to Orders List",
+        "print": "Print",
+        "downloadInvoice": "Download Invoice",
+        "subscriptionService": "Subscription Service",
+        "creditsRecharge": "Credits Recharge",
+        "paymentSummary": "Payment Summary",
+        "originalPrice": "Original Price",
+        "discount": "Discount",
+        "actualPayment": "Actual Payment",
+        "thankYouForPurchase": "Thank you for your purchase",
+        "waitingForPaymentConfirmation": "Waiting for payment confirmation"
     }
 }

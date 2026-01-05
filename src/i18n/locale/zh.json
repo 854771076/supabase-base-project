@@ -103,6 +103,7 @@
         }
     },
     "OrderHistory": {
+        "orderId":"订单ID",
         "title": "账单与记录",
         "subtitle": "管理您的订阅方案及消费记录",
         "exportReport": "导出报告",
@@ -136,6 +137,16 @@
         "providerOrderId": "提供商订单ID",
         "createdAt": "创建时间",
         "completedAt": "完成时间",
-        "backToOrders": "返回订单列表"
+        "backToOrders": "返回订单列表",
+        "print": "打印",
+        "downloadInvoice": "下载发票",
+        "subscriptionService": "订阅服务",
+        "creditsRecharge": "点数充值",
+        "paymentSummary": "支付摘要",
+        "originalPrice": "商品原价",
+        "discount": "优惠减免",
+        "actualPayment": "实付款",
+        "thankYouForPurchase": "感谢您的购买",
+        "waitingForPaymentConfirmation": "等待款项确认"
     }
 }

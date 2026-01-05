@@ -76,7 +76,7 @@ export default function HomeClient() {
             {/* Features Section */}
             <div style={{ marginBottom: '48px' }}>
                 <Title level={2} style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '48px', fontSize: isMobile ? '24px' : '30px' }}>
-                    {t('featuresTitle')}
+                    {t('features.title')}
                 </Title>
                 <Row gutter={[24, 24]}>
                     {features.map((feature) => (
