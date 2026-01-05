@@ -9,21 +9,15 @@ export async function createClient() {
 
     const options: any = {
         cookies: {
-            get(name: string) {
-                return cookieStore.get(name)?.value
+            getAll() {
+                return cookieStore.getAll()
             },
-            set(name: string, value: string, options: any) {
+            setAll(cookiesToSet: any) {
                 try {
-                    cookieStore.set({ name, value, ...options })
-                } catch (error) {
-                    // This can be ignored if you have middleware refreshing
-                    // user sessions.
-                }
-            },
-            remove(name: string, options: any) {
-                try {
-                    cookieStore.set({ name, value: '', ...options })
-                } catch (error) {
+                    cookiesToSet.forEach(({ name, value, options }: any) =>
+                        cookieStore.set(name, value, options)
+                    )
+                } catch {
                     // This can be ignored if you have middleware refreshing
                     // user sessions.
                 }
@@ -58,7 +52,10 @@ export async function createAdminClient() {
         env.NEXT_PUBLIC_SUPABASE_URL,
         env.SUPABASE_SERVICE_ROLE_KEY,
         {
-            cookies: {}, // Admin client doesn't need to handle cookies for auth context
+            cookies: {
+                getAll() { return [] },
+                setAll() { },
+            },
         }
     )
 }
