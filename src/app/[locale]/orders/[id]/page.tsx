@@ -6,8 +6,10 @@ import OrderHistory from '@/components/order/OrderHistory';
 
 export default async function OrderDetailPage({
   params,
-}: { params: { id: string; locale: string } }) {
-  const { id, locale } = params;
+}: {
+  params: Promise<{ id: string; locale: string }>;
+}) {
+  const { id, locale } = await params;
   const supabase = await createClient();
 
   // 获取当前用户
