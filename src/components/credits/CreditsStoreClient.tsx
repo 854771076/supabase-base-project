@@ -40,16 +40,21 @@ export default function CreditsStoreClient({
     const handleCapture = async (orderId: string, productId: string) => {
         setLoading(productId);
         try {
-            const response = await fetch('/api/v1/credits/capture-order', {
+            const response = await fetch('/api/v1/payments/capture-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, productId }),
+                body: JSON.stringify({ orderId, providerOrderId: orderId }),
             });
 
             const result = await response.json();
             if (result.success) {
                 message.success(t.success);
-                setBalance(result.balance);
+                const found = products.find(p => p.id === productId);
+                if (found) {
+                    setBalance(prev => prev + found.credits_amount);
+                } else {
+                    console.warn('未找到对应产品，积分未增加');
+                }
                 router.refresh();
             } else {
                 message.error(result.error || t.error);
@@ -112,13 +117,13 @@ export default function CreditsStoreClient({
                                     <PayPalButtons
                                         style={{ layout: "vertical", shape: "rect", label: "buynow" }}
                                         createOrder={async () => {
-                                            const response = await fetch('/api/v1/credits/create-order', {
+                                            const response = await fetch('/api/v1/payments/create-order', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ productId: product.id }),
+                                                body: JSON.stringify({ type: 'credits', productId: product.id }),
                                             });
-                                            const order = await response.json();
-                                            return order.id;
+                                            const { paypalOrder } = await response.json();
+                                            return paypalOrder.id;
                                         }}
                                         onApprove={async (data) => {
                                             await handleCapture(data.orderID, product.id);

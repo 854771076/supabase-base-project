@@ -48,15 +48,15 @@ export default function PricingClient({ plans, currentSubscription, locale }: Pr
 
     const handlePayPalCapture = async (orderId: string, planId: string) => {
         try {
-            const response = await fetch('/api/v1/paypal/capture-order', {
+            const response = await fetch('/api/v1/payments/capture-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, planId }),
+                body: JSON.stringify({ orderId, providerOrderId: orderId }),
             });
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Payment failed');
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Payment failed');
             }
 
             message.success(t('subscribeSuccess'));
@@ -153,13 +153,13 @@ export default function PricingClient({ plans, currentSubscription, locale }: Pr
                                         <PayPalButtons
                                             style={{ layout: "vertical", shape: "rect" }}
                                             createOrder={async () => {
-                                                const response = await fetch('/api/v1/paypal/create-order', {
+                                                const response = await fetch('/api/v1/payments/create-order', {
                                                     method: 'POST',
                                                     headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify({ planId: plan.id }),
+                                                    body: JSON.stringify({ type: 'subscription', productId: plan.id }),
                                                 });
-                                                const order = await response.json();
-                                                return order.id;
+                                                const { paypalOrder } = await response.json();
+                                                return paypalOrder.id;
                                             }}
                                             onApprove={async (data) => {
                                                 await handlePayPalCapture(data.orderID, plan.id);
