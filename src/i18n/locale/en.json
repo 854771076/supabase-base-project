@@ -24,7 +24,10 @@
         "apiDocs": "API Docs",
         "pricing": "Pricing",
         "demo": "Demo",
-        "credits": "Credits Store"
+        "credits": "Credits Store",
+        "orderHistory": "Order History"
+
+
     },
     "Profile": {
         "title": "User Profile",

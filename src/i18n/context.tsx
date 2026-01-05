@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useCallback } from 'react';
 
-import enMessages from '@/messages/en.json';
-import zhMessages from '@/messages/zh.json';
+import enMessages from './locale/en.json';
+import zhMessages from './locale/zh.json';
 
 type Messages = typeof enMessages;
 type Locale = 'en' | 'zh';

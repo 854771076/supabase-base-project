@@ -24,7 +24,8 @@
         "apiDocs": "API 文档",
         "pricing": "价格",
         "demo": "演示",
-        "credits": "点数商城"
+        "credits": "点数商城",
+        "orderHistory": "订单历史"
     },
     "Profile": {
         "title": "个人资料",

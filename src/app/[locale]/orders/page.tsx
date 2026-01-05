@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { getUserOrders } from '@/lib/payment';
-import OrderHistory from '@/components/profile/OrderHistory';
+import OrderHistory from '@/components/order/OrderHistory';
 
 export default async function OrdersPage(props: {
     params: Promise<{ locale: string }>;

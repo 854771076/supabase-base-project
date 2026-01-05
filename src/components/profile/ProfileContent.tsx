@@ -75,15 +75,6 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                     </Button>
                 </Space>
             ),
-        },
-        {
-            key: '6',
-            label: t('orderHistory'),
-            children: (
-                <Button type="primary" onClick={() => router.push(`/${locale}/profile/orders`)}>
-                    {t('viewOrders')}
-                </Button>
-            ),
         }
     ];
 

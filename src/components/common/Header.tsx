@@ -58,6 +58,15 @@ export default function Header({ user }: HeaderProps) {
             icon: <UserOutlined />,
         },
         {
+            key: 'orders',
+            label: (
+                <Link href="/orders" onClick={() => setDrawerVisible(false)}>
+                    {t('orderHistory')}
+                </Link>
+            ),
+            icon: <LogoutOutlined />,
+        },
+        {
             key: 'logout',
             label: t('logout'),
             icon: <LogoutOutlined />,
