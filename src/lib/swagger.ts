@@ -1,7 +1,17 @@
 import { createSwaggerSpec } from 'next-swagger-doc';
 import { getURL } from '@/utils/url';
+import { userPaths, paymentPaths, subscriptionPaths, demoPaths, authPaths } from './doc';
 
 export const getApiDocs = async () => {
+  // 合并所有API路径
+  const paths = {
+    ...userPaths,
+    ...paymentPaths,
+    ...subscriptionPaths,
+    ...demoPaths,
+    ...authPaths,
+  };
+
   const spec = createSwaggerSpec({
     definition: {
       openapi: '3.0.0',
@@ -24,53 +34,101 @@ export const getApiDocs = async () => {
             bearerFormat: 'JWT',
           },
         },
+        schemas: {
+          ErrorResponse: {
+            type: 'object',
+            properties: {
+              error: {
+                type: 'string',
+                description: 'Error message',
+              },
+              success: {
+                type: 'boolean',
+                description: 'Success status',
+              },
+            },
+          },
+          Order: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'Order ID',
+              },
+              user_id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'User ID',
+              },
+              type: {
+                type: 'string',
+                enum: ['subscription', 'credits'],
+                description: 'Order type',
+              },
+              provider: {
+                type: 'string',
+                description: 'Payment provider',
+              },
+              provider_order_id: {
+                type: 'string',
+                description: 'Provider order ID',
+              },
+              status: {
+                type: 'string',
+                enum: ['pending', 'processing', 'completed', 'failed', 'cancelled'],
+                description: 'Order status',
+              },
+              amount_cents: {
+                type: 'integer',
+                description: 'Order amount in cents',
+              },
+              currency: {
+                type: 'string',
+                description: 'Currency code',
+              },
+              product_id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'Product ID',
+              },
+              product_type: {
+                type: 'string',
+                description: 'Product type',
+              },
+              product_name: {
+                type: 'string',
+                description: 'Product name',
+              },
+              metadata: {
+                type: 'object',
+                description: 'Order metadata',
+              },
+              created_at: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Order creation timestamp',
+              },
+              updated_at: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Order update timestamp',
+              },
+              completed_at: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Order completion timestamp',
+              },
+            },
+          },
+        },
       },
       security: [
         {
           BearerAuth: [],
         },
       ],
-      paths: {
-        '/api/v1/user': {
-          get: {
-            summary: 'Get current authenticated user profile',
-            description: 'Returns the basic profile information of the currently logged-in user.',
-            tags: ['User'],
-            security: [{ BearerAuth: [] }],
-            responses: {
-              200: {
-                description: 'User profile data',
-                content: {
-                  'application/json': {
-                    schema: {
-                      type: 'object',
-                      properties: {
-                        id: { type: 'string', format: 'uuid', description: 'User ID' },
-                        email: { type: 'string', format: 'email', description: 'User email' },
-                        user_metadata: { type: 'object', description: 'User metadata' },
-                        last_sign_in_at: { type: 'string', format: 'date-time', description: 'Last sign-in timestamp' },
-                      },
-                    },
-                  },
-                },
-              },
-              401: {
-                description: 'Unauthorized - User not logged in',
-                content: {
-                  'application/json': {
-                    schema: {
-                      type: 'object',
-                      properties: {
-                        error: { type: 'string', example: 'Unauthorized' },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+      paths,
     },
   });
   return spec;
