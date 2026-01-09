@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button, Space, Typography, Spin, App } from 'antd';
+import { Button, Space, Typography, Spin, App, Modal, List, Avatar } from 'antd';
 import { WalletOutlined, QrcodeOutlined, LoginOutlined, DisconnectOutlined } from '@ant-design/icons';
 import { useAccount, useConnect, useDisconnect, useSignMessage, useConnectors } from 'wagmi';
 import { createClient } from '@/utils/supabase/client';
@@ -25,8 +25,10 @@ export default function WalletLogin() {
     const [isVerifying, setIsVerifying] = useState(false);
     const [nonce, setNonce] = useState<string | null>(null);
 
-    // Find connectors by type
-    const injectedConnector = connectors.find(c => c.type === 'injected');
+    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+
+    // Filter connectors
+    const injectedConnectors = connectors.filter(c => c.type === 'injected');
     const walletConnectConnector = connectors.find(c => c.type === 'walletConnect');
 
     // Log connection errors
@@ -45,6 +47,7 @@ export default function WalletLogin() {
     useEffect(() => {
         if (isConnected && address) {
             fetchNonce();
+            setIsWalletModalOpen(false);
         }
     }, [isConnected, address]);
 
@@ -60,11 +63,16 @@ export default function WalletLogin() {
     };
 
     const handleBrowserWalletConnect = () => {
-        if (!injectedConnector) {
-            message.error('No browser wallet detected. Please install MetaMask.');
+        if (injectedConnectors.length === 0) {
+            message.error('No browser wallet detected. Please install MetaMask or OKX Wallet.');
             return;
         }
-        connect({ connector: injectedConnector });
+
+        if (injectedConnectors.length === 1) {
+            connect({ connector: injectedConnectors[0] });
+        } else {
+            setIsWalletModalOpen(true);
+        }
     };
 
     const handleWalletConnectConnect = () => {
@@ -227,6 +235,36 @@ Issued At: ${new Date().toISOString()}`;
             >
                 {t('connectWalletConnect')}
             </Button>
+
+            <Modal
+                title="Select Wallet"
+                open={isWalletModalOpen}
+                onCancel={() => setIsWalletModalOpen(false)}
+                footer={null}
+            >
+                <List
+                    itemLayout="horizontal"
+                    dataSource={injectedConnectors}
+                    renderItem={(item) => (
+                        <List.Item>
+                            <Button
+                                block
+                                size="large"
+                                onClick={() => {
+                                    connect({ connector: item });
+                                    setIsWalletModalOpen(false);
+                                }}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', height: 'auto', padding: '12px' }}
+                            >
+                                <Space>
+                                    {item.icon ? <img src={item.icon} alt={item.name} style={{ width: 24, height: 24 }} /> : <WalletOutlined />}
+                                    <span>{item.name}</span>
+                                </Space>
+                            </Button>
+                        </List.Item>
+                    )}
+                />
+            </Modal>
         </Space>
     );
 }
