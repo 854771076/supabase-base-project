@@ -102,6 +102,22 @@
             "confirmation_text": "检查您的邮箱以获取登录链接"
         }
     },
+    "Wallet": {
+        "connectBrowser": "连接浏览器钱包",
+        "connectWalletConnect": "使用 WalletConnect 连接",
+        "signIn": "使用钱包登录",
+        "disconnect": "断开连接",
+        "connected": "已连接",
+        "signing": "签名中...",
+        "verifying": "验证中...",
+        "error": "连接失败",
+        "orWallet": "或使用钱包登录"
+    },
+    "Network": {
+        "switchNetwork": "切换网络",
+        "current": "当前",
+        "unknown": "未知"
+    },
     "OrderHistory": {
         "orderId":"订单ID",
         "title": "账单与记录",

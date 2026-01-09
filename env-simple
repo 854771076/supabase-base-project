@@ -4,3 +4,4 @@ NEXT_PUBLIC_PAYPAL_CLIENT_ID=xxx
 PAYPAL_SECRET=xxx
 PAYPAL_API_BASE=https://api-m.sandbox.paypal.com
 SUPABASE_SERVICE_ROLE_KEY=sb_secret_xxx
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id

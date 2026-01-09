@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/server";
 import { Locale, locales } from '@/i18n/config';
 import { getURL } from "@/utils/url";
 import { App } from 'antd';
+import { Web3Provider } from "@/components/providers/Web3Provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export async function generateStaticParams() {
@@ -48,16 +49,19 @@ export default async function LocaleLayout(props: Readonly<{
     <html lang={locale}>
       <body className={inter.className}>
         <I18nProvider locale={locale as Locale}>
-          <StyledComponentsRegistry locale={locale as Locale}>
-            <App style={{ minHeight: '100%' }}>
-              <MainLayout user={user}>
-                {children}
-              </MainLayout>
-            </App>
+          <Web3Provider>
+            <StyledComponentsRegistry locale={locale as Locale}>
+              <App style={{ minHeight: '100%' }}>
+                <MainLayout user={user}>
+                  {children}
+                </MainLayout>
+              </App>
 
-          </StyledComponentsRegistry>
+            </StyledComponentsRegistry>
+          </Web3Provider>
         </I18nProvider>
       </body>
     </html>
   );
 }
+

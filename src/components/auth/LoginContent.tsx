@@ -1,14 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Card, Typography, Space } from 'antd';
+import { Card, Typography, Space, Divider } from 'antd';
 import AuthForm from './AuthForm';
+import WalletLogin from './WalletLogin';
 import { useTranslations } from '@/i18n/context';
 
 const { Title, Text } = Typography;
 
 export default function LoginContent() {
     const t = useTranslations('Login');
+    const walletT = useTranslations('Wallet');
 
     return (
         <div style={{
@@ -36,6 +38,10 @@ export default function LoginContent() {
 
                     <AuthForm />
 
+                    <Divider plain>{walletT('orWallet')}</Divider>
+
+                    <WalletLogin />
+
                     <Text type="secondary" style={{ fontSize: '12px' }}>
                         &copy; {new Date().getFullYear()} Supabase Project
                     </Text>
@@ -44,3 +50,4 @@ export default function LoginContent() {
         </div>
     );
 }
+

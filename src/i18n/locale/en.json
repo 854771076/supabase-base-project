@@ -104,6 +104,22 @@
             "confirmation_text": "Check your email for the login link!"
         }
     },
+    "Wallet": {
+        "connectBrowser": "Connect Browser Wallet",
+        "connectWalletConnect": "Connect with WalletConnect",
+        "signIn": "Sign In with Wallet",
+        "disconnect": "Disconnect",
+        "connected": "Connected",
+        "signing": "Signing...",
+        "verifying": "Verifying...",
+        "error": "Connection failed",
+        "orWallet": "or sign in with wallet"
+    },
+    "Network": {
+        "switchNetwork": "Switch Network",
+        "current": "Current",
+        "unknown": "Unknown"
+    },
     "OrderHistory": {
         "orderId":"orderId",
         "title": "Billing & Records",

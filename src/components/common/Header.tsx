@@ -9,6 +9,7 @@ import { Locale } from '@/i18n/config';
 import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import NetworkSwitcher from './NetworkSwitcher';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -134,6 +135,8 @@ export default function Header({ user }: HeaderProps) {
                                 {t('language')}
                             </Button>
                         </Dropdown>
+
+                        <NetworkSwitcher />
 
                         {user ? (
                             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
