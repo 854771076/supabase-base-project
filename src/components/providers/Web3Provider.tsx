@@ -16,6 +16,7 @@ const config = createConfig({
     injected(),
     ...(projectId ? [walletConnect({ projectId })] : []),
   ],
+  ssr: true,
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),

@@ -33,7 +33,11 @@ export default function WalletLogin() {
     useEffect(() => {
         if (connectError) {
             console.error('Connect error:', connectError);
-            message.error(connectError.message || t('error'));
+            if ((connectError as any).name === 'ProviderNotFoundError') {
+                message.error('No wallet found. Please install MetaMask.');
+            } else {
+                message.error(connectError.message || t('error'));
+            }
         }
     }, [connectError]);
 
