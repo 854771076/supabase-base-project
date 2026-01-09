@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button, Space, Typography, message, Spin } from 'antd';
+import { Button, Space, Typography, message, Spin,App } from 'antd';
 import { WalletOutlined, QrcodeOutlined, LoginOutlined, DisconnectOutlined } from '@ant-design/icons';
 import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 import { injected, walletConnect } from '@wagmi/connectors';
@@ -16,6 +16,7 @@ export default function WalletLogin() {
     const t = useTranslations('Wallet');
     const router = useRouter();
     const supabase = createClient();
+    const {message} = App.useApp();
 
     const { address, isConnected, connector } = useAccount();
     const { connect, isPending: isConnecting } = useConnect();

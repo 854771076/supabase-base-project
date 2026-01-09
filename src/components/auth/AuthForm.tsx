@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react';
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/utils/supabase/client'
@@ -9,6 +10,12 @@ import { getURL } from '@/utils/url';
 export default function AuthForm() {
     const supabase = createClient()
     const t = useTranslations('Auth');
+    const [mounted, setMounted] = useState(false);
+
+    // Prevent hydration mismatch and style flickering
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Get translations for magic link authentication
     const magicLinkTranslations = {
@@ -20,31 +27,41 @@ export default function AuthForm() {
     };
 
     return (
-        <div className="auth-container">
-            <Auth
-                supabaseClient={supabase}
-                view="magic_link"
-                appearance={{
-                    theme: ThemeSupa,
-                    variables: {
-                        default: {
-                            colors: {
-                                brand: '#1677ff',
-                                brandAccent: '#4096ff',
+        <div
+            className="auth-container"
+            style={{
+                opacity: mounted ? 1 : 0,
+                transition: 'opacity 0.2s ease-in-out',
+                minHeight: mounted ? 'auto' : '200px'
+            }}
+        >
+            {mounted && (
+                <Auth
+                    supabaseClient={supabase}
+                    view="magic_link"
+                    appearance={{
+                        theme: ThemeSupa,
+                        variables: {
+                            default: {
+                                colors: {
+                                    brand: '#1677ff',
+                                    brandAccent: '#4096ff',
+                                }
                             }
                         }
-                    }
-                }}
-                theme="light"
-                showLinks={false}
-                providers={['google']} // Restored Google login provider
-                localization={{
-                    variables: {
-                        magic_link: magicLinkTranslations
-                    }
-                }}
-                redirectTo={`${getURL()}api/v1/auth/callback`}
-            />
+                    }}
+                    theme="light"
+                    showLinks={false}
+                    providers={['google']}
+                    localization={{
+                        variables: {
+                            magic_link: magicLinkTranslations
+                        }
+                    }}
+                    redirectTo={`${getURL()}api/v1/auth/callback`}
+                />
+            )}
         </div>
     )
 }
+
