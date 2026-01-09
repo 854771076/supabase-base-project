@@ -141,7 +141,7 @@ Issued At: ${new Date().toISOString()}`;
                 }
 
                 message.success('Successfully signed in!');
-                router.push('/dashboard');
+                router.push('/');
             } else {
                 throw new Error('No verification token received');
             }

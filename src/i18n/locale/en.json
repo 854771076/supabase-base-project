@@ -113,7 +113,8 @@
         "signing": "Signing...",
         "verifying": "Verifying...",
         "error": "Connection failed",
-        "orWallet": "or sign in with wallet"
+        "orWallet": "or sign in with wallet",
+        "SelectWallet": "Select Wallet"
     },
     "Network": {
         "switchNetwork": "Switch Network",

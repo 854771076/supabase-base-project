@@ -111,7 +111,8 @@
         "signing": "签名中...",
         "verifying": "验证中...",
         "error": "连接失败",
-        "orWallet": "或使用钱包登录"
+        "orWallet": "或使用钱包登录",
+        "SelectWallet":"选择钱包"
     },
     "Network": {
         "switchNetwork": "切换网络",
