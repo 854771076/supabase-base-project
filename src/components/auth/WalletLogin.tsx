@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button, Space, Typography, message, Spin,App } from 'antd';
+import { Button, Space, Typography, Spin, App } from 'antd';
 import { WalletOutlined, QrcodeOutlined, LoginOutlined, DisconnectOutlined } from '@ant-design/icons';
-import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
-import { injected, walletConnect } from '@wagmi/connectors';
+import { useAccount, useConnect, useDisconnect, useSignMessage, useConnectors } from 'wagmi';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from '@/i18n/context';
-import { env } from '@/utils/env';
 import { useRouter } from 'next/navigation';
 
 const { Text } = Typography;
@@ -16,15 +14,28 @@ export default function WalletLogin() {
     const t = useTranslations('Wallet');
     const router = useRouter();
     const supabase = createClient();
-    const {message} = App.useApp();
+    const { message } = App.useApp();
 
-    const { address, isConnected, connector } = useAccount();
-    const { connect, isPending: isConnecting } = useConnect();
+    const { address, isConnected } = useAccount();
+    const { connect, isPending: isConnecting, error: connectError } = useConnect();
     const { disconnect } = useDisconnect();
     const { signMessageAsync, isPending: isSigning } = useSignMessage();
+    const connectors = useConnectors();
 
     const [isVerifying, setIsVerifying] = useState(false);
     const [nonce, setNonce] = useState<string | null>(null);
+
+    // Find connectors by type
+    const injectedConnector = connectors.find(c => c.type === 'injected');
+    const walletConnectConnector = connectors.find(c => c.type === 'walletConnect');
+
+    // Log connection errors
+    useEffect(() => {
+        if (connectError) {
+            console.error('Connect error:', connectError);
+            message.error(connectError.message || t('error'));
+        }
+    }, [connectError]);
 
     // Fetch nonce when connected
     useEffect(() => {
@@ -45,16 +56,19 @@ export default function WalletLogin() {
     };
 
     const handleBrowserWalletConnect = () => {
-        connect({ connector: injected() });
+        if (!injectedConnector) {
+            message.error('No browser wallet detected. Please install MetaMask.');
+            return;
+        }
+        connect({ connector: injectedConnector });
     };
 
     const handleWalletConnectConnect = () => {
-        const projectId = env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-        if (!projectId) {
-            message.error('WalletConnect Project ID not configured');
+        if (!walletConnectConnector) {
+            message.error('WalletConnect not configured');
             return;
         }
-        connect({ connector: walletConnect({ projectId }) });
+        connect({ connector: walletConnectConnector });
     };
 
     const handleSignIn = async () => {
