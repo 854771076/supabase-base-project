@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Row, Col, Typography, Button, Radio, Space, List, Divider, App, Result, Select, QRCode, Descriptions } from 'antd';
-import { CreditCardOutlined, WalletOutlined, CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Typography, Button, Radio, Space, List, Divider, App, Result, Select, QRCode, Descriptions, Modal, Image, Tag } from 'antd';
+import { CreditCardOutlined, WalletOutlined, CheckCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useCart } from '@/components/cart/CartContext';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
@@ -23,6 +23,7 @@ export default function CheckoutClient() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [orderInfo, setOrderInfo] = useState<any>(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const handlePayment = async () => {
         if (items.length === 0) return;
@@ -44,8 +45,11 @@ export default function CheckoutClient() {
             if (result.success) {
                 if (result.redirectUrl && paymentMethod !== 'tokenpay') {
                     window.location.href = result.redirectUrl;
-                } else {
+                } else if (paymentMethod === 'tokenpay') {
                     setOrderInfo(result);
+                    setIsModalVisible(true);
+                    clearCart();
+                } else {
                     setSuccess(true);
                     clearCart();
                 }
@@ -60,72 +64,94 @@ export default function CheckoutClient() {
         }
     };
 
-    if (success) {
+    const renderTokenPayModal = () => {
         const tpInfo = orderInfo?.metadata;
+        if (!tpInfo) return null;
 
+        return (
+            <Modal
+                title={<Space><WalletOutlined style={{ color: '#1677ff' }} />{t('paymentInfo')}</Space>}
+                open={isModalVisible}
+                onCancel={() => setIsModalVisible(false)}
+                footer={[
+                    <Button key="close" onClick={() => setIsModalVisible(false)}>
+                        {t('close')}
+                    </Button>,
+                    <Button key="orders" type="primary" onClick={() => router.push(`/${locale}/orders`)}>
+                        {t('viewOrders')}
+                    </Button>
+                ]}
+                width={700}
+                centered
+                styles={{ body: { padding: '24px' } }}
+            >
+                <Row gutter={24}>
+                    <Col xs={24} md={10} style={{ textAlign: 'center', marginBottom: '24px' }}>
+                        <div style={{ padding: '16px', background: '#f5f5f5', borderRadius: '12px', display: 'inline-block' }}>
+                            <QRCode value={tpInfo.QrCodeLink || tpInfo.ToAddress} size={220} bordered={false} />
+                        </div>
+                        <div style={{ marginTop: '12px' }}>
+                            <Text type="secondary">{t('scanToPay')}</Text>
+                        </div>
+                        <div style={{ marginTop: '16px' }}>
+                            <Tag color="blue" icon={<LoadingOutlined />}>Waiting for payment...</Tag>
+                        </div>
+                    </Col>
+                    <Col xs={24} md={14}>
+                        <Descriptions column={1} bordered size="small" labelStyle={{ width: '100px', fontWeight: 'bold' }}>
+                            <Descriptions.Item label={t('amount')}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Text strong style={{ fontSize: '20px', color: '#1677ff' }}>
+                                        {tpInfo.Amount} {tpInfo.CurrencyName}
+                                    </Text>
+                                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                                        ≈ {tpInfo.ActualAmount} {tpInfo.BaseCurrency}
+                                    </Text>
+                                </div>
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('network')}>
+                                <Tag color="gold">{tpInfo.BlockChainName}</Tag>
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('address')}>
+                                <Text copyable code style={{ fontSize: '12px', wordBreak: 'break-all' }}>{tpInfo.ToAddress}</Text>
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('orderId')}>
+                                <Text type="secondary" style={{ fontSize: '12px' }}>{tpInfo.Id}</Text>
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('expires')}>
+                                <Text type="danger" style={{ fontSize: '12px' }}>{tpInfo.ExpireTime}</Text>
+                            </Descriptions.Item>
+                        </Descriptions>
+                        <div style={{ marginTop: '16px', padding: '12px', background: '#fff7e6', border: '1px solid #ffe7ba', borderRadius: '8px' }}>
+                            <Space align="start">
+                                <InfoCircleOutlined style={{ color: '#faad14', marginTop: '4px' }} />
+                                <Text type="warning" style={{ fontSize: '12px' }}>
+                                    {t('tokenPayWarning')}
+                                </Text>
+                            </Space>
+                        </div>
+                    </Col>
+                </Row>
+            </Modal>
+        );
+    };
+
+    if (success) {
         return (
             <div style={{ padding: '40px 24px', maxWidth: '800px', margin: '0 auto' }}>
                 <Result
                     status="success"
                     title={t('successTitle')}
-                    subTitle={paymentMethod === 'tokenpay' ? t('tokenPayInstructions') : t('successSubtitle')}
-                />
-
-                {paymentMethod === 'tokenpay' && tpInfo && (
-                    <Card title={t('paymentInfo')} style={{ marginTop: '24px', borderRadius: '12px' }}>
-                        <Row gutter={32} align="middle">
-                            <Col xs={24} md={8} style={{ textAlign: 'center', marginBottom: '24px' }}>
-                                <Space direction="vertical" align="center">
-                                    <QRCode value={tpInfo.QrCodeLink || tpInfo.ToAddress} size={200} />
-                                    <Text type="secondary">{t('scanToPay')}</Text>
-                                </Space>
-                            </Col>
-                            <Col xs={24} md={16}>
-                                <Descriptions column={1} bordered size="small">
-                                    <Descriptions.Item label={t('amount')}>
-                                        <Text strong style={{ fontSize: '18px', color: '#1677ff' }}>
-                                            {tpInfo.Amount} {tpInfo.CurrencyName}
-                                        </Text>
-                                        <div style={{ fontSize: '12px', color: '#8c8c8c' }}>
-                                            ≈ {tpInfo.ActualAmount} {tpInfo.BaseCurrency}
-                                        </div>
-                                    </Descriptions.Item>
-                                    <Descriptions.Item label={t('network')}>
-                                        <Text strong>{tpInfo.BlockChainName}</Text>
-                                    </Descriptions.Item>
-                                    <Descriptions.Item label={t('address')}>
-                                        <Text copyable code style={{ fontSize: '12px' }}>{tpInfo.ToAddress}</Text>
-                                    </Descriptions.Item>
-                                    <Descriptions.Item label={t('orderId')}>
-                                        <Text type="secondary">{tpInfo.Id}</Text>
-                                    </Descriptions.Item>
-                                    <Descriptions.Item label={t('expires')}>
-                                        <Text type="danger">{tpInfo.ExpireTime}</Text>
-                                    </Descriptions.Item>
-                                </Descriptions>
-                                <div style={{ marginTop: '16px', padding: '12px', background: '#fff7e6', border: '1px solid #ffe7ba', borderRadius: '8px' }}>
-                                    <Space align="start">
-                                        <InfoCircleOutlined style={{ color: '#faad14', marginTop: '4px' }} />
-                                        <Text type="warning" style={{ fontSize: '12px' }}>
-                                            {t('tokenPayWarning')}
-                                        </Text>
-                                    </Space>
-                                </div>
-                            </Col>
-                        </Row>
-                    </Card>
-                )}
-
-                <div style={{ textAlign: 'center', marginTop: '32px' }}>
-                    <Space size="middle">
-                        <Button type="primary" size="large" onClick={() => router.push(`/${locale}`)}>
+                    subTitle={t('successSubtitle')}
+                    extra={[
+                        <Button type="primary" key="home" onClick={() => router.push(`/${locale}`)}>
                             {t('backHome')}
-                        </Button>
-                        <Button size="large" onClick={() => router.push(`/${locale}/orders`)}>
+                        </Button>,
+                        <Button key="orders" onClick={() => router.push(`/${locale}/orders`)}>
                             {t('viewOrders')}
-                        </Button>
-                    </Space>
-                </div>
+                        </Button>,
+                    ]}
+                />
             </div>
         );
     }
@@ -178,26 +204,36 @@ export default function CheckoutClient() {
                             style={{ width: '100%' }}
                         >
                             <Space direction="vertical" style={{ width: '100%' }}>
-                                <Radio value="paypal" style={{ width: '100%', padding: '12px', border: '1px solid #f0f0f0', borderRadius: '8px', marginBottom: '8px' }}>
+                                <Radio value="paypal" style={{ width: '100%', padding: '16px', border: '1px solid #f0f0f0', borderRadius: '12px', marginBottom: '8px' }}>
                                     <Space>
-                                        <CreditCardOutlined />
-                                        <span>PayPal</span>
+                                        <CreditCardOutlined style={{ fontSize: '20px', color: '#003087' }} />
+                                        <Text strong>PayPal</Text>
                                     </Space>
                                 </Radio>
-                                <Radio value="tokenpay" style={{ width: '100%', padding: '12px', border: '1px solid #f0f0f0', borderRadius: '8px' }}>
+                                <Radio value="tokenpay" style={{ width: '100%', padding: '16px', border: '1px solid #f0f0f0', borderRadius: '12px' }}>
                                     <Space direction="vertical" style={{ width: '100%' }}>
                                         <Space>
-                                            <WalletOutlined />
-                                            <span>TokenPay (Crypto)</span>
+                                            <WalletOutlined style={{ fontSize: '20px', color: '#1677ff' }} />
+                                            <Text strong>TokenPay (Crypto)</Text>
                                         </Space>
                                         {paymentMethod === 'tokenpay' && (
-                                            <div style={{ marginTop: '12px', paddingLeft: '24px' }}>
+                                            <div style={{ marginTop: '16px', paddingLeft: '28px' }}>
                                                 <Text type="secondary" style={{ display: 'block', marginBottom: '8px' }}>{t('selectCurrency')}</Text>
                                                 <Select
                                                     value={tokenPayCurrency}
                                                     onChange={setTokenPayCurrency}
-                                                    style={{ width: '100%' }}
-                                                    options={TOKENPAY_CURRENCIES}
+                                                    style={{ width: '100%', height: '48px' }}
+                                                    dropdownStyle={{ borderRadius: '12px' }}
+                                                    options={TOKENPAY_CURRENCIES.map(c => ({
+                                                        label: (
+                                                            <Space>
+                                                                <Image src={c.icon} width={24} height={24} preview={false} />
+                                                                <Text>{c.label}</Text>
+                                                                <Tag color="default" style={{ marginLeft: 'auto' }}>{c.network}</Tag>
+                                                            </Space>
+                                                        ),
+                                                        value: c.value
+                                                    }))}
                                                 />
                                             </div>
                                         )}
@@ -220,13 +256,14 @@ export default function CheckoutClient() {
                             block
                             loading={loading}
                             onClick={handlePayment}
-                            style={{ height: '54px', borderRadius: '8px', marginTop: '16px' }}
+                            style={{ height: '54px', borderRadius: '12px', marginTop: '16px' }}
                         >
                             {t('payNow')}
                         </Button>
                     </Card>
                 </Col>
             </Row>
+            {renderTokenPayModal()}
         </div>
     );
 }

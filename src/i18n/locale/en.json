@@ -199,6 +199,7 @@
         "orderId": "Order ID",
         "expires": "Expires",
         "tokenPayWarning": "Please ensure you are sending the correct currency on the correct network. The order will be automatically confirmed once the transaction is detected.",
-        "selectCurrency": "Select Currency:"
+        "selectCurrency": "Select Currency:",
+        "close": "Close"
     }
 }
