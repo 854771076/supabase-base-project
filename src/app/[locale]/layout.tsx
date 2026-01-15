@@ -9,6 +9,7 @@ import { Locale, locales } from '@/i18n/config';
 import { getURL } from "@/utils/url";
 import { App } from 'antd';
 import { Web3Provider } from "@/components/providers/Web3Provider";
+import { CartProvider } from "@/components/cart/CartContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export async function generateStaticParams() {
@@ -51,12 +52,13 @@ export default async function LocaleLayout(props: Readonly<{
         <I18nProvider locale={locale as Locale}>
           <Web3Provider>
             <StyledComponentsRegistry locale={locale as Locale}>
-              <App style={{ minHeight: '100%' }}>
-                <MainLayout user={user}>
-                  {children}
-                </MainLayout>
-              </App>
-
+              <CartProvider>
+                <App style={{ minHeight: '100%' }}>
+                  <MainLayout user={user}>
+                    {children}
+                  </MainLayout>
+                </App>
+              </CartProvider>
             </StyledComponentsRegistry>
           </Web3Provider>
         </I18nProvider>

@@ -167,5 +167,27 @@
         "actualPayment": "实付款",
         "thankYouForPurchase": "感谢您的购买",
         "waitingForPaymentConfirmation": "等待款项确认"
+    },
+    "Cart": {
+        "title": "购物车",
+        "emptyCart": "您的购物车是空的",
+        "checkout": "去结算",
+        "total": "总计",
+        "continueShopping": "继续购物",
+        "addedToCart": "已添加到购物车"
+    },
+    "Checkout": {
+        "title": "收银台",
+        "orderSummary": "订单摘要",
+        "total": "总计",
+        "paymentMethod": "支付方式",
+        "checkout": "结算",
+        "disclaimer": "点击支付即表示您同意我们的服务条款。",
+        "payNow": "立即支付",
+        "successTitle": "支付成功！",
+        "successSubtitle": "您的订单已处理完成，感谢您的支持。",
+        "backHome": "返回首页",
+        "viewOrders": "查看订单",
+        "goShopping": "去购物"
     }
 }

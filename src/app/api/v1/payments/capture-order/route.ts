@@ -1,14 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { capturePaymentOrder } from '@/lib/payment';
 import { createClient } from '@/utils/supabase/server';
-import { z } from 'zod';
 
-const captureOrderSchema = z.object({
-    orderId: z.string().uuid(),
-    providerOrderId: z.string()
-});
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -17,22 +11,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const body = await request.json();
-        const { orderId, providerOrderId } = captureOrderSchema.parse(body);
+        const { orderId, providerOrderId } = await request.json();
 
-        const { data: order, error: orderError } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('id', orderId)
-            .eq('user_id', user.id)
-            .single();
+        // Get order details to get type and amount
+        const adminSupabase = await createClient();
+        const { data: order } = await adminSupabase.from('orders').select('*').eq('id', orderId).single();
 
-        if (orderError || !order) {
+        if (!order) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-        }
-
-        if (order.status === 'completed') {
-            return NextResponse.json({ error: 'Order already completed' }, { status: 400 });
         }
 
         const result = await capturePaymentOrder({
@@ -41,18 +27,13 @@ export async function POST(request: Request) {
             userId: user.id,
             type: order.type,
             productId: order.product_id,
-            amountCents: order.amount_cents
+            amountCents: order.amount_cents,
+            provider: 'paypal',
         });
 
-        return NextResponse.json({
-            success: true,
-            order: result.order
-        });
+        return NextResponse.json({ success: true, order: result.order });
     } catch (error: any) {
-        console.error('Capture payment order error:', error);
-        if (error instanceof z.ZodError) {
-            return NextResponse.json({ error: error.errors }, { status: 400 });
-        }
-        return NextResponse.json({ error: error.message || 'Failed to capture payment order' }, { status: 500 });
+        console.error('Capture order error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

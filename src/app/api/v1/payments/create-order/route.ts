@@ -1,14 +1,8 @@
-import { NextResponse } from 'next/server';
-import { createPaymentOrder, paymentTypeSchema } from '@/lib/payment';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { z } from 'zod';
+import { createPaymentOrder } from '@/lib/payment';
 
-const createOrderSchema = z.object({
-    type: paymentTypeSchema,
-    productId: z.string().uuid()
-});
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -17,62 +11,42 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const body = await request.json();
-        const { type, productId } = createOrderSchema.parse(body);
+        const { type, productId } = await request.json();
 
-        let amountCents: number;
-        let productType: string;
-        let productName: string;
-
+        // Get product details
+        const adminSupabase = await createClient();
+        let product;
         if (type === 'subscription') {
-            const { data: plan } = await supabase
-                .from('plans')
-                .select('*')
-                .eq('id', productId)
-                .single();
-
-            if (!plan) {
-                return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
-            }
-
-            if (plan.price_cents === 0) {
-                return NextResponse.json({ error: 'Free plan does not require payment' }, { status: 400 });
-            }
-
-            amountCents = plan.price_cents;
-            productType = 'plan';
-            productName = plan.name;
+            const { data } = await adminSupabase.from('plans').select('*').eq('id', productId).single();
+            product = data;
         } else {
-            const { data: product } = await supabase
-                .from('credit_products')
-                .select('*')
-                .eq('id', productId)
-                .single();
+            const { data } = await adminSupabase.from('credit_products').select('*').eq('id', productId).single();
+            product = data;
+        }
 
-            if (!product) {
-                return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-            }
-
-            amountCents = product.price_cents;
-            productType = 'credit_product';
-            productName = product.name;
+        if (!product) {
+            return NextResponse.json({ error: 'Product not found' }, { status: 404 });
         }
 
         const result = await createPaymentOrder({
             userId: user.id,
             type,
             productId,
-            productType,
-            productName,
-            amountCents
+            productType: type,
+            productName: product.name,
+            amountCents: product.price_cents,
+            provider: 'paypal',
         });
 
-        return NextResponse.json(result);
+        return NextResponse.json({
+            order: result.order,
+            paypalOrder: {
+                id: result.providerOrderId,
+                status: 'CREATED',
+            }
+        });
     } catch (error: any) {
-        console.error('Create payment order error:', error);
-        if (error instanceof z.ZodError) {
-            return NextResponse.json({ error: error.errors }, { status: 400 });
-        }
-        return NextResponse.json({ error: error.message || 'Failed to create payment order' }, { status: 500 });
+        console.error('Create order error:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

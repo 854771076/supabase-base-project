@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Layout, Menu, Button, Dropdown, Avatar, Space, Typography, Drawer, Grid } from 'antd';
-import { UserOutlined, GlobalOutlined, LogoutOutlined, DownOutlined, MenuOutlined, SwapOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, Dropdown, Avatar, Space, Typography, Drawer, Grid, Badge } from 'antd';
+import { UserOutlined, GlobalOutlined, LogoutOutlined, DownOutlined, MenuOutlined, SwapOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { Locale } from '@/i18n/config';
@@ -10,6 +10,8 @@ import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import NetworkSwitcher, { useNetworkMenuItems } from './NetworkSwitcher';
+import { useCart } from '../cart/CartContext';
+import CartDrawer from '../cart/CartDrawer';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -26,7 +28,9 @@ export default function Header({ user }: HeaderProps) {
     const pathname = usePathname();
     const screens = useBreakpoint();
     const [drawerVisible, setDrawerVisible] = useState(false);
+    const [cartVisible, setCartVisible] = useState(false);
     const { items: networkItems } = useNetworkMenuItems();
+    const { itemCount } = useCart();
 
     const isMobile = screens.xs || (screens.sm && !screens.md);
 
@@ -129,6 +133,13 @@ export default function Header({ user }: HeaderProps) {
             </div>
 
             <Space size={isMobile ? "small" : "middle"}>
+                <Badge count={itemCount} size="small" offset={[-2, 4]}>
+                    <Button
+                        type="text"
+                        icon={<ShoppingCartOutlined style={{ fontSize: '20px' }} />}
+                        onClick={() => setCartVisible(true)}
+                    />
+                </Badge>
                 {!isMobile ? (
                     <>
                         <Dropdown menu={languageMenu} placement="bottomRight">
@@ -206,6 +217,11 @@ export default function Header({ user }: HeaderProps) {
                     </>
                 )}
             </Space>
+            <CartDrawer
+                open={cartVisible}
+                onClose={() => setCartVisible(false)}
+                locale={currentLocale}
+            />
         </AntHeader>
     );
 }

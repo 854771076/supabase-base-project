@@ -1,12 +1,27 @@
-import { createPayPalOrder, capturePayPalOrder } from './paypal';
 import { createAdminClient } from '@/utils/supabase/server';
 import { z } from 'zod';
+import { PayPalProvider } from './payment/providers/paypal';
+import { TokenPayProvider } from './payment/providers/tokenpay';
+import { PaymentProvider, PaymentOrder } from './payment/types';
 
 export const paymentTypeSchema = z.enum(['subscription', 'credits']);
 export const paymentStatusSchema = z.enum(['pending', 'processing', 'completed', 'failed', 'cancelled']);
 
 export type PaymentType = z.infer<typeof paymentTypeSchema>;
 export type PaymentStatus = z.infer<typeof paymentStatusSchema>;
+
+const providers: Record<string, PaymentProvider> = {
+    paypal: new PayPalProvider(),
+    tokenpay: new TokenPayProvider(),
+};
+
+function getProvider(name: string): PaymentProvider {
+    const provider = providers[name];
+    if (!provider) {
+        throw new Error(`Payment provider ${name} not found`);
+    }
+    return provider;
+}
 
 interface CreatePaymentParams {
     userId: string;
@@ -16,7 +31,9 @@ interface CreatePaymentParams {
     productName: string;
     amountCents: number;
     currency?: string;
+    provider: string;
     metadata?: Record<string, any>;
+    items?: any[];
 }
 
 interface CapturePaymentParams {
@@ -26,6 +43,7 @@ interface CapturePaymentParams {
     type: PaymentType;
     productId: string;
     amountCents: number;
+    provider: string;
 }
 
 export async function createPaymentOrder(params: CreatePaymentParams) {
@@ -37,21 +55,21 @@ export async function createPaymentOrder(params: CreatePaymentParams) {
         productName,
         amountCents,
         currency = 'USD',
-        metadata = {}
+        provider: providerName,
+        metadata = {},
+        items = []
     } = params;
 
     const adminSupabase = await createAdminClient();
+    const provider = getProvider(providerName);
 
-    const amount = (amountCents / 100).toFixed(2);
-    const paypalOrder = await createPayPalOrder(amount, currency);
-
+    // Create local order first
     const { data: order, error } = await adminSupabase
         .from('orders')
         .insert({
             user_id: userId,
             type,
-            provider: 'paypal',
-            provider_order_id: paypalOrder.id,
+            provider: providerName,
             status: 'pending',
             amount_cents: amountCents,
             currency,
@@ -68,13 +86,36 @@ export async function createPaymentOrder(params: CreatePaymentParams) {
         throw new Error('Failed to create order');
     }
 
+    // Create order with provider
+    const providerResponse = await provider.createOrder({
+        id: order.id,
+        userId,
+        amountCents,
+        currency,
+        status: 'pending',
+        type,
+        items,
+        metadata
+    });
+
+    if (!providerResponse.success) {
+        await adminSupabase
+            .from('orders')
+            .update({ status: 'failed', metadata: { ...metadata, error: providerResponse.error } })
+            .eq('id', order.id);
+        throw new Error(providerResponse.error || 'Failed to create provider order');
+    }
+
+    // Update order with provider order ID
+    await adminSupabase
+        .from('orders')
+        .update({ provider_order_id: providerResponse.providerOrderId })
+        .eq('id', order.id);
+
     return {
-        order,
-        paypalOrder: {
-            id: paypalOrder.id,
-            status: paypalOrder.status,
-            approveUrl: paypalOrder.links?.find((l: any) => l.rel === 'approve')?.href
-        }
+        order: { ...order, provider_order_id: providerResponse.providerOrderId },
+        redirectUrl: providerResponse.redirectUrl,
+        providerOrderId: providerResponse.providerOrderId
     };
 }
 
@@ -85,13 +126,16 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
         userId,
         type,
         productId,
-        amountCents
+        amountCents,
+        provider: providerName
     } = params;
 
     const adminSupabase = await createAdminClient();
-    const captureData = await capturePayPalOrder(providerOrderId);
+    const provider = getProvider(providerName);
 
-    if (captureData.status !== 'COMPLETED') {
+    const captureResult = await provider.captureOrder(providerOrderId);
+
+    if (!captureResult.success) {
         await adminSupabase
             .from('orders')
             .update({
@@ -100,7 +144,7 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
             })
             .eq('id', orderId);
 
-        throw new Error('Payment not completed');
+        throw new Error(`Payment not completed: ${captureResult.status}`);
     }
 
     if (type === 'credits') {
@@ -125,7 +169,7 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
         throw new Error('Failed to update order');
     }
 
-    return { order, captureData };
+    return { order, captureResult };
 }
 
 async function processCreditsPayment(adminSupabase: any, userId: string, productId: string, amountCents: number) {

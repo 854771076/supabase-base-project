@@ -168,5 +168,27 @@
         "actualPayment": "Actual Payment",
         "thankYouForPurchase": "Thank you for your purchase",
         "waitingForPaymentConfirmation": "Waiting for payment confirmation"
+    },
+    "Cart": {
+        "title": "Shopping Cart",
+        "emptyCart": "Your cart is empty",
+        "checkout": "Checkout",
+        "total": "Total",
+        "continueShopping": "Continue Shopping",
+        "addedToCart": "Added to cart"
+    },
+    "Checkout": {
+        "title": "Cashier",
+        "orderSummary": "Order Summary",
+        "total": "Total",
+        "paymentMethod": "Payment Method",
+        "checkout": "Checkout",
+        "disclaimer": "By clicking Pay Now, you agree to our Terms of Service.",
+        "payNow": "Pay Now",
+        "successTitle": "Payment Successful!",
+        "successSubtitle": "Your order has been processed. Thank you for your support.",
+        "backHome": "Back Home",
+        "viewOrders": "View Orders",
+        "goShopping": "Go Shopping"
     }
 }

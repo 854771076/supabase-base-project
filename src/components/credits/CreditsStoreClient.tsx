@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { Card, Row, Col, Typography, Button, Space, Statistic, App } from 'antd';
-import { ShoppingCartOutlined, WalletOutlined } from '@ant-design/icons';
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { ShoppingCartOutlined, WalletOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from '@/i18n/context';
+import { useTranslations, useLocale } from '@/i18n/context';
+import { useCart } from '../cart/CartContext';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -26,127 +26,104 @@ export default function CreditsStoreClient({
     initialBalance
 }: CreditsStoreClientProps) {
     const t = useTranslations('Credits');
-    const tPayment = useTranslations('Payment');
+    const tCart = useTranslations('Cart');
     const { message } = App.useApp();
 
     const [balance, setBalance] = useState(initialBalance);
-    const [loading, setLoading] = useState<string | null>(null);
     const router = useRouter();
-    const [localOrderId, setLocalOrderId] = useState<string | null>(null);
+    const { addItem } = useCart();
 
-    const handleCapture = async (orderId: string, providerOrderId: string) => {
-        setLoading(providerOrderId);
-        try {
-            const response = await fetch('/api/v1/payments/capture-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, providerOrderId: providerOrderId }),
-            });
+    const currentLocale = useLocale();
 
-            const result = await response.json();
-            if (result.success) {
-                message.success(t('success'));
-                const found = products.find(p => p.id === providerOrderId);
-                if (found) {
-                    setBalance(prev => prev + found.credits_amount);
-                } else {
-                    console.warn('未找到对应产品，积分未增加');
-                }
-                router.refresh();
-            } else {
-                message.error(result.error || t('error'));
-            }
-        } catch (error) {
-            console.error('Capture error:', error);
-            message.error(t('error'));
-        } finally {
-            setLoading(null);
-        }
+    const handleAddToCart = (product: CreditProduct) => {
+        addItem({
+            id: product.id,
+            name: product.name,
+            price_cents: product.price_cents,
+            type: 'credits',
+        });
+        message.success(tCart('addedToCart'));
+    };
+
+    const handleBuyNow = (product: CreditProduct) => {
+        addItem({
+            id: product.id,
+            name: product.name,
+            price_cents: product.price_cents,
+            type: 'credits',
+        });
+        router.push(`/${currentLocale}/checkout`);
     };
 
     return (
-        <PayPalScriptProvider options={{
-            clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
-            currency: "USD",
-            intent: "capture"
-        }}>
-            <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-                <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-                    <Title level={2}>{t('title')}</Title>
-                    <Paragraph type="secondary" style={{ fontSize: '16px' }}>
-                        {t('subtitle')}
-                    </Paragraph>
+        <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                <Title level={2}>{t('title')}</Title>
+                <Paragraph type="secondary" style={{ fontSize: '16px' }}>
+                    {t('subtitle')}
+                </Paragraph>
 
-                    <Card style={{ maxWidth: '300px', margin: '24px auto', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                        <Statistic
-                            title={t('balance')}
-                            value={balance}
-                            prefix={<WalletOutlined />}
-                            valueStyle={{ color: '#1890ff' }}
-                        />
-                    </Card>
-                </div>
-
-                <Row gutter={[24, 24]} justify="center">
-                    {products.map((product) => (
-                        <Col xs={24} sm={12} lg={8} key={product.id}>
-                            <Card
-                                hoverable
-                                title={
-                                    <Space>
-                                        <ShoppingCartOutlined />
-                                        <span>{product.name}</span>
-                                    </Space>
-                                }
-                                style={{ borderRadius: '12px', textAlign: 'center' }}
-                            >
-                                <Title level={3} style={{ margin: '12px 0' }}>
-                                    ${(product.price_cents / 100).toFixed(2)}
-                                </Title>
-                                <Paragraph>
-                                    <Text strong style={{ fontSize: '18px' }}>
-                                        {product.credits_amount}
-                                    </Text>
-                                    <Text type="secondary"> Credits</Text>
-                                </Paragraph>
-
-                                <div style={{ marginTop: '24px' }}>
-                                    <PayPalButtons
-                                        style={{ layout: "vertical", shape: "rect", label: "buynow" }}
-                                        onClick={() => setLocalOrderId(null)}
-                                        createOrder={async () => {
-                                            const response = await fetch('/api/v1/payments/create-order', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ type: 'credits', productId: product.id }),
-                                            });
-                                            const { paypalOrder,order } = await response.json();
-                                            setLocalOrderId(order.id);
-                                            return paypalOrder.id;
-                                        }}
-                                        onApprove={async (data) => {
-                                            if (!localOrderId) {
-                                                message.error({ content: tPayment('systemConfigSyncFailed'), duration: 3 });
-                                                return;
-                                            }
-                                            try {
-                                                await handleCapture(localOrderId, data.orderID);
-                                                message.success({ content: tPayment('paymentSuccessProcessing'), duration: 3 });
-                                            } catch (err) {
-                                                message.error({ content: tPayment('paymentCaptureFailed'), duration: 3 });
-                                            }
-                                        }}
-                                        onError={(err) => {
-                                            console.error('PayPal Credits Error:', err);
-                                            message.error(t('error'));
-                                        }}
-                                    />
-                                </div>
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
+                <Card style={{ maxWidth: '300px', margin: '24px auto', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                    <Statistic
+                        title={t('balance')}
+                        value={balance}
+                        prefix={<WalletOutlined />}
+                        valueStyle={{ color: '#1890ff' }}
+                    />
+                </Card>
             </div>
-        </PayPalScriptProvider>
+
+            <Row gutter={[24, 24]} justify="center">
+                {products.map((product) => (
+                    <Col xs={24} sm={12} lg={8} key={product.id}>
+                        <Card
+                            hoverable
+                            title={
+                                <Space>
+                                    <ShoppingCartOutlined />
+                                    <span>{product.name}</span>
+                                </Space>
+                            }
+                            style={{ borderRadius: '12px', textAlign: 'center' }}
+                        >
+                            <Title level={3} style={{ margin: '12px 0' }}>
+                                ${(product.price_cents / 100).toFixed(2)}
+                            </Title>
+                            <Paragraph>
+                                <Text strong style={{ fontSize: '18px' }}>
+                                    {product.credits_amount}
+                                </Text>
+                                <Text type="secondary"> Credits</Text>
+                            </Paragraph>
+
+                            <div style={{ marginTop: '24px' }}>
+                                <Space direction="vertical" style={{ width: '100%' }}>
+                                    <Button
+                                        type="primary"
+                                        size="large"
+                                        block
+                                        icon={<CreditCardOutlined />}
+                                        onClick={() => handleBuyNow(product)}
+                                        style={{ borderRadius: '8px', height: '48px' }}
+                                    >
+                                        {t('buyNow')}
+                                    </Button>
+                                    <Button
+                                        type="default"
+                                        size="large"
+                                        block
+                                        icon={<ShoppingCartOutlined />}
+                                        onClick={() => handleAddToCart(product)}
+                                        style={{ borderRadius: '8px', height: '48px' }}
+                                    >
+                                        {tCart('addedToCart')}
+                                    </Button>
+                                </Space>
+                            </div>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+        </div>
     );
 }

@@ -34,6 +34,11 @@ export default function WalletLogin() {
     // Log connection errors
     useEffect(() => {
         if (connectError) {
+            // Skip logging user rejection as an error
+            if (connectError.name === 'UserRejectedRequestError') {
+                return;
+            }
+
             console.error('Connect error:', connectError);
             if ((connectError as any).name === 'ProviderNotFoundError') {
                 message.error('No wallet found. Please install MetaMask.');
@@ -57,7 +62,8 @@ export default function WalletLogin() {
             const data = await response.json();
             setNonce(data.nonce);
         } catch (error) {
-            console.error('Failed to fetch nonce:', error);
+            // Nonce fetch failure is usually a network or server issue, keep logging but maybe as warn if it's transient
+            console.warn('Failed to fetch nonce:', error);
             message.error(t('error'));
         }
     };
@@ -147,6 +153,10 @@ Issued At: ${new Date().toISOString()}`;
             }
 
         } catch (error: any) {
+            // Skip logging user rejection during signing
+            if (error.name === 'UserRejectedRequestError' || error.code === 4001) {
+                return;
+            }
             console.error('Sign in error:', error);
             message.error(error.message || t('error'));
         } finally {
