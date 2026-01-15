@@ -175,7 +175,7 @@
         "checkout": "Checkout",
         "total": "Total",
         "continueShopping": "Continue Shopping",
-        "addedToCart": "Added to cart"
+        "addedToCart": "Add to cart"
     },
     "Checkout": {
         "title": "Cashier",

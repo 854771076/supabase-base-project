@@ -174,7 +174,7 @@
         "checkout": "去结算",
         "total": "总计",
         "continueShopping": "继续购物",
-        "addedToCart": "已添加到购物车"
+        "addedToCart": "添加到购物车"
     },
     "Checkout": {
         "title": "收银台",
@@ -198,6 +198,7 @@
         "orderId": "订单 ID",
         "expires": "过期时间",
         "tokenPayWarning": "请确保您在正确的网络上发送正确的币种。一旦检测到交易，订单将自动确认。",
-        "selectCurrency": "选择币种："
+        "selectCurrency": "选择币种：",
+        "close": "关闭"
     }
 }
