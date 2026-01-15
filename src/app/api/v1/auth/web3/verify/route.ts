@@ -4,40 +4,6 @@ import { parseSiweMessage, verifySiweMessage } from 'viem/siwe';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
 
-/**
- * @swagger
- * /api/v1/auth/web3/verify:
- *   post:
- *     summary: Verify SIWE signature and create Supabase session
- *     description: Verifies the SIWE signature and creates a Supabase user session
- *     tags:
- *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - message
- *               - signature
- *             properties:
- *               message:
- *                 type: string
- *                 description: The SIWE message that was signed
- *               signature:
- *                 type: string
- *                 description: The signature of the SIWE message
- *     responses:
- *       200:
- *         description: Successfully verified and created session
- *       400:
- *         description: Missing required fields
- *       401:
- *         description: Invalid signature
- *       500:
- *         description: Server error
- */
 export async function POST(request: NextRequest) {
     try {
         const { message, signature } = await request.json();
