@@ -25,6 +25,17 @@ export default function CheckoutClient() {
     const [orderInfo, setOrderInfo] = useState<any>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
+    const tokenPayOptions = React.useMemo(() => TOKENPAY_CURRENCIES.map(c => ({
+        label: (
+            <Space>
+                <Image src={c.icon} width={24} height={24} preview={false} alt={c.label} />
+                <Text>{c.label}</Text>
+                <Tag color="default" style={{ marginLeft: 'auto' }}>{c.network}</Tag>
+            </Space>
+        ),
+        value: c.value
+    })), []);
+
     const handlePayment = async () => {
         if (items.length === 0) return;
 
@@ -167,16 +178,6 @@ export default function CheckoutClient() {
         );
     }
 
-    const tokenPayOptions = React.useMemo(() => TOKENPAY_CURRENCIES.map(c => ({
-        label: (
-            <Space>
-                <Image src={c.icon} width={24} height={24} preview={false} />
-                <Text>{c.label}</Text>
-                <Tag color="default" style={{ marginLeft: 'auto' }}>{c.network}</Tag>
-            </Space>
-        ),
-        value: c.value
-    })), [t]);
 
     return (
         <div style={{ padding: '40px 24px', maxWidth: '1000px', margin: '0 auto' }}>
