@@ -95,8 +95,8 @@ export class TokenPayProvider implements PaymentProvider {
 
             // Based on docs, status 1 is paid
             return {
-                success: data.success && data.data?.Status === 1,
-                status: data.data?.Status === 1 ? 'completed' : (data.data?.Status === 2 ? 'expired' : 'pending'),
+                success: data.success && data.data?.status === 'Paid',
+                status: data.data?.status === 'Paid' ? 'completed' : (data.data?.status === 'Pending' ? 'pending' : 'failed'),
             };
         } catch (error) {
             return {
