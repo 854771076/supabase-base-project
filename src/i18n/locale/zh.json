@@ -26,7 +26,9 @@
         "demo": "演示",
         "credits": "点数商城",
         "orderHistory": "订单历史",
-        "language": "语言"
+        "language": "语言",
+        "title":"菜单",
+        "network": "网络"
     },
     "Profile": {
         "title": "个人资料",

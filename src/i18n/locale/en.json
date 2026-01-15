@@ -26,8 +26,9 @@
         "demo": "Demo",
         "credits": "Credits Store",
         "orderHistory": "Order History",
-        "language": "Language"
-
+        "language": "Language",
+        "title":"Menu",
+        "network": "Network"
 
     },
     "Profile": {

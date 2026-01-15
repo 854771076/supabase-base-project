@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import { Layout, Menu, Button, Dropdown, Avatar, Space, Typography, Drawer, Grid } from 'antd';
-import { UserOutlined, GlobalOutlined, LogoutOutlined, DownOutlined, MenuOutlined } from '@ant-design/icons';
+import { UserOutlined, GlobalOutlined, LogoutOutlined, DownOutlined, MenuOutlined, SwapOutlined } from '@ant-design/icons';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { Locale } from '@/i18n/config';
 import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import NetworkSwitcher from './NetworkSwitcher';
+import NetworkSwitcher, { useNetworkMenuItems } from './NetworkSwitcher';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -26,6 +26,7 @@ export default function Header({ user }: HeaderProps) {
     const pathname = usePathname();
     const screens = useBreakpoint();
     const [drawerVisible, setDrawerVisible] = useState(false);
+    const { items: networkItems } = useNetworkMenuItems();
 
     const isMobile = screens.xs || (screens.sm && !screens.md);
 
@@ -160,7 +161,7 @@ export default function Header({ user }: HeaderProps) {
                             onClick={() => setDrawerVisible(true)}
                         />
                         <Drawer
-                            title="Menu"
+                            title={t("menu")}
                             placement="right"
                             onClose={() => setDrawerVisible(false)}
                             open={drawerVisible}
@@ -180,6 +181,12 @@ export default function Header({ user }: HeaderProps) {
                                             { key: 'en', label: 'English', onClick: () => handleLanguageChange({ key: 'en' }) },
                                             { key: 'zh', label: '中文', onClick: () => handleLanguageChange({ key: 'zh' }) },
                                         ]
+                                    },
+                                    {
+                                        key: 'network',
+                                        label: t('network'),
+                                        icon: <SwapOutlined />,
+                                        children: networkItems
                                     },
                                     ...(user ? [
                                         { type: 'divider' as const },
