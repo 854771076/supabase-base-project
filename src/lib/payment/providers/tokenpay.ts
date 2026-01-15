@@ -27,13 +27,15 @@ export class TokenPayProvider implements PaymentProvider {
             };
         }
 
+        const baseUrl = NEXT_PUBLIC_TOKENPAY_URL.replace(/\/$/, '');
+
         try {
             const payload: Record<string, any> = {
                 OutOrderId: order.id,
                 OrderUserKey: order.userId,
-                ActualAmount: (order.amountCents / 100).toFixed(2),
+                ActualAmount: Number((order.amountCents / 100).toFixed(2)),
                 Currency: order.currency,
-                RedirectUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/payment/callback?order_id=${order.id}`,
+                RedirectUrl: order.metadata?.redirect_url || `${process.env.NEXT_PUBLIC_APP_URL || ''}/payment/callback?order_id=${order.id}`,
             };
 
             // Add optional fields if available
@@ -44,7 +46,7 @@ export class TokenPayProvider implements PaymentProvider {
             const signature = this.generateSignature(payload, TOKENPAY_API_KEY);
             payload.Signature = signature;
 
-            const response = await fetch(`${NEXT_PUBLIC_TOKENPAY_URL}/CreateOrder`, {
+            const response = await fetch(`${baseUrl}/CreateOrder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,8 +59,8 @@ export class TokenPayProvider implements PaymentProvider {
             if (data.success) {
                 return {
                     success: true,
-                    providerOrderId: data.info?.Id || order.id, // TokenPay returns internal ID in info.Id
-                    redirectUrl: data.data, // The payment URL is in data field
+                    providerOrderId: data.info?.Id || order.id,
+                    redirectUrl: data.data,
                 };
             }
 
@@ -81,11 +83,13 @@ export class TokenPayProvider implements PaymentProvider {
             return { success: false, status: 'error' };
         }
 
+        const baseUrl = NEXT_PUBLIC_TOKENPAY_URL.replace(/\/$/, '');
+
         try {
             const params = { Id: providerOrderId };
             const signature = this.generateSignature(params, TOKENPAY_API_KEY);
 
-            const response = await fetch(`${NEXT_PUBLIC_TOKENPAY_URL}/Query?Id=${providerOrderId}&Signature=${signature}`);
+            const response = await fetch(`${baseUrl}/Query?Id=${providerOrderId}&Signature=${signature}`);
             const data = await response.json();
 
             // Based on docs, status 1 is paid
