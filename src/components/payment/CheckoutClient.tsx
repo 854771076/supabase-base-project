@@ -167,7 +167,7 @@ export default function CheckoutClient() {
         );
     }
 
-    if (items.length === 0) {
+    if (items.length === 0 && !success && !isModalVisible) {
         return (
             <div style={{ padding: '80px 24px', textAlign: 'center' }}>
                 <Title level={2}>{tCart('emptyCart')}</Title>
@@ -231,7 +231,6 @@ export default function CheckoutClient() {
                                         {paymentMethod === 'tokenpay' && (
                                             <div
                                                 style={{ marginTop: '16px', paddingLeft: '28px' }}
-                                                onMouseDown={(e) => e.stopPropagation()}
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 <Text type="secondary" style={{ display: 'block', marginBottom: '8px' }}>{t('selectCurrency')}</Text>
