@@ -200,6 +200,9 @@
         "expires": "过期时间",
         "tokenPayWarning": "请在规定时间内完成支付，超时订单将自动失效。",
         "selectCurrency": "选择币种：",
-        "close": "关闭"
+        "close": "关闭",
+        "iHavePaid": "我已支付",
+        "verifying": "正在验证支付状态...",
+        "paymentNotDetected": "尚未检测到支付，请稍后再试或等待确认。"
     }
 }

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Modal, Row, Col, Typography, Space, Tag, QRCode, Descriptions, Image, Button, App } from 'antd';
-import { WalletOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { WalletOutlined, InfoCircleOutlined, LoadingOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
 
@@ -40,29 +40,42 @@ export default function TokenPayModal({ visible, onCancel, orderId, metadata, on
         }
     };
 
+    const [verifying, setVerifying] = React.useState(false);
+
+    const checkStatus = async (isManual = false) => {
+        if (isManual) setVerifying(true);
+        try {
+            const response = await fetch(`/api/v1/payments/orders/${orderId}`);
+            const data = await response.json();
+
+            if (data.success && data.order.status === 'completed') {
+                message.success(t('successTitle'));
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    onCancel();
+                    router.push(`/${locale}/orders/${orderId}`);
+                }
+                return true;
+            } else if (isManual) {
+                message.info(t('paymentNotDetected'));
+            }
+        } catch (error) {
+            console.error('Polling error:', error);
+        } finally {
+            if (isManual) setVerifying(false);
+        }
+        return false;
+    };
+
     // Polling for order status
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
         if (visible && orderId) {
             interval = setInterval(async () => {
-                try {
-                    const response = await fetch(`/api/v1/payments/orders/${orderId}`);
-                    const data = await response.json();
-
-                    if (data.success && data.order.status === 'completed') {
-                        message.success(t('successTitle'));
-                        if (onSuccess) {
-                            onSuccess();
-                        } else {
-                            onCancel();
-                            router.push(`/${locale}/orders/${orderId}`);
-                        }
-                        clearInterval(interval);
-                    }
-                } catch (error) {
-                    console.error('Polling error:', error);
-                }
+                const isCompleted = await checkStatus();
+                if (isCompleted) clearInterval(interval);
             }, 5000);
         }
 
@@ -82,7 +95,16 @@ export default function TokenPayModal({ visible, onCancel, orderId, metadata, on
                 <Button key="close" onClick={onCancel}>
                     {t('close')}
                 </Button>,
-                <Button key="orders" type="primary" onClick={() => router.push(`/${locale}/orders`)}>
+                <Button
+                    key="verify"
+                    type="primary"
+                    loading={verifying}
+                    onClick={() => checkStatus(true)}
+                    icon={<CheckCircleOutlined />}
+                >
+                    {t('iHavePaid')}
+                </Button>,
+                <Button key="orders" onClick={() => router.push(`/${locale}/orders`)}>
                     {t('viewOrders')}
                 </Button>
             ]}

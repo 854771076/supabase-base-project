@@ -26,16 +26,6 @@ export default function CheckoutClient() {
     const [orderInfo, setOrderInfo] = useState<any>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const tokenPayOptions = React.useMemo(() => TOKENPAY_CURRENCIES.map(c => ({
-        label: (
-            <Space>
-                <Image src={c.icon} width={24} height={24} preview={false} alt={c.label} />
-                <Text>{c.label}</Text>
-                <Tag color="default" style={{ marginLeft: 'auto' }}>{c.network}</Tag>
-            </Space>
-        ),
-        value: c.value
-    })), []);
 
     const handlePayment = async () => {
         if (items.length === 0) return;
@@ -163,13 +153,36 @@ export default function CheckoutClient() {
                                                 style={{ marginTop: '16px', paddingLeft: '28px' }}
                                             >
                                                 <Text type="secondary" style={{ display: 'block', marginBottom: '8px' }}>{t('selectCurrency')}</Text>
-                                                <Select
-                                                    value={tokenPayCurrency}
-                                                    onChange={setTokenPayCurrency}
-                                                    style={{ width: '100%', height: '48px' }}
-                                                    dropdownStyle={{ borderRadius: '12px' }}
-                                                    options={tokenPayOptions}
-                                                />
+                                                <Row gutter={[12, 12]}>
+                                                    {TOKENPAY_CURRENCIES.map((c) => (
+                                                        <Col xs={12} sm={8} key={c.value}>
+                                                            <Card
+                                                                hoverable
+                                                                size="small"
+                                                                onClick={() => setTokenPayCurrency(c.value)}
+                                                                styles={{
+                                                                    body: {
+                                                                        padding: '12px',
+                                                                        display: 'flex',
+                                                                        flexDirection: 'column',
+                                                                        alignItems: 'center',
+                                                                        gap: '8px',
+                                                                        border: tokenPayCurrency === c.value ? '2px solid #1677ff' : '1px solid #f0f0f0',
+                                                                        borderRadius: '8px',
+                                                                        background: tokenPayCurrency === c.value ? '#e6f4ff' : '#fff',
+                                                                        transition: 'all 0.3s'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <Image src={c.icon} width={32} height={32} preview={false} alt={c.label} />
+                                                                <div style={{ textAlign: 'center' }}>
+                                                                    <Text strong style={{ fontSize: '14px', display: 'block' }}>{c.label}</Text>
+                                                                    <Tag color="default" style={{ margin: 0, fontSize: '10px' }}>{c.network}</Tag>
+                                                                </div>
+                                                            </Card>
+                                                        </Col>
+                                                    ))}
+                                                </Row>
                                             </div>
                                         )}
                                     </Space>

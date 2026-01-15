@@ -201,6 +201,9 @@
         "expires": "Expires",
         "tokenPayWarning": "Please ensure you are sending the correct currency on the correct network. The order will be automatically confirmed once the transaction is detected.",
         "selectCurrency": "Select Currency:",
-        "close": "Close"
+        "close": "Close",
+        "iHavePaid": "I Have Paid",
+        "verifying": "Verifying payment...",
+        "paymentNotDetected": "Payment not detected yet. Please wait a moment or try again."
     }
 }
