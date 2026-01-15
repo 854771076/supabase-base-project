@@ -1,8 +1,21 @@
 import { env } from '@/utils/env';
 import { PaymentProvider, PaymentOrder, PaymentProviderResponse } from '../types';
+import crypto from 'crypto';
 
 export class TokenPayProvider implements PaymentProvider {
     name = 'tokenpay';
+
+    private generateSignature(params: Record<string, any>, secret: string): string {
+        const sortedKeys = Object.keys(params)
+            .filter(key => params[key] !== undefined && params[key] !== null && params[key] !== '')
+            .sort();
+
+        const queryString = sortedKeys
+            .map(key => `${key}=${params[key]}`)
+            .join('&');
+
+        return crypto.createHash('md5').update(queryString + secret).digest('hex');
+    }
 
     async createOrder(order: PaymentOrder): Promise<PaymentProviderResponse> {
         const { NEXT_PUBLIC_TOKENPAY_URL, TOKENPAY_API_KEY } = env;
@@ -15,31 +28,37 @@ export class TokenPayProvider implements PaymentProvider {
         }
 
         try {
-            // TokenPay API implementation (Assuming standard TokenPay REST API)
-            const response = await fetch(`${NEXT_PUBLIC_TOKENPAY_URL}/api/v1/order/create`, {
+            const payload: Record<string, any> = {
+                OutOrderId: order.id,
+                OrderUserKey: order.userId,
+                ActualAmount: (order.amountCents / 100).toFixed(2),
+                Currency: order.currency,
+                RedirectUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/payment/callback?order_id=${order.id}`,
+            };
+
+            // Add optional fields if available
+            if (order.metadata?.notify_url) {
+                payload.NotifyUrl = order.metadata.notify_url;
+            }
+
+            const signature = this.generateSignature(payload, TOKENPAY_API_KEY);
+            payload.Signature = signature;
+
+            const response = await fetch(`${NEXT_PUBLIC_TOKENPAY_URL}/CreateOrder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': TOKENPAY_API_KEY,
                 },
-                body: JSON.stringify({
-                    amount: (order.amountCents / 100).toFixed(2),
-                    currency: order.currency,
-                    order_id: order.id,
-                    title: `Order #${order.id.slice(0, 8)}`,
-                    description: order.items.map(i => i.name).join(', '),
-                    success_url: `${window.location.origin}/payment/success?order_id=${order.id}`,
-                    cancel_url: `${window.location.origin}/payment/cancel?order_id=${order.id}`,
-                }),
+                body: JSON.stringify(payload),
             });
 
             const data = await response.json();
 
-            if (data.code === 200) {
+            if (data.success) {
                 return {
                     success: true,
-                    providerOrderId: data.data.order_id,
-                    redirectUrl: data.data.payment_url,
+                    providerOrderId: data.info?.Id || order.id, // TokenPay returns internal ID in info.Id
+                    redirectUrl: data.data, // The payment URL is in data field
                 };
             }
 
@@ -56,20 +75,23 @@ export class TokenPayProvider implements PaymentProvider {
     }
 
     async captureOrder(providerOrderId: string): Promise<{ success: boolean; status: string }> {
-        // TokenPay usually uses webhooks for confirmation, but we can implement a check if needed
         const { NEXT_PUBLIC_TOKENPAY_URL, TOKENPAY_API_KEY } = env;
 
+        if (!NEXT_PUBLIC_TOKENPAY_URL || !TOKENPAY_API_KEY) {
+            return { success: false, status: 'error' };
+        }
+
         try {
-            const response = await fetch(`${NEXT_PUBLIC_TOKENPAY_URL}/api/v1/order/check?order_id=${providerOrderId}`, {
-                headers: {
-                    'x-api-key': TOKENPAY_API_KEY!,
-                },
-            });
+            const params = { Id: providerOrderId };
+            const signature = this.generateSignature(params, TOKENPAY_API_KEY);
+
+            const response = await fetch(`${NEXT_PUBLIC_TOKENPAY_URL}/Query?Id=${providerOrderId}&Signature=${signature}`);
             const data = await response.json();
 
+            // Based on docs, status 1 is paid
             return {
-                success: data.data?.status === 'completed',
-                status: data.data?.status || 'unknown',
+                success: data.success && data.data?.Status === 1,
+                status: data.data?.Status === 1 ? 'completed' : (data.data?.Status === 2 ? 'expired' : 'pending'),
             };
         } catch (error) {
             return {

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Space, Typography, Spin, App, Modal, List, Avatar } from 'antd';
 import { WalletOutlined, QrcodeOutlined, LoginOutlined, DisconnectOutlined } from '@ant-design/icons';
 import { useAccount, useConnect, useDisconnect, useSignMessage, useConnectors } from 'wagmi';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const { Text } = Typography;
 
@@ -46,17 +47,9 @@ export default function WalletLogin() {
                 message.error(connectError.message || t('error'));
             }
         }
-    }, [connectError]);
+    }, [connectError, message, t]);
 
-    // Fetch nonce when connected
-    useEffect(() => {
-        if (isConnected && address) {
-            fetchNonce();
-            setIsWalletModalOpen(false);
-        }
-    }, [isConnected, address]);
-
-    const fetchNonce = async () => {
+    const fetchNonce = useCallback(async () => {
         try {
             const response = await fetch('/api/v1/auth/web3/nonce');
             const data = await response.json();
@@ -66,7 +59,15 @@ export default function WalletLogin() {
             console.warn('Failed to fetch nonce:', error);
             message.error(t('error'));
         }
-    };
+    }, [message, t]);
+
+    // Fetch nonce when connected
+    useEffect(() => {
+        if (isConnected && address) {
+            fetchNonce();
+            setIsWalletModalOpen(false);
+        }
+    }, [isConnected, address, fetchNonce]);
 
     const handleBrowserWalletConnect = () => {
         if (injectedConnectors.length === 0) {
@@ -267,7 +268,17 @@ Issued At: ${new Date().toISOString()}`;
                                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', height: 'auto', padding: '12px' }}
                             >
                                 <Space>
-                                    {item.icon ? <img src={item.icon} alt={item.name} style={{ width: 24, height: 24 }} /> : <WalletOutlined />}
+                                    {item.icon ? (
+                                        <Image
+                                            src={item.icon}
+                                            alt={item.name}
+                                            width={24}
+                                            height={24}
+                                            unoptimized
+                                        />
+                                    ) : (
+                                        <WalletOutlined />
+                                    )}
                                     <span>{item.name}</span>
                                 </Space>
                             </Button>

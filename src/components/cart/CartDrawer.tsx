@@ -68,6 +68,7 @@ export default function CartDrawer({ open, onClose, locale }: CartDrawerProps) {
                         <List.Item
                             actions={[
                                 <Button
+                                    key="delete"
                                     type="text"
                                     danger
                                     icon={<DeleteOutlined />}
