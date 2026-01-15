@@ -94,7 +94,6 @@ export class TokenPayProvider implements PaymentProvider {
             const data = await response.json();
 
             // Based on docs, status 1 is paid
-            console.log(data);
             return {
                 success: data.success && data.data?.Status === 1,
                 status: data.data?.Status === 1 ? 'completed' : (data.data?.Status === 2 ? 'expired' : 'pending'),

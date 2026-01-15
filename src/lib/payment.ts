@@ -153,7 +153,7 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
         await adminSupabase
             .from('orders')
             .update({
-                status: 'failed',
+                status: captureResult.status,
                 updated_at: new Date().toISOString()
             })
             .eq('id', orderId);
