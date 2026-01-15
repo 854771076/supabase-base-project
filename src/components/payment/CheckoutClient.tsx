@@ -167,6 +167,17 @@ export default function CheckoutClient() {
         );
     }
 
+    const tokenPayOptions = React.useMemo(() => TOKENPAY_CURRENCIES.map(c => ({
+        label: (
+            <Space>
+                <Image src={c.icon} width={24} height={24} preview={false} />
+                <Text>{c.label}</Text>
+                <Tag color="default" style={{ marginLeft: 'auto' }}>{c.network}</Tag>
+            </Space>
+        ),
+        value: c.value
+    })), [t]);
+
     return (
         <div style={{ padding: '40px 24px', maxWidth: '1000px', margin: '0 auto' }}>
             <Title level={2} style={{ marginBottom: '32px' }}>{t('title')}</Title>
@@ -217,23 +228,18 @@ export default function CheckoutClient() {
                                             <Text strong>TokenPay (Crypto)</Text>
                                         </Space>
                                         {paymentMethod === 'tokenpay' && (
-                                            <div style={{ marginTop: '16px', paddingLeft: '28px' }}>
+                                            <div
+                                                style={{ marginTop: '16px', paddingLeft: '28px' }}
+                                                onMouseDown={(e) => e.stopPropagation()}
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
                                                 <Text type="secondary" style={{ display: 'block', marginBottom: '8px' }}>{t('selectCurrency')}</Text>
                                                 <Select
                                                     value={tokenPayCurrency}
                                                     onChange={setTokenPayCurrency}
                                                     style={{ width: '100%', height: '48px' }}
                                                     dropdownStyle={{ borderRadius: '12px' }}
-                                                    options={TOKENPAY_CURRENCIES.map(c => ({
-                                                        label: (
-                                                            <Space>
-                                                                <Image src={c.icon} width={24} height={24} preview={false} />
-                                                                <Text>{c.label}</Text>
-                                                                <Tag color="default" style={{ marginLeft: 'auto' }}>{c.network}</Tag>
-                                                            </Space>
-                                                        ),
-                                                        value: c.value
-                                                    }))}
+                                                    options={tokenPayOptions}
                                                 />
                                             </div>
                                         )}

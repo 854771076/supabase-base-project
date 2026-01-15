@@ -115,7 +115,8 @@ export async function createPaymentOrder(params: CreatePaymentParams) {
     return {
         order: { ...order, provider_order_id: providerResponse.providerOrderId },
         redirectUrl: providerResponse.redirectUrl,
-        providerOrderId: providerResponse.providerOrderId
+        providerOrderId: providerResponse.providerOrderId,
+        metadata: providerResponse?.metadata
     };
 }
 

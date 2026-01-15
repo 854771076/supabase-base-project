@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
             success: true,
             orderId: result.order.id,
             redirectUrl: result.redirectUrl,
-            providerOrderId: result.providerOrderId
+            providerOrderId: result.providerOrderId,
+            metadata: result?.metadata
+
         });
 
     } catch (error: any) {
