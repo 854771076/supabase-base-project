@@ -25,18 +25,33 @@ export class PayPalProvider implements PaymentProvider {
             };
         }
     }
-
+    getStatus(status: string): string {
+        switch (status) {
+            case 'COMPLETED':
+                return 'completed';
+            case 'PENDING':
+                return 'pending';
+            case 'PROCESSING':
+                return 'processing';
+            case 'FAILED':
+                return 'failed';
+            case 'EXPIRED':
+                return 'failed';
+            default:
+                return 'failed';
+        }
+    }
     async captureOrder(providerOrderId: string): Promise<{ success: boolean; status: string }> {
         try {
             const captureData = await capturePayPalOrder(providerOrderId);
             return {
                 success: captureData.status === 'COMPLETED',
-                status: captureData.status,
+                status: this.getStatus(captureData.status),
             };
         } catch (error) {
             return {
                 success: false,
-                status: 'FAILED',
+                status: 'failed',
             };
         }
     }

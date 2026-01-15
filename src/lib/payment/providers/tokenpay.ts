@@ -81,7 +81,7 @@ export class TokenPayProvider implements PaymentProvider {
         const { NEXT_PUBLIC_TOKENPAY_URL, TOKENPAY_API_KEY } = env;
 
         if (!NEXT_PUBLIC_TOKENPAY_URL || !TOKENPAY_API_KEY) {
-            return { success: false, status: 'error' };
+            return { success: false, status: 'failed' };
         }
 
         const baseUrl = NEXT_PUBLIC_TOKENPAY_URL.replace(/\/$/, '');
@@ -101,7 +101,7 @@ export class TokenPayProvider implements PaymentProvider {
         } catch (error) {
             return {
                 success: false,
-                status: 'error',
+                status: 'failed',
             };
         }
     }
