@@ -358,4 +358,90 @@ export const paymentPaths = {
       },
     },
   },
+  '/api/v1/payments/checkout': {
+    post: {
+      summary: 'Checkout cart items',
+      description: 'Creates a payment order for the items in the cart.',
+      tags: ['Payment'],
+      security: [{ BearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      name: { type: 'string' },
+                      price_cents: { type: 'integer' },
+                      quantity: { type: 'integer' },
+                      type: { type: 'string', enum: ['subscription', 'credits'] },
+                    },
+                    required: ['id', 'name', 'price_cents', 'quantity', 'type'],
+                  },
+                },
+                paymentMethod: {
+                  type: 'string',
+                  description: 'Payment provider (e.g., paypal, tokenpay)',
+                },
+                currency: {
+                  type: 'string',
+                  description: 'Currency code (e.g., USD, BTC, ETH)',
+                },
+              },
+              required: ['items', 'paymentMethod'],
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Checkout successful',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean' },
+                  orderId: { type: 'string', format: 'uuid' },
+                  redirectUrl: { type: 'string' },
+                  providerOrderId: { type: 'string' },
+                  metadata: { type: 'object' },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Bad request - Cart is empty',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+            },
+          },
+        },
+        401: {
+          description: 'Unauthorized - User not logged in',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+            },
+          },
+        },
+      },
+    },
+  },
 };

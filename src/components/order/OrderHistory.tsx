@@ -10,10 +10,12 @@ import {
     ClockCircleOutlined, CheckCircleOutlined,
     CloseCircleOutlined, DollarOutlined,
     FilterOutlined, DownloadOutlined,
-    SyncOutlined, ArrowRightOutlined
+    SyncOutlined, ArrowRightOutlined,
+    WalletOutlined
 } from '@ant-design/icons';
-import { useTranslations } from '@/i18n/context';
+import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
+import TokenPayModal from '@/components/payment/TokenPayModal';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -29,14 +31,19 @@ interface Order {
     product_name: string;
     created_at: string;
     completed_at?: string;
+    metadata?: any;
 }
 
 // --- 样式配置抽取 ---
-export default function OrderHistory({ orders = [], locale }: { orders: Order[], locale: string }) {
+export default function OrderHistory({ orders = [], locale: propLocale }: { orders: Order[], locale: string }) {
     const t = useTranslations('OrderHistory');
+    const locale = useLocale();
     const [filterType, setFilterType] = useState<string>('all');
     const { message } = App.useApp();
     const router = useRouter();
+
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
     // 数据处理
     const filteredOrders = orders.filter(o => filterType === 'all' || o.type === filterType);
     const stats = {
@@ -182,14 +189,29 @@ export default function OrderHistory({ orders = [], locale }: { orders: Order[],
             title: t('action'),
             key: 'action',
             render: (_: any, record: Order) => (
-                <Button 
-                    type="link" 
-                    size="small" 
-                    icon={<ArrowRightOutlined />}
-                    onClick={() => router.push(`/${locale}/orders/${record.id}`)}
-                >
-                    {t('details')}
-                </Button>
+                <Space>
+                    {record.status === 'pending' && record.provider === 'tokenpay' && record.metadata && (
+                        <Button
+                            type="primary"
+                            size="small"
+                            icon={<WalletOutlined />}
+                            onClick={() => {
+                                setSelectedOrder(record);
+                                setIsModalVisible(true);
+                            }}
+                        >
+                            {t('payNow')}
+                        </Button>
+                    )}
+                    <Button
+                        type="link"
+                        size="small"
+                        icon={<ArrowRightOutlined />}
+                        onClick={() => router.push(`/${locale}/orders/${record.id}`)}
+                    >
+                        {t('details')}
+                    </Button>
+                </Space>
             ),
         }
     ];
@@ -291,6 +313,17 @@ export default function OrderHistory({ orders = [], locale }: { orders: Order[],
                         }}
                     />
                 </Card>
+
+                <TokenPayModal
+                    visible={isModalVisible}
+                    onCancel={() => setIsModalVisible(false)}
+                    orderId={selectedOrder?.id || ''}
+                    metadata={selectedOrder?.metadata}
+                    onSuccess={() => {
+                        setIsModalVisible(false);
+                        router.refresh();
+                    }}
+                />
             </div>
         </div>
     );

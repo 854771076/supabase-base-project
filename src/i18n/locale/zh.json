@@ -140,6 +140,7 @@
         "time": "时间",
         "action": "操作",
         "details": "详情",
+        "payNow": "立即支付",
         "noRecords": "暂无消费记录",
         "totalRecords": "共 {total} 条记录",
         "pending": "待支付",
@@ -197,7 +198,7 @@
         "address": "地址",
         "orderId": "订单 ID",
         "expires": "过期时间",
-        "tokenPayWarning": "请确保您在正确的网络上发送正确的币种。一旦检测到交易，订单将自动确认。",
+        "tokenPayWarning": "请在规定时间内完成支付，超时订单将自动失效。",
         "selectCurrency": "选择币种：",
         "close": "关闭"
     }

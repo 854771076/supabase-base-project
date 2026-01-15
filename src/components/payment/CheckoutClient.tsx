@@ -7,6 +7,7 @@ import { useCart } from '@/components/cart/CartContext';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
 import { TOKENPAY_CURRENCIES, DEFAULT_TOKENPAY_CURRENCY } from '@/lib/payment/providers/tokenpay.config';
+import TokenPayModal from '@/components/payment/TokenPayModal';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -75,77 +76,6 @@ export default function CheckoutClient() {
         }
     };
 
-    const renderTokenPayModal = () => {
-        const tpInfo = orderInfo?.metadata;
-        if (!tpInfo) return null;
-
-        return (
-            <Modal
-                title={<Space><WalletOutlined style={{ color: '#1677ff' }} />{t('paymentInfo')}</Space>}
-                open={isModalVisible}
-                onCancel={() => setIsModalVisible(false)}
-                footer={[
-                    <Button key="close" onClick={() => setIsModalVisible(false)}>
-                        {t('close')}
-                    </Button>,
-                    <Button key="orders" type="primary" onClick={() => router.push(`/${locale}/orders`)}>
-                        {t('viewOrders')}
-                    </Button>
-                ]}
-                width={700}
-                centered
-                styles={{ body: { padding: '24px' } }}
-            >
-                <Row gutter={24}>
-                    <Col xs={24} md={10} style={{ textAlign: 'center', marginBottom: '24px' }}>
-                        <div style={{ padding: '16px', background: '#f5f5f5', borderRadius: '12px', display: 'inline-block' }}>
-                            <QRCode value={tpInfo.QrCodeLink || tpInfo.ToAddress} size={220} bordered={false} />
-                        </div>
-                        <div style={{ marginTop: '12px' }}>
-                            <Text type="secondary">{t('scanToPay')}</Text>
-                        </div>
-                        <div style={{ marginTop: '16px' }}>
-                            <Tag color="blue" icon={<LoadingOutlined />}>Waiting for payment...</Tag>
-                        </div>
-                    </Col>
-                    <Col xs={24} md={14}>
-                        <Descriptions column={1} bordered size="small" labelStyle={{ width: '100px', fontWeight: 'bold' }}>
-                            <Descriptions.Item label={t('amount')}>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <Text strong style={{ fontSize: '20px', color: '#1677ff' }}>
-                                        {tpInfo.Amount} {tpInfo.CurrencyName}
-                                    </Text>
-                                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                                        ≈ {tpInfo.ActualAmount} {tpInfo.BaseCurrency}
-                                    </Text>
-                                </div>
-                            </Descriptions.Item>
-                            <Descriptions.Item label={t('network')}>
-                                <Tag color="gold">{tpInfo.BlockChainName}</Tag>
-                            </Descriptions.Item>
-                            <Descriptions.Item label={t('address')}>
-                                <Text copyable code style={{ fontSize: '12px', wordBreak: 'break-all' }}>{tpInfo.ToAddress}</Text>
-                            </Descriptions.Item>
-                            <Descriptions.Item label={t('orderId')}>
-                                <Text type="secondary" style={{ fontSize: '12px' }}>{tpInfo.Id}</Text>
-                            </Descriptions.Item>
-                            <Descriptions.Item label={t('expires')}>
-                                <Text type="danger" style={{ fontSize: '12px' }}>{tpInfo.ExpireTime}</Text>
-                            </Descriptions.Item>
-                        </Descriptions>
-                        <div style={{ marginTop: '16px', padding: '12px', background: '#fff7e6', border: '1px solid #ffe7ba', borderRadius: '8px' }}>
-                            <Space align="start">
-                                <InfoCircleOutlined style={{ color: '#faad14', marginTop: '4px' }} />
-                                <Text type="warning" style={{ fontSize: '12px' }}>
-                                    {t('tokenPayWarning')}
-                                </Text>
-                            </Space>
-                        </div>
-                    </Col>
-                </Row>
-            </Modal>
-        );
-    };
 
     if (success) {
         return (
@@ -231,7 +161,6 @@ export default function CheckoutClient() {
                                         {paymentMethod === 'tokenpay' && (
                                             <div
                                                 style={{ marginTop: '16px', paddingLeft: '28px' }}
-                                                onClick={(e) => e.stopPropagation()}
                                             >
                                                 <Text type="secondary" style={{ display: 'block', marginBottom: '8px' }}>{t('selectCurrency')}</Text>
                                                 <Select
@@ -269,7 +198,16 @@ export default function CheckoutClient() {
                     </Card>
                 </Col>
             </Row>
-            {renderTokenPayModal()}
+            <TokenPayModal
+                visible={isModalVisible}
+                onCancel={() => setIsModalVisible(false)}
+                orderId={orderInfo?.orderId}
+                metadata={orderInfo?.metadata}
+                onSuccess={() => {
+                    setIsModalVisible(false);
+                    setSuccess(true);
+                }}
+            />
         </div>
     );
 }

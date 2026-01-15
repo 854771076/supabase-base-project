@@ -106,10 +106,13 @@ export async function createPaymentOrder(params: CreatePaymentParams) {
         throw new Error(providerResponse.error || 'Failed to create provider order');
     }
 
-    // Update order with provider order ID
+    // Update order with provider order ID and metadata
     await adminSupabase
         .from('orders')
-        .update({ provider_order_id: providerResponse.providerOrderId })
+        .update({
+            provider_order_id: providerResponse.providerOrderId,
+            metadata: { ...metadata, ...providerResponse.metadata }
+        })
         .eq('id', order.id);
 
     return {

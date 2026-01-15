@@ -1,6 +1,6 @@
 import { createSwaggerSpec } from 'next-swagger-doc';
 import { getURL } from '@/utils/url';
-import { userPaths, paymentPaths, subscriptionPaths, demoPaths, authPaths } from './doc';
+import { userPaths, paymentPaths, subscriptionPaths, demoPaths, authPaths, cronPaths } from './doc';
 
 export const getApiDocs = async () => {
   // 合并所有API路径
@@ -10,6 +10,7 @@ export const getApiDocs = async () => {
     ...subscriptionPaths,
     ...demoPaths,
     ...authPaths,
+    ...cronPaths,
   };
 
   const spec = createSwaggerSpec({

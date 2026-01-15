@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
             type: order.type,
             productId: order.product_id,
             amountCents: order.amount_cents,
-            provider: 'paypal',
+            provider: order.provider,
         });
 
         return NextResponse.json({ success: true, order: result.order });

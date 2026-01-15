@@ -141,6 +141,7 @@
         "time": "Time",
         "action": "Action",
         "details": "Details",
+        "payNow": "Pay Now",
         "noRecords": "No consumption records",
         "totalRecords": "Total {total} records",
         "pending": "Pending",

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { Card, Descriptions, Tag, Typography, Button, Space, Row, Col, Divider, Result,App } from 'antd';
+import React, { useRef, useState } from 'react';
+import { Card, Descriptions, Tag, Typography, Button, Space, Row, Col, Divider, Result, App } from 'antd';
 import {
   ArrowLeftOutlined,
   ClockCircleOutlined,
@@ -10,35 +10,41 @@ import {
   SyncOutlined,
   CopyOutlined,
   PrinterOutlined,
-  ShoppingOutlined
+  ShoppingOutlined,
+  WalletOutlined
 } from '@ant-design/icons';
-import { useTranslations } from '@/i18n/context';
+import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
+import TokenPayModal from '@/components/payment/TokenPayModal';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 const { Title, Text, Paragraph } = Typography;
 interface Order {
-    id: string;
-    type: 'subscription' | 'credits';
-    provider: string;
-    provider_order_id: string;
-    status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
-    amount_cents: number;
-    currency: string;
-    product_name: string;
-    created_at: string;
-    completed_at?: string;
+  id: string;
+  type: 'subscription' | 'credits';
+  provider: string;
+  provider_order_id: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  amount_cents: number;
+  currency: string;
+  product_name: string;
+  created_at: string;
+  completed_at?: string;
+  metadata?: any;
 }
 interface OrderDetailProps {
   order: Order;
   locale: string;
 }
 
-export function OrderDetail({ order, locale }: OrderDetailProps) {
+export function OrderDetail({ order, locale: propLocale }: OrderDetailProps) {
   const t = useTranslations('OrderHistory');
+  const locale = useLocale();
   const router = useRouter();
   const { message } = App.useApp();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   // 1. 增强状态配置
   const statusMap: Record<string, { color: string; icon: React.ReactNode; text: string; bg: string }> = {
     pending: { color: '#faad14', icon: <ClockCircleOutlined />, text: t('pending'), bg: '#fffbe6' },
@@ -72,7 +78,7 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
     try {
       // 临时显示隐藏的发票层
       element.style.display = 'block';
-      
+
       const canvas = await html2canvas(element, {
         scale: 2, // 提高清晰度
         useCORS: true,
@@ -87,7 +93,7 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Invoice_${order.id.slice(0, 8)}.pdf`);
-      
+
       message.success('发票下载成功');
     } catch (error) {
       console.error('PDF generation error:', error);
@@ -100,15 +106,15 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
 
   return (
     <div style={{ backgroundColor: '#f0f2f5', minHeight: '100vh', padding: '40px 20px' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>        
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         {/* 隐藏的发票模板 */}
-        <div 
-          ref={invoiceRef} 
-          style={{ 
-            display: 'none', 
-            backgroundColor: '#fff', 
-            padding: '40px', 
-            fontFamily: 'Arial, sans-serif' 
+        <div
+          ref={invoiceRef}
+          style={{
+            display: 'none',
+            backgroundColor: '#fff',
+            padding: '40px',
+            fontFamily: 'Arial, sans-serif'
           }}
         >
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
@@ -116,7 +122,7 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
             <p style={{ margin: '10px 0' }}>Order Number: {order.id}</p>
             <p style={{ margin: '5px 0' }}>Date: {new Date(order.created_at).toLocaleDateString()}</p>
           </div>
-          
+
           <div style={{ marginBottom: '30px' }}>
             <h3 style={{ marginBottom: '15px', borderBottom: '1px solid #e8e8e8', paddingBottom: '5px' }}>Order Details</h3>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -144,19 +150,19 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
               </tbody>
             </table>
           </div>
-          
+
           <div style={{ marginTop: '40px', textAlign: 'center', color: '#8c8c8c', fontSize: '12px' }}>
             <p>Thank you for your business!</p>
             <p>This is an electronic invoice. No signature required.</p>
           </div>
         </div>
-        
+
         {/* 页眉导航 */}
         <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
           <Col>
-            <Button 
-              type="text" 
-              icon={<ArrowLeftOutlined />} 
+            <Button
+              type="text"
+              icon={<ArrowLeftOutlined />}
               onClick={() => router.back()}
               style={{ padding: 0 }}
             >
@@ -172,23 +178,23 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
         </Row>
 
         {/* 核心状态横幅 */}
-        <Card 
-          bordered={false} 
-          style={{ 
-            borderRadius: 16, 
-            marginBottom: 24, 
+        <Card
+          bordered={false}
+          style={{
+            borderRadius: 16,
+            marginBottom: 24,
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-            background: currentStatus.bg 
+            background: currentStatus.bg
           }}
         >
           <Row align="middle" gutter={24}>
             <Col xs={24} sm={16}>
               <Space size="middle" align="start">
-                <div style={{ 
-                  backgroundColor: '#fff', 
-                  padding: 12, 
-                  borderRadius: 12, 
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)' 
+                <div style={{
+                  backgroundColor: '#fff',
+                  padding: 12,
+                  borderRadius: 12,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                 }}>
                   <ShoppingOutlined style={{ fontSize: 32, color: '#1890ff' }} />
                 </div>
@@ -208,6 +214,16 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
                   <span style={{ fontSize: 16, marginRight: 4 }}>{order.currency.toUpperCase()}</span>
                   {(order.amount_cents / 100).toFixed(2)}
                 </div>
+                {order.status === 'pending' && order.provider === 'tokenpay' && order.metadata && (
+                  <Button
+                    type="primary"
+                    icon={<WalletOutlined />}
+                    style={{ marginTop: 12 }}
+                    onClick={() => setIsModalVisible(true)}
+                  >
+                    {t('payNow')}
+                  </Button>
+                )}
               </div>
             </Col>
           </Row>
@@ -217,9 +233,9 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
         <Row gutter={24}>
           {/* 左侧主要详情 */}
           <Col xs={24} md={16}>
-            <Card 
-              title={t('orderDetails')} 
-              bordered={false} 
+            <Card
+              title={t('orderDetails')}
+              bordered={false}
               style={{ borderRadius: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
             >
               <Descriptions column={1} labelStyle={{ color: '#8c8c8c' }} contentStyle={{ fontWeight: 500 }}>
@@ -248,8 +264,8 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
 
           {/* 右侧支付概览 */}
           <Col xs={24} md={8}>
-            <Card 
-              bordered={false} 
+            <Card
+              bordered={false}
               style={{ borderRadius: 16, height: '100%', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
             >
               <Title level={5} style={{ marginBottom: 20 }}>{t('paymentSummary')}</Title>
@@ -270,9 +286,9 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
                   </Text>
                 </div>
               </Space>
-              
+
               <Divider />
-              
+
               <div style={{ textAlign: 'center' }}>
                 <Result
                   status={order.status === 'completed' ? 'success' : 'info'}
@@ -283,6 +299,17 @@ export function OrderDetail({ order, locale }: OrderDetailProps) {
             </Card>
           </Col>
         </Row>
+
+        <TokenPayModal
+          visible={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          orderId={order.id}
+          metadata={order.metadata}
+          onSuccess={() => {
+            setIsModalVisible(false);
+            router.refresh();
+          }}
+        />
       </div>
     </div>
   );
