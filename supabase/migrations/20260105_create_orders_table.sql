@@ -3,7 +3,7 @@ CREATE TABLE public.orders (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     type TEXT NOT NULL CHECK (type IN ('subscription', 'credits')),
-    provider TEXT NOT NULL DEFAULT 'paypal' CHECK (provider IN ('paypal')),
+    provider TEXT NOT NULL DEFAULT 'paypal' CHECK (provider IN ('paypal', 'tokenpay')),
     provider_order_id TEXT,
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled')),
     amount_cents INTEGER NOT NULL DEFAULT 0,
