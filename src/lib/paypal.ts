@@ -26,9 +26,28 @@ async function generateAccessToken() {
 /**
  * Create a PayPal order
  */
-export async function createPayPalOrder(amount: string, currencyCode: string = 'USD') {
+export async function createPayPalOrder(amount: string, currencyCode: string = 'USD', returnUrl?: string, cancelUrl?: string) {
     const accessToken = await generateAccessToken();
     const url = `${env.PAYPAL_API_BASE}/v2/checkout/orders`;
+
+    const body: any = {
+        intent: 'CAPTURE',
+        purchase_units: [
+            {
+                amount: {
+                    currency_code: currencyCode,
+                    value: amount,
+                },
+            },
+        ],
+    };
+
+    if (returnUrl || cancelUrl) {
+        body.application_context = {
+            return_url: returnUrl,
+            cancel_url: cancelUrl,
+        };
+    }
 
     const response = await fetch(url, {
         method: 'POST',
@@ -36,17 +55,7 @@ export async function createPayPalOrder(amount: string, currencyCode: string = '
             'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-            intent: 'CAPTURE',
-            purchase_units: [
-                {
-                    amount: {
-                        currency_code: currencyCode,
-                        value: amount,
-                    },
-                },
-            ],
-        }),
+        body: JSON.stringify(body),
     });
 
     return handleResponse(response);

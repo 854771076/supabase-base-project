@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Typography, Button, Radio, Space, List, Divider, App, Result, Select, QRCode, Descriptions, Modal, Image, Tag } from 'antd';
 import { CreditCardOutlined, WalletOutlined, CheckCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useCart } from '@/components/cart/CartContext';
@@ -25,6 +25,49 @@ export default function CheckoutClient() {
     const [success, setSuccess] = useState(false);
     const [orderInfo, setOrderInfo] = useState<any>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [capturing, setCapturing] = useState(false);
+
+    // Handle PayPal callback
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order_id');
+        const status = urlParams.get('status');
+
+        if (orderId && status === 'success' && !capturing && !success) {
+            handleCapture(orderId);
+        } else if (status === 'cancel') {
+            message.warning('Payment cancelled');
+            // Clean up URL
+            router.replace(`/${locale}/checkout`);
+        }
+    }, []);
+
+    const handleCapture = async (orderId: string) => {
+        setCapturing(true);
+        setLoading(true);
+        try {
+            const response = await fetch(`/api/v1/payments/orders/${orderId}/capture`, {
+                method: 'POST',
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                setSuccess(true);
+                message.success('Payment completed successfully!');
+                clearCart();
+                // Clean up URL
+                router.replace(`/${locale}/checkout?success=true`);
+            } else {
+                message.error(result.error || 'Failed to capture payment');
+            }
+        } catch (error) {
+            console.error('Capture error:', error);
+            message.error('An error occurred while capturing payment');
+        } finally {
+            setCapturing(false);
+            setLoading(false);
+        }
+    };
 
 
     const handlePayment = async () => {

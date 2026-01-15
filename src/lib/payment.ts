@@ -86,6 +86,14 @@ export async function createPaymentOrder(params: CreatePaymentParams) {
         throw new Error('Failed to create order');
     }
 
+    // Replace {order_id} placeholder in metadata if present
+    const processedMetadata = { ...metadata };
+    Object.keys(processedMetadata).forEach(key => {
+        if (typeof processedMetadata[key] === 'string') {
+            processedMetadata[key] = processedMetadata[key].replace('{order_id}', order.id);
+        }
+    });
+
     // Create order with provider
     const providerResponse = await provider.createOrder({
         id: order.id,
@@ -95,7 +103,7 @@ export async function createPaymentOrder(params: CreatePaymentParams) {
         status: 'pending',
         type,
         items,
-        metadata
+        metadata: processedMetadata
     });
 
     if (!providerResponse.success) {
@@ -137,7 +145,9 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
     const adminSupabase = await createAdminClient();
     const provider = getProvider(providerName);
 
+    console.log(`Capturing payment for order ${orderId} (Provider: ${providerName}, ProviderOrderId: ${providerOrderId})`);
     const captureResult = await provider.captureOrder(providerOrderId);
+    console.log(`Capture result for order ${orderId}:`, captureResult);
 
     if (!captureResult.success) {
         await adminSupabase

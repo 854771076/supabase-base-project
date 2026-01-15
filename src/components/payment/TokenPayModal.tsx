@@ -45,7 +45,7 @@ export default function TokenPayModal({ visible, onCancel, orderId, metadata, on
     const checkStatus = async (isManual = false) => {
         if (isManual) setVerifying(true);
         try {
-            const response = await fetch(`/api/v1/payments/orders/${orderId}`);
+            const response = await fetch(`/api/v1/payments/orders/${orderId}/capture`);
             const data = await response.json();
 
             if (data.success && data.order.status === 'completed') {

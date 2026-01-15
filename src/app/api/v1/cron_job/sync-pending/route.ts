@@ -27,24 +27,6 @@ export async function GET(request: NextRequest) {
         const results = [];
         for (const order of orders) {
             try {
-                // Check for timeout
-                const metadata = order.metadata || {};
-                if (metadata.ExpireTime) {
-                    const expireTime = new Date(metadata.ExpireTime.replace(' ', 'T') + 'Z');
-                    if (expireTime < new Date()) {
-                        await supabase
-                            .from('orders')
-                            .update({
-                                status: 'failed',
-                                updated_at: new Date().toISOString(),
-                                metadata: { ...metadata, error: 'Order expired' }
-                            })
-                            .eq('id', order.id);
-                        results.push({ orderId: order.id, status: 'failed', message: 'Expired' });
-                        continue;
-                    }
-                }
-
                 const result = await capturePaymentOrder({
                     orderId: order.id,
                     providerOrderId: order.provider_order_id,
@@ -52,7 +34,7 @@ export async function GET(request: NextRequest) {
                     type: order.type,
                     productId: order.product_id,
                     amountCents: order.amount_cents,
-                    provider: 'tokenpay',
+                    provider: order.provider,
                 });
                 results.push({ orderId: order.id, status: result.order.status });
             } catch (e: any) {
@@ -60,7 +42,7 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        await logger.logSuccess(`Processed ${results.length} orders`, { results });
+        await logger.logSuccess(`Processed ${results.length} orders`);
         return NextResponse.json({ success: true, processed: results.length, results });
     } catch (error: any) {
         console.error('Sync pending orders error:', error);

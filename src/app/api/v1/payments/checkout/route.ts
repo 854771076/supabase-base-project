@@ -33,7 +33,9 @@ export async function POST(request: NextRequest) {
             provider: paymentMethod,
             items: items,
             metadata: {
-                cart_items: items
+                cart_items: items,
+                return_url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/checkout?order_id={order_id}&status=success`,
+                cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/checkout?order_id={order_id}&status=cancel`,
             }
         });
 
