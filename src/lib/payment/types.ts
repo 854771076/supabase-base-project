@@ -16,6 +16,7 @@ export interface PaymentProviderResponse {
     providerOrderId?: string;
     redirectUrl?: string;
     error?: string;
+    metadata?: Record<string, any>;
 }
 
 export interface PaymentProvider {

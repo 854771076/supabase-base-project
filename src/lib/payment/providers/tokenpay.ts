@@ -61,6 +61,7 @@ export class TokenPayProvider implements PaymentProvider {
                     success: true,
                     providerOrderId: data.info?.Id || order.id,
                     redirectUrl: data.data,
+                    metadata: data.info,
                 };
             }
 

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { items, paymentMethod } = await request.json();
+        const { items, paymentMethod, currency } = await request.json();
 
         if (!items || items.length === 0) {
             return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
             productType: firstItem.type,
             productName: items.length > 1 ? `${firstItem.name} and ${items.length - 1} more` : firstItem.name,
             amountCents: totalAmountCents,
+            currency: currency || 'USD',
             provider: paymentMethod,
             items: items,
             metadata: {

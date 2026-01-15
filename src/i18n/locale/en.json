@@ -189,6 +189,16 @@
         "successSubtitle": "Your order has been processed. Thank you for your support.",
         "backHome": "Back Home",
         "viewOrders": "View Orders",
-        "goShopping": "Go Shopping"
+        "goShopping": "Go Shopping",
+        "paymentInfo": "Payment Information",
+        "tokenPayInstructions": "Please complete the payment using the information below.",
+        "scanToPay": "Scan to pay",
+        "amount": "Amount",
+        "network": "Network",
+        "address": "Address",
+        "orderId": "Order ID",
+        "expires": "Expires",
+        "tokenPayWarning": "Please ensure you are sending the correct currency on the correct network. The order will be automatically confirmed once the transaction is detected.",
+        "selectCurrency": "Select Currency:"
     }
 }

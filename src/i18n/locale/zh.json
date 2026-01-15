@@ -188,6 +188,16 @@
         "successSubtitle": "您的订单已处理完成，感谢您的支持。",
         "backHome": "返回首页",
         "viewOrders": "查看订单",
-        "goShopping": "去购物"
+        "goShopping": "去购物",
+        "paymentInfo": "支付信息",
+        "tokenPayInstructions": "请使用以下信息完成支付。",
+        "scanToPay": "扫码支付",
+        "amount": "金额",
+        "network": "网络",
+        "address": "地址",
+        "orderId": "订单 ID",
+        "expires": "过期时间",
+        "tokenPayWarning": "请确保您在正确的网络上发送正确的币种。一旦检测到交易，订单将自动确认。",
+        "selectCurrency": "选择币种："
     }
 }
