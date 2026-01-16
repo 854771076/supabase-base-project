@@ -22,6 +22,8 @@ export async function POST(request: NextRequest) {
         const totalAmountCents = items.reduce((sum: number, item: any) => sum + item.price_cents * item.quantity, 0);
         const firstItem = items[0];
 
+        const origin = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+
         const result = await createPaymentOrder({
             userId: user.id,
             type: firstItem.type, // Assuming all items are of the same type for now
@@ -34,8 +36,8 @@ export async function POST(request: NextRequest) {
             items: items,
             metadata: {
                 cart_items: items,
-                return_url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/checkout?order_id={order_id}&status=success`,
-                cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/checkout?order_id={order_id}&status=cancel`,
+                return_url: `${origin}/checkout?order_id={order_id}&status=success`,
+                cancel_url: `${origin}/checkout?order_id={order_id}&status=cancel`,
             }
         });
 
