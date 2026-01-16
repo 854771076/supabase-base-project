@@ -125,6 +125,16 @@ export default function Header({ user }: HeaderProps) {
         },
     ];
 
+    const getActiveKey = () => {
+        if (pathname === '/') return 'home';
+        if (pathname.startsWith('/shop')) return 'shop';
+        if (pathname.startsWith('/pricing')) return 'pricing';
+        if (pathname.startsWith('/api-docs')) return 'docs';
+        if (pathname.startsWith('/dashboard')) return 'demo';
+        if (pathname.startsWith('/credits')) return 'credits';
+        return '';
+    };
+
     return (
         <AntHeader
             style={{
@@ -147,7 +157,7 @@ export default function Header({ user }: HeaderProps) {
                 {!isMobile && (
                     <Menu
                         mode="horizontal"
-                        selectedKeys={[pathname === '/' ? 'home' : pathname.replace('/', '')]}
+                        selectedKeys={[getActiveKey()]}
                         items={menuItems}
                         style={{ borderBottom: 'none', flex: 1, minWidth: 0 }}
                     />
@@ -202,7 +212,7 @@ export default function Header({ user }: HeaderProps) {
                         >
                             <Menu
                                 mode="inline"
-                                selectedKeys={[pathname === '/' ? 'home' : pathname.replace('/', '')]}
+                                selectedKeys={[getActiveKey()]}
                                 items={[
                                     ...menuItems,
                                     { type: 'divider' as const },
