@@ -7,7 +7,7 @@ export interface CartItem {
     name: string;
     price_cents: number;
     quantity: number;
-    type: 'subscription' | 'credits';
+    type: 'subscription' | 'credits' | 'product';
     metadata?: Record<string, any>;
 }
 

@@ -8,6 +8,7 @@ import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
 import { TOKENPAY_CURRENCIES, DEFAULT_TOKENPAY_CURRENCY } from '@/lib/payment/providers/tokenpay.config';
 import TokenPayModal from '@/components/payment/TokenPayModal';
+import ShippingAddressForm from '@/components/checkout/ShippingAddressForm';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -26,6 +27,10 @@ export default function CheckoutClient() {
     const [orderInfo, setOrderInfo] = useState<any>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [capturing, setCapturing] = useState(false);
+    const [shippingAddressId, setShippingAddressId] = useState<string | null>(null);
+
+    // Check if cart has any product items (requires shipping)
+    const hasProductItems = items.some(item => item.type === 'product');
 
     // Handle PayPal callback
     useEffect(() => {
@@ -73,6 +78,12 @@ export default function CheckoutClient() {
     const handlePayment = async () => {
         if (items.length === 0) return;
 
+        // Validate shipping address for product orders
+        if (hasProductItems && !shippingAddressId) {
+            message.error(t('shippingRequired') || 'Please select a shipping address');
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await fetch('/api/v1/payments/checkout', {
@@ -82,6 +93,7 @@ export default function CheckoutClient() {
                     items,
                     paymentMethod,
                     currency: paymentMethod === 'tokenpay' ? tokenPayCurrency : 'USD',
+                    shipping_address_id: hasProductItems ? shippingAddressId : undefined,
                 }),
             });
 
@@ -148,6 +160,14 @@ export default function CheckoutClient() {
 
             <Row gutter={32}>
                 <Col xs={24} lg={16}>
+                    {/* Shipping Address for product orders */}
+                    {hasProductItems && (
+                        <ShippingAddressForm
+                            onSelect={setShippingAddressId}
+                            selectedAddressId={shippingAddressId}
+                        />
+                    )}
+
                     <Card title={t('orderSummary')} style={{ marginBottom: '24px', borderRadius: '12px' }}>
                         <List
                             itemLayout="horizontal"

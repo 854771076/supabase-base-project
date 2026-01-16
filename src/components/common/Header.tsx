@@ -64,6 +64,15 @@ export default function Header({ user }: HeaderProps) {
             icon: <UserOutlined />,
         },
         {
+            key: 'favorites',
+            label: (
+                <Link href="/favorites" onClick={() => setDrawerVisible(false)}>
+                    {t('favorites')}
+                </Link>
+            ),
+            icon: <UserOutlined />,
+        },
+        {
             key: 'orders',
             label: (
                 <Link href="/orders" onClick={() => setDrawerVisible(false)}>
@@ -72,6 +81,15 @@ export default function Header({ user }: HeaderProps) {
             ),
             icon: <LogoutOutlined />,
         },
+        ...(user?.user_metadata?.is_super_admin ? [{
+            key: 'admin',
+            label: (
+                <Link href="/admin" onClick={() => setDrawerVisible(false)}>
+                    {t('admin')}
+                </Link>
+            ),
+            icon: <UserOutlined />,
+        }] : []),
         {
             key: 'logout',
             label: t('logout'),
@@ -84,6 +102,10 @@ export default function Header({ user }: HeaderProps) {
         {
             key: 'home',
             label: <Link href={`/${currentLocale}`} onClick={() => setDrawerVisible(false)}>{t('home')}</Link>,
+        },
+        {
+            key: 'shop',
+            label: <Link href={`/${currentLocale}/shop`} onClick={() => setDrawerVisible(false)}>{t('shop')}</Link>,
         },
         {
             key: 'pricing',
