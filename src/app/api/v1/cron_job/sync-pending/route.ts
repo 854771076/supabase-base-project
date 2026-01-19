@@ -7,11 +7,12 @@ export async function GET(request: NextRequest) {
     const logger = new CronLogger('sync-pending-orders');
     try {
         const authHeader = request.headers.get('Authorization');
-
+        await logger.logStart('Starting sync of pending TokenPay orders');
         if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+            await logger.logFailure(`Unauthorized ${authHeader}`);
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-        await logger.logStart('Starting sync of pending TokenPay orders');
+        
 
         const supabase = await createAdminClient();
 
