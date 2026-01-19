@@ -42,7 +42,7 @@ export default function TokenPayModal({ visible, onCancel, orderId, metadata, on
 
     const [verifying, setVerifying] = React.useState(false);
 
-    const checkStatus = async (isManual = false) => {
+    const checkStatus = React.useCallback(async (isManual = false) => {
         if (isManual) setVerifying(true);
         try {
             const response = await fetch(`/api/v1/payments/orders/${orderId}/capture`, {
@@ -71,7 +71,7 @@ export default function TokenPayModal({ visible, onCancel, orderId, metadata, on
             if (isManual) setVerifying(false);
         }
         return false;
-    };
+    }, [locale, message, onCancel, onSuccess, orderId, router, t]);
 
     // Polling for order status
     useEffect(() => {
@@ -87,7 +87,7 @@ export default function TokenPayModal({ visible, onCancel, orderId, metadata, on
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [visible, orderId, t, message, locale, router, onCancel, onSuccess]);
+    }, [visible, orderId, checkStatus]);
 
     if (!metadata) return null;
 

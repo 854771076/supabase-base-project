@@ -37,7 +37,7 @@ export async function GET(request: Request, { params }: RouteParams) {
             .from('products')
             .select(`
                 *,
-                category:categories(id, name, slug)
+                categories(id, name, slug)
             `);
 
         if (isUUID) {
@@ -52,9 +52,15 @@ export async function GET(request: Request, { params }: RouteParams) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });
         }
 
+        // Map categories to category
+        const mappedProduct = {
+            ...product,
+            category: product.categories
+        };
+
         return NextResponse.json({
             success: true,
-            data: product,
+            data: mappedProduct,
         });
     } catch (error) {
         console.error('Product GET error:', error);
@@ -73,9 +79,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check if user is super admin
-        const isSuperAdmin = user.user_metadata?.is_super_admin === true;
-        if (!isSuperAdmin) {
+        // Check if user is admin
+        const isAdmin = user.app_metadata?.is_admin === true;
+        if (!isAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
@@ -132,9 +138,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check if user is super admin
-        const isSuperAdmin = user.user_metadata?.is_super_admin === true;
-        if (!isSuperAdmin) {
+        // Check if user is admin
+        const isAdmin = user.app_metadata?.is_admin === true;
+        if (!isAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 

@@ -47,11 +47,7 @@ export default function AdminOrdersPage() {
 
     const pageSize = 10;
 
-    useEffect(() => {
-        fetchOrders();
-    }, [page, statusFilter, typeFilter]);
-
-    const fetchOrders = async () => {
+    const fetchOrders = React.useCallback(async () => {
         setLoading(true);
         try {
             const params = new URLSearchParams({
@@ -72,7 +68,11 @@ export default function AdminOrdersPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, statusFilter, typeFilter]);
+
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
 
     const handleStatusChange = async (orderId: string, newStatus: string) => {
         try {

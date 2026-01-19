@@ -48,23 +48,7 @@ export default function AdminProductsPage() {
         fetchCategories();
     }, []);
 
-    useEffect(() => {
-        fetchProducts();
-    }, [page, search, statusFilter]);
-
-    const fetchCategories = async () => {
-        try {
-            const res = await fetch('/api/v1/shop/categories?include_inactive=true');
-            const data = await res.json();
-            if (data.success) {
-                setCategories(data.data);
-            }
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
-
-    const fetchProducts = async () => {
+    const fetchProducts = React.useCallback(async () => {
         setLoading(true);
         try {
             const params = new URLSearchParams({
@@ -89,7 +73,23 @@ export default function AdminProductsPage() {
         } finally {
             setLoading(false);
         }
+    }, [page, search, statusFilter]);
+
+    const fetchCategories = async () => {
+        try {
+            const res = await fetch('/api/v1/shop/categories?include_inactive=true');
+            const data = await res.json();
+            if (data.success) {
+                setCategories(data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
     };
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
     const handleCreate = () => {
         setEditingProduct(null);

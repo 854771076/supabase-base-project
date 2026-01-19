@@ -37,7 +37,7 @@ export async function GET(request: Request) {
             .from('products')
             .select(`
                 *,
-                category:categories(id, name, slug)
+                categories(id, name, slug)
             `, { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(offset, offset + limit - 1);
@@ -46,7 +46,12 @@ export async function GET(request: Request) {
         if (status) {
             query = query.eq('status', status);
         } else {
-            query = query.eq('status', 'published');
+            // If admin is viewing (implied by no status filter or specific status), we might want to allow all
+            // But for now, keep behavior consistent. Admin usually passes status filter.
+            // If public, we want published.
+            // Let's assume if no status is passed, we return published.
+            // Admin page passes status filter.
+            if (!status) query = query.eq('status', 'published');
         }
 
         if (category_id) {
@@ -68,9 +73,15 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
         }
 
+        // Map categories to category for frontend compatibility
+        const mappedProducts = products?.map((p: any) => ({
+            ...p,
+            category: p.categories
+        }));
+
         return NextResponse.json({
             success: true,
-            data: products,
+            data: mappedProducts,
             pagination: {
                 limit,
                 offset,
@@ -93,9 +104,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check if user is super admin
-        const isSuperAdmin = user.user_metadata?.is_super_admin === true;
-        if (!isSuperAdmin) {
+        // Check if user is admin
+        const isAdmin = user.app_metadata?.is_admin === true;
+        if (!isAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 

@@ -47,11 +47,7 @@ export default function ShippingAddressForm({ onSelect, selectedAddressId }: Shi
     const [editingId, setEditingId] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
 
-    useEffect(() => {
-        fetchAddresses();
-    }, []);
-
-    const fetchAddresses = async () => {
+    const fetchAddresses = React.useCallback(async () => {
         try {
             const res = await fetch('/api/v1/shop/addresses');
             const data = await res.json();
@@ -68,7 +64,11 @@ export default function ShippingAddressForm({ onSelect, selectedAddressId }: Shi
         } finally {
             setLoading(false);
         }
-    };
+    }, [onSelect, selectedAddressId]);
+
+    useEffect(() => {
+        fetchAddresses();
+    }, [fetchAddresses]);
 
     const handleSubmit = async (values: any) => {
         setSaving(true);

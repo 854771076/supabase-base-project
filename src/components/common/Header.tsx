@@ -81,7 +81,7 @@ export default function Header({ user }: HeaderProps) {
             ),
             icon: <LogoutOutlined />,
         },
-        ...(user?.user_metadata?.is_super_admin ? [{
+        ...(user?.app_metadata?.is_admin ? [{
             key: 'admin',
             label: (
                 <Link href="/admin" onClick={() => setDrawerVisible(false)}>

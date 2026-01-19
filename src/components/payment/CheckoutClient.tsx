@@ -32,22 +32,7 @@ export default function CheckoutClient() {
     // Check if cart has any product items (requires shipping)
     const hasProductItems = items.some(item => item.type === 'product');
 
-    // Handle PayPal callback
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('order_id');
-        const status = urlParams.get('status');
-
-        if (orderId && status === 'success' && !capturing && !success) {
-            handleCapture(orderId);
-        } else if (status === 'cancel') {
-            message.warning('Payment cancelled');
-            // Clean up URL
-            router.replace(`/${locale}/checkout`);
-        }
-    }, []);
-
-    const handleCapture = async (orderId: string) => {
+    const handleCapture = React.useCallback(async (orderId: string) => {
         setCapturing(true);
         setLoading(true);
         try {
@@ -72,7 +57,22 @@ export default function CheckoutClient() {
             setCapturing(false);
             setLoading(false);
         }
-    };
+    }, [clearCart, locale, message, router]);
+
+    // Handle PayPal callback
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order_id');
+        const status = urlParams.get('status');
+
+        if (orderId && status === 'success' && !capturing && !success) {
+            handleCapture(orderId);
+        } else if (status === 'cancel') {
+            message.warning('Payment cancelled');
+            // Clean up URL
+            router.replace(`/${locale}/checkout`);
+        }
+    }, [capturing, handleCapture, locale, message, router, success]);
 
 
     const handlePayment = async () => {

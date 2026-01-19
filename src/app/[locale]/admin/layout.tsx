@@ -1,13 +1,14 @@
 'use client';
 
 import React, { use, useEffect, useState } from 'react';
-import { Layout, Menu, Typography, Result, Spin, Button } from 'antd';
+import { Layout, Menu, Typography, Result, Spin, Button, Drawer } from 'antd';
 import {
     DashboardOutlined,
     ShoppingOutlined,
     AppstoreOutlined,
     OrderedListOutlined,
-    ArrowLeftOutlined
+    ArrowLeftOutlined,
+    MenuOutlined
 } from '@ant-design/icons';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter, usePathname } from 'next/navigation';
@@ -28,9 +29,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(true);
+    const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        // Check if user is super admin
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    useEffect(() => {
+        // Check if user is admin
         fetch('/api/v1/user')
             .then(res => res.json())
             .then(data => {
@@ -75,6 +85,32 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         return 'dashboard';
     };
 
+    const SidebarContent = () => (
+        <>
+            <div style={{ padding: '20px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: 32, height: 32, background: '#1890ff', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>A</div>
+                <Title level={4} style={{ margin: 0 }}>{t('adminPanel')}</Title>
+            </div>
+            <Menu
+                mode="inline"
+                selectedKeys={[getActiveKey()]}
+                items={menuItems}
+                style={{ border: 'none' }}
+                onClick={() => setMobileDrawerOpen(false)}
+            />
+            <div style={{ padding: '16px', marginTop: 'auto' }}>
+                <Button
+                    type="text"
+                    icon={<ArrowLeftOutlined />}
+                    onClick={() => router.push(`/${locale}`)}
+                    style={{ color: '#666' }}
+                >
+                    {t('backToSite')}
+                </Button>
+            </div>
+        </>
+    );
+
     if (loading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
@@ -101,37 +137,52 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
 
     return (
-        <Layout style={{ minHeight: 'calc(100vh - 180px)' }}>
-            <Sider
-                width={220}
-                theme="light"
-                style={{
-                    borderRight: '1px solid #f0f0f0',
-                    background: '#fff'
-                }}
-            >
-                <div style={{ padding: '20px 16px', borderBottom: '1px solid #f0f0f0' }}>
-                    <Title level={4} style={{ margin: 0 }}>{t('adminPanel')}</Title>
-                </div>
-                <Menu
-                    mode="inline"
-                    selectedKeys={[getActiveKey()]}
-                    items={menuItems}
-                    style={{ border: 'none' }}
-                />
-                <div style={{ padding: '16px' }}>
-                    <Button
-                        type="link"
-                        icon={<ArrowLeftOutlined />}
-                        onClick={() => router.push(`/${locale}`)}
-                    >
-                        {t('backToSite')}
-                    </Button>
-                </div>
-            </Sider>
-            <Content style={{ padding: '24px', background: '#f5f5f5' }}>
-                {children}
-            </Content>
+        <Layout style={{ minHeight: '100vh' }}>
+            {!isMobile && (
+                <Sider
+                    width={250}
+                    theme="light"
+                    style={{
+                        borderRight: '1px solid #f0f0f0',
+                        background: '#fff',
+                        position: 'fixed',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        zIndex: 100,
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
+                >
+                    <SidebarContent />
+                </Sider>
+            )}
+
+            {isMobile && (
+                <Drawer
+                    placement="left"
+                    onClose={() => setMobileDrawerOpen(false)}
+                    open={mobileDrawerOpen}
+                    width={250}
+                    styles={{ body: { padding: 0 } }}
+                >
+                    <SidebarContent />
+                </Drawer>
+            )}
+
+            <Layout style={{ marginLeft: isMobile ? 0 : 250, transition: 'all 0.2s' }}>
+                {isMobile && (
+                    <div style={{ padding: '16px', background: '#fff', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center' }}>
+                        <Button icon={<MenuOutlined />} onClick={() => setMobileDrawerOpen(true)} />
+                        <span style={{ marginLeft: '16px', fontWeight: 'bold' }}>{t('adminPanel')}</span>
+                    </div>
+                )}
+                <Content style={{ padding: '24px', background: '#f5f7fa', minHeight: '100vh' }}>
+                    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                        {children}
+                    </div>
+                </Content>
+            </Layout>
         </Layout>
     );
 }

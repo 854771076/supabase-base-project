@@ -56,9 +56,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check if user is super admin
-        const isSuperAdmin = user.user_metadata?.is_super_admin === true;
-        if (!isSuperAdmin) {
+        // Check if user is admin
+        const isAdmin = user.app_metadata?.is_admin === true;
+        if (!isAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
