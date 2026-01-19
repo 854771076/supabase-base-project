@@ -62,7 +62,7 @@ export default function AdminProductsPage() {
                 // For simplicity, we'll just not filter
             }
 
-            const res = await fetch(`/api/v1/shop/products?${params}`);
+            const res = await fetch(`/api/v1/admin/products?${params}`);
             const data = await res.json();
             if (data.success) {
                 setProducts(data.data);
@@ -77,7 +77,7 @@ export default function AdminProductsPage() {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch('/api/v1/admin/categories?include_inactive=true');
+            const res = await fetch('/api/v1/admin/categories');
             const data = await res.json();
             if (data.success) {
                 setCategories(data.data);
@@ -86,10 +86,6 @@ export default function AdminProductsPage() {
             console.error('Error fetching categories:', error);
         }
     };
-
-    useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
 
     const handleCreate = () => {
         setEditingProduct(null);
@@ -166,6 +162,12 @@ export default function AdminProductsPage() {
     };
 
     const columns = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            render: (id: string) => <Typography.Text copyable code style={{ fontSize: '12px' }}>{id}</Typography.Text>,
+        },
         {
             title: t('productName'),
             dataIndex: 'name',
@@ -255,7 +257,7 @@ export default function AdminProductsPage() {
             </div>
 
             <Card style={{ marginBottom: '16px' }}>
-                <Space>
+                <Space wrap>
                     <Input
                         placeholder={t('searchProducts')}
                         prefix={<SearchOutlined />}
@@ -284,6 +286,7 @@ export default function AdminProductsPage() {
                     dataSource={products}
                     rowKey="id"
                     loading={loading}
+                    scroll={{ x: 1000 }}
                     pagination={{
                         current: page,
                         pageSize,
@@ -298,7 +301,8 @@ export default function AdminProductsPage() {
                 open={modalOpen}
                 onCancel={() => setModalOpen(false)}
                 footer={null}
-                width={600}
+                width="100%"
+                style={{ maxWidth: 600 }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit}>
                     <Form.Item name="name" label={t('productName')} rules={[{ required: true }]}>

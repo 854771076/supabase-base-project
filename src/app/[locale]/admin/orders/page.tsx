@@ -126,7 +126,7 @@ export default function AdminOrdersPage() {
             title: t('orderId'),
             dataIndex: 'id',
             key: 'id',
-            render: (id: string) => <Text code style={{ fontSize: '12px' }}>{id.slice(0, 8)}...</Text>,
+            render: (id: string) => <Text copyable code style={{ fontSize: '12px' }}>{id}</Text>,
         },
         {
             title: t('type'),
@@ -242,6 +242,7 @@ export default function AdminOrdersPage() {
                     dataSource={orders}
                     rowKey="id"
                     loading={loading}
+                    scroll={{ x: 1000 }}
                     pagination={{
                         current: page,
                         pageSize,
@@ -256,10 +257,11 @@ export default function AdminOrdersPage() {
                 open={modalOpen}
                 onCancel={() => setModalOpen(false)}
                 footer={<Button onClick={() => setModalOpen(false)}>{t('close')}</Button>}
-                width={700}
+                width="100%"
+                style={{ maxWidth: 700 }}
             >
                 {selectedOrder && (
-                    <Descriptions bordered column={2} size="small">
+                    <Descriptions bordered column={{ xs: 1, sm: 2 }} size="small">
                         <Descriptions.Item label={t('orderId')} span={2}>
                             <Text copyable>{selectedOrder.id}</Text>
                         </Descriptions.Item>

@@ -177,7 +177,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         <span style={{ marginLeft: '16px', fontWeight: 'bold' }}>{t('adminPanel')}</span>
                     </div>
                 )}
-                <Content style={{ padding: '24px', background: '#f5f7fa', minHeight: '100vh' }}>
+                <Content style={{ padding: isMobile ? '12px' : '24px', background: '#f5f7fa', minHeight: '100vh' }}>
                     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                         {children}
                     </div>

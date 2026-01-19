@@ -31,11 +31,24 @@ export async function GET(request: Request) {
 
         const adminSupabase = await createAdminClient();
 
-        // Admin sees all categories, ordered by sort_order
-        const { data: categories, error } = await adminSupabase
+        const { searchParams } = new URL(request.url);
+        const search = searchParams.get('search');
+        const is_active = searchParams.get('is_active');
+
+        let query = adminSupabase
             .from('categories')
             .select('*')
             .order('sort_order', { ascending: true });
+
+        if (search) {
+            query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%,id.eq.${search}`);
+        }
+
+        if (is_active !== null && is_active !== undefined) {
+            query = query.eq('is_active', is_active === 'true');
+        }
+
+        const { data: categories, error } = await query;
 
         if (error) {
             console.error('Error fetching categories:', error);
