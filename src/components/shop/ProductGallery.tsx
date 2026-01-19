@@ -30,6 +30,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                                     src={img}
                                     alt={`${productName} - ${index + 1}`}
                                     preview={{ mask: '点击放大查看' }}
+                                    style={{ width: '100%', height: '100%' }}
                                 />
                             </div>
                         ))}

@@ -218,7 +218,7 @@ export default function ShopListClient() {
                 .product-card:hover .product-image { transform: scale(1.1); }
                 .hover-actions {
                     position: absolute;
-                    bottom: -50px;
+                    bottom: -70px;
                     left: 0;
                     right: 0;
                     height: 80px;

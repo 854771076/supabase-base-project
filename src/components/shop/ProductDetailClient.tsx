@@ -106,7 +106,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
 
     if (loading) {
         return (
-            <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
                 <Row gutter={[48, 48]}>
                     <Col xs={24} md={12}><Skeleton.Image active style={{ width: '100%', height: 500 }} /></Col>
                     <Col xs={24} md={12}><Skeleton active paragraph={{ rows: 12 }} /></Col>
@@ -176,7 +176,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                 .thumb-item { width: 72px; height: 72px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; overflow: hidden; transition: all 0.2s; flex-shrink: 0; }
                 .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
                 .thumb-item:hover { border-color: #d9d9d9; }
-                .thumb-item.active { border-color: #1677ff; transform: scale(1.05); }
+                .thumb-item.active { border-color: #1677ff; }
                 .purchase-card { background: #fcfcfc; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); border: 1px solid #f0f0f0; }
                 .current-price { font-size: 42px; font-weight: 800; color: #1a1a1a; display: block; }
                 .old-price { font-size: 18px; }
