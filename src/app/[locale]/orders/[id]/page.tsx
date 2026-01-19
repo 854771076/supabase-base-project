@@ -2,7 +2,7 @@ import React from 'react';
 import { createClient } from '@/utils/supabase/server';
 import { notFound } from 'next/navigation';
 import { redirect } from 'next/navigation';
-import {OrderDetail} from '@/components/order/OrderDetail';
+import { OrderDetail } from '@/components/order/OrderDetail';
 
 export default async function OrderDetailPage({
   params,
@@ -27,6 +27,7 @@ export default async function OrderDetailPage({
     .single();
 
   if (error || !order) {
+    console.error('Error fetching order:', error);
     notFound();
   }
 
