@@ -75,6 +75,10 @@ export default function AdminProductsPage() {
         }
     }, [page, search, statusFilter]);
 
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
     const fetchCategories = async () => {
         try {
             const res = await fetch('/api/v1/admin/categories');

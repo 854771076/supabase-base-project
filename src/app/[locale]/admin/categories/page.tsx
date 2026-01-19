@@ -123,7 +123,48 @@ export default function AdminCategoriesPage() {
             dataIndex: 'name',
             key: 'name',
         },
-        // ... (rest of columns)
+        {
+            title: t('slug'),
+            dataIndex: 'slug',
+            key: 'slug',
+            render: (slug: string) => <code>{slug}</code>,
+        },
+        {
+            title: t('description'),
+            dataIndex: 'description',
+            key: 'description',
+            render: (desc: string) => desc || '-',
+        },
+        {
+            title: t('status'),
+            dataIndex: 'is_active',
+            key: 'is_active',
+            render: (active: boolean) => (
+                <Tag color={active ? 'green' : 'default'}>
+                    {active ? t('active') : t('inactive')}
+                </Tag>
+            ),
+        },
+        {
+            title: t('sortOrder'),
+            dataIndex: 'sort_order',
+            key: 'sort_order',
+        },
+        {
+            title: t('actions'),
+            key: 'actions',
+            render: (_: any, record: Category) => (
+                <Space>
+                    <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+                    <Popconfirm
+                        title={t('confirmDelete')}
+                        onConfirm={() => handleDelete(record.id)}
+                    >
+                        <Button size="small" danger icon={<DeleteOutlined />} />
+                    </Popconfirm>
+                </Space>
+            ),
+        },
     ];
 
     return (
