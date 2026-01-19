@@ -186,9 +186,9 @@ export default function ShopPage() {
                 <Empty description={t('noProducts')} />
             ) : (
                 <>
-                    <Row gutter={[24, 24]}>
+                    <Row gutter={[24, 32]}>
                         {products.map(product => (
-                            <Col xs={24} sm={12} md={8} lg={6} key={product.id}>
+                            <Col xs={12} sm={12} md={8} lg={6} xl={4} key={product.id}>
                                 <Badge.Ribbon
                                     text={t('featured')}
                                     color="gold"
@@ -214,7 +214,8 @@ export default function ShopPage() {
                                                         src={product.thumbnail_url}
                                                         alt={product.name}
                                                         fill
-                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                                        sizes="(max-width: 576px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
+                                                        priority={products.indexOf(product) < 4}
                                                         style={{
                                                             objectFit: 'cover',
                                                             transition: 'transform 0.3s ease'

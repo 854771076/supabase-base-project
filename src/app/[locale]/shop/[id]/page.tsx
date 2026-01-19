@@ -161,24 +161,18 @@ export default function ProductDetailPage({ params }: PageProps) {
                                     ref={(node) => { (window as any).carousel = node; }}
                                 >
                                     {images.map((img, index) => (
-                                        <div key={index}>
+                                        <div key={index} className="carousel-image-container">
                                             <AntImage
                                                 src={img}
                                                 alt={`${product.name} - ${index + 1}`}
-                                                style={{ width: '100%', height: '500px', objectFit: 'cover' }}
+                                                className="main-product-image"
                                                 preview
                                             />
                                         </div>
                                     ))}
                                 </Carousel>
                             ) : (
-                                <div style={{
-                                    height: '500px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    background: '#f9f9f9'
-                                }}>
+                                <div className="empty-image-container">
                                     <ShoppingCartOutlined style={{ fontSize: '64px', color: '#ccc' }} />
                                 </div>
                             )}
@@ -284,21 +278,14 @@ export default function ProductDetailPage({ params }: PageProps) {
                             </Space>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '16px', marginBottom: '40px' }}>
+                        <div className="product-actions-container">
                             <Button
                                 type="primary"
                                 size="large"
                                 icon={<ShoppingCartOutlined />}
                                 onClick={handleAddToCart}
                                 disabled={product.stock_quantity === 0}
-                                style={{
-                                    flex: 2,
-                                    height: '56px',
-                                    fontSize: '18px',
-                                    fontWeight: 600,
-                                    borderRadius: '12px',
-                                    boxShadow: '0 4px 12px rgba(22, 119, 255, 0.2)'
-                                }}
+                                className="add-to-cart-btn"
                             >
                                 {t('addToCart')}
                             </Button>
@@ -306,12 +293,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                                 size="large"
                                 icon={isFavorite ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
                                 onClick={handleToggleFavorite}
-                                style={{
-                                    flex: 1,
-                                    height: '56px',
-                                    fontSize: '18px',
-                                    borderRadius: '12px'
-                                }}
+                                className="favorite-btn"
                             >
                                 {isFavorite ? t('inFavorites') : t('addToFavorites')}
                             </Button>
@@ -345,6 +327,60 @@ export default function ProductDetailPage({ params }: PageProps) {
                 .ant-carousel .slick-slide {
                     border-radius: 12px;
                     overflow: hidden;
+                }
+                .carousel-image-container {
+                    width: 100%;
+                    aspect-ratio: 1 / 1;
+                    background: #f9f9f9;
+                }
+                .main-product-image {
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: cover !important;
+                }
+                .empty-image-container {
+                    aspect-ratio: 1 / 1;
+                    display: flex;
+                    alignItems: center;
+                    justifyContent: center;
+                    background: #f9f9f9;
+                }
+                @media (min-width: 768px) {
+                    .carousel-image-container, .empty-image-container {
+                        height: 500px;
+                        aspect-ratio: auto;
+                    }
+                }
+                @media (max-width: 767px) {
+                    .thumbnail-item {
+                        width: 60px !important;
+                        height: 60px !important;
+                    }
+                    .product-actions-container {
+                        flex-direction: column !important;
+                    }
+                    .add-to-cart-btn, .favorite-btn {
+                        width: 100% !important;
+                    }
+                }
+                .product-actions-container {
+                    display: flex;
+                    gap: 16px;
+                    margin-bottom: 40px;
+                }
+                .add-to-cart-btn {
+                    flex: 2;
+                    height: 56px !important;
+                    font-size: 18px !important;
+                    font-weight: 600 !important;
+                    border-radius: 12px !important;
+                    box-shadow: 0 4px 12px rgba(22, 119, 255, 0.2) !important;
+                }
+                .favorite-btn {
+                    flex: 1;
+                    height: 56px !important;
+                    font-size: 18px !important;
+                    border-radius: 12px !important;
                 }
             `}</style>
         </div>
