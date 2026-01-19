@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Button, Dropdown, Avatar, Space, Typography, Drawer, Grid, Badge } from 'antd';
 import { UserOutlined, GlobalOutlined, LogoutOutlined, DownOutlined, MenuOutlined, SwapOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
@@ -29,6 +29,11 @@ export default function Header({ user }: HeaderProps) {
     const screens = useBreakpoint();
     const [drawerVisible, setDrawerVisible] = useState(false);
     const [cartVisible, setCartVisible] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     const { items: networkItems } = useNetworkMenuItems();
     const { itemCount } = useCart();
 
@@ -146,15 +151,15 @@ export default function Header({ user }: HeaderProps) {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 background: '#fff',
-                padding: isMobile ? '0 16px' : '0 50px',
+                padding: mounted ? (isMobile ? '0 16px' : '0 50px') : '0 16px',
                 boxShadow: '0 2px 8px #f0f1f2'
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                <Link href="/" style={{ marginRight: isMobile ? '12px' : '24px', fontSize: isMobile ? '16px' : '18px', fontWeight: 'bold', color: 'inherit', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                    ⚡ {isMobile ? 'Supabase' : 'Supabase Project'}
+                <Link href="/" style={{ marginRight: (mounted && isMobile) ? '12px' : '24px', fontSize: (mounted && isMobile) ? '16px' : '18px', fontWeight: 'bold', color: 'inherit', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                    ⚡ {(mounted && isMobile) ? 'Supabase' : 'Supabase Project'}
                 </Link>
-                {!isMobile && (
+                {mounted && !isMobile && (
                     <Menu
                         mode="horizontal"
                         selectedKeys={[getActiveKey()]}
@@ -164,7 +169,7 @@ export default function Header({ user }: HeaderProps) {
                 )}
             </div>
 
-            <Space size={isMobile ? "small" : "middle"}>
+            <Space size={mounted ? (isMobile ? "small" : "middle") : "small"}>
                 <Badge count={itemCount} size="small" offset={[-2, 4]}>
                     <Button
                         type="text"
@@ -172,81 +177,83 @@ export default function Header({ user }: HeaderProps) {
                         onClick={() => setCartVisible(true)}
                     />
                 </Badge>
-                {!isMobile ? (
-                    <>
-                        <Dropdown menu={languageMenu} placement="bottomRight">
-                            <Button type="text" icon={<GlobalOutlined />}>
-                                {t('language')}
-                            </Button>
-                        </Dropdown>
-
-                        <NetworkSwitcher />
-
-                        {user ? (
-                            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-                                <Space align="center" style={{ cursor: 'pointer', display: 'flex', minWidth: 0 }}>
-                                    <Avatar size="small" icon={<UserOutlined />} src={user.user_metadata?.avatar_url} />
-                                    <Text style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</Text>
-                                    <DownOutlined style={{ fontSize: '10px' }} />
-                                </Space>
+                {mounted && (
+                    !isMobile ? (
+                        <>
+                            <Dropdown menu={languageMenu} placement="bottomRight">
+                                <Button type="text" icon={<GlobalOutlined />}>
+                                    {t('language')}
+                                </Button>
                             </Dropdown>
-                        ) : (
-                            <Link href="/login">
-                                <Button type="primary">{t('login')}</Button>
-                            </Link>
-                        )}
-                    </>
-                ) : (
-                    <>
-                        <Button
-                            type="text"
-                            icon={<MenuOutlined style={{ fontSize: '20px' }} />}
-                            onClick={() => setDrawerVisible(true)}
-                        />
-                        <Drawer
-                            title={t("menu")}
-                            placement="right"
-                            onClose={() => setDrawerVisible(false)}
-                            open={drawerVisible}
-                            width={280}
-                        >
-                            <Menu
-                                mode="inline"
-                                selectedKeys={[getActiveKey()]}
-                                items={[
-                                    ...menuItems,
-                                    { type: 'divider' as const },
-                                    {
-                                        key: 'language',
-                                        label: 'Language',
-                                        icon: <GlobalOutlined />,
-                                        children: [
-                                            { key: 'en', label: 'English', onClick: () => handleLanguageChange({ key: 'en' }) },
-                                            { key: 'zh', label: '中文', onClick: () => handleLanguageChange({ key: 'zh' }) },
-                                        ]
-                                    },
-                                    {
-                                        key: 'network',
-                                        label: t('network'),
-                                        icon: <SwapOutlined />,
-                                        children: networkItems
-                                    },
-                                    ...(user ? [
-                                        { type: 'divider' as const },
-                                        ...userMenuItems
-                                    ] : [
+
+                            <NetworkSwitcher />
+
+                            {user ? (
+                                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+                                    <Space align="center" style={{ cursor: 'pointer', display: 'flex', minWidth: 0 }}>
+                                        <Avatar size="small" icon={<UserOutlined />} src={user.user_metadata?.avatar_url} />
+                                        <Text style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</Text>
+                                        <DownOutlined style={{ fontSize: '10px' }} />
+                                    </Space>
+                                </Dropdown>
+                            ) : (
+                                <Link href="/login">
+                                    <Button type="primary">{t('login')}</Button>
+                                </Link>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                type="text"
+                                icon={<MenuOutlined style={{ fontSize: '20px' }} />}
+                                onClick={() => setDrawerVisible(true)}
+                            />
+                            <Drawer
+                                title={t("menu")}
+                                placement="right"
+                                onClose={() => setDrawerVisible(false)}
+                                open={drawerVisible}
+                                width={280}
+                            >
+                                <Menu
+                                    mode="inline"
+                                    selectedKeys={[getActiveKey()]}
+                                    items={[
+                                        ...menuItems,
                                         { type: 'divider' as const },
                                         {
-                                            key: 'login',
-                                            label: <Link href="/login" onClick={() => setDrawerVisible(false)}>{t('login')}</Link>,
-                                            icon: <UserOutlined />,
-                                        }
-                                    ])
-                                ]}
-                                style={{ borderRight: 'none' }}
-                            />
-                        </Drawer>
-                    </>
+                                            key: 'language',
+                                            label: 'Language',
+                                            icon: <GlobalOutlined />,
+                                            children: [
+                                                { key: 'en', label: 'English', onClick: () => handleLanguageChange({ key: 'en' }) },
+                                                { key: 'zh', label: '中文', onClick: () => handleLanguageChange({ key: 'zh' }) },
+                                            ]
+                                        },
+                                        {
+                                            key: 'network',
+                                            label: t('network'),
+                                            icon: <SwapOutlined />,
+                                            children: networkItems
+                                        },
+                                        ...(user ? [
+                                            { type: 'divider' as const },
+                                            ...userMenuItems
+                                        ] : [
+                                            { type: 'divider' as const },
+                                            {
+                                                key: 'login',
+                                                label: <Link href="/login" onClick={() => setDrawerVisible(false)}>{t('login')}</Link>,
+                                                icon: <UserOutlined />,
+                                            }
+                                        ])
+                                    ]}
+                                    style={{ borderRight: 'none' }}
+                                />
+                            </Drawer>
+                        </>
+                    )
                 )}
             </Space>
             <CartDrawer
