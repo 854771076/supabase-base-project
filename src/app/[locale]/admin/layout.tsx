@@ -35,7 +35,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.user) {
-                    setIsAdmin(data.user.app_metadata?.is_admin === true);
+                    setIsAdmin(data.user.is_admin === true);
                 } else {
                     setIsAdmin(false);
                 }
