@@ -16,5 +16,6 @@ export async function GET() {
         email: user.email,
         user_metadata: user.user_metadata,
         last_sign_in_at: user.last_sign_in_at,
+        role: user.role,
     });
 }
