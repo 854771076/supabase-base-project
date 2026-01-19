@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
             .from('orders')
             .select('*')
             .eq('status', 'pending')
-            .eq('provider', 'tokenpay');
 
         if (error) throw error;
 
