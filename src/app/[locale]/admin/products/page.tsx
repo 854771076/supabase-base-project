@@ -179,6 +179,12 @@ export default function AdminProductsPage() {
             render: (id: string) => <Typography.Text copyable code style={{ fontSize: '12px' }}>{id}</Typography.Text>,
         },
         {
+            title: t('thumbnail'),
+            dataIndex: 'thumbnail_url',
+            key: 'thumbnail',
+            render: (url: string) => url ? <img src={url} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} /> : '-',
+        },
+        {
             title: t('productName'),
             dataIndex: 'name',
             key: 'name',
