@@ -163,7 +163,8 @@ CREATE POLICY "Users can view own order items" ON public.order_items
 -- Service role can manage order items
 CREATE POLICY "Service role can manage order items" ON public.order_items
     FOR ALL USING (current_setting('role', true) = 'service_role');
-
+CREATE POLICY "Service role can manage order shipping_addresses" ON public.shipping_addresses
+    FOR ALL USING (current_setting('role', true) = 'service_role');
 -- Indexes
 CREATE INDEX idx_order_items_order_id ON public.order_items(order_id);
 CREATE INDEX idx_order_items_product_id ON public.order_items(product_id);

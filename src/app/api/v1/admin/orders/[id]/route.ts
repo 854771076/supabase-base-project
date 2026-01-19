@@ -41,8 +41,7 @@ export async function GET(request: Request, { params }: RouteParams) {
                     quantity,
                     unit_price_cents,
                     total_price_cents
-                ),
-                shipping_address:shipping_addresses(*)
+                )
             `)
             .eq('id', id)
             .single();
@@ -51,9 +50,28 @@ export async function GET(request: Request, { params }: RouteParams) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
+        // Manually fetch shipping address if exists
+        let shippingAddress = null;
+        if (order.shipping_address_id) {
+            const { data: address } = await adminSupabase
+                .from('shipping_addresses')
+                .select('*')
+                .eq('id', order.shipping_address_id)
+                .single();
+
+            if (address) {
+                shippingAddress = address;
+            }
+        }
+
+        const orderWithAddress = {
+            ...order,
+            shipping_address: shippingAddress
+        };
+
         return NextResponse.json({
             success: true,
-            data: order,
+            data: orderWithAddress,
         });
     } catch (error) {
         console.error('Admin Order GET error:', error);

@@ -43,8 +43,7 @@ export async function GET(request: Request) {
                     quantity,
                     unit_price_cents,
                     total_price_cents
-                ),
-                shipping_address:shipping_addresses(*)
+                )
             `, { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(offset, offset + limit - 1);
@@ -73,9 +72,33 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
         }
 
+        // Manually fetch shipping addresses to avoid FK issues
+        const shippingAddressIds = orders
+            ?.map((o: any) => o.shipping_address_id)
+            .filter((id: any) => id);
+
+        let addressMap: Record<string, any> = {};
+        if (shippingAddressIds && shippingAddressIds.length > 0) {
+            const { data: addresses } = await adminSupabase
+                .from('shipping_addresses')
+                .select('*')
+                .in('id', shippingAddressIds);
+
+            if (addresses) {
+                addresses.forEach((addr: any) => {
+                    addressMap[addr.id] = addr;
+                });
+            }
+        }
+
+        const ordersWithAddress = orders?.map((order: any) => ({
+            ...order,
+            shipping_address: order.shipping_address_id ? addressMap[order.shipping_address_id] : null
+        }));
+
         return NextResponse.json({
             success: true,
-            data: orders,
+            data: ordersWithAddress,
             pagination: {
                 limit,
                 offset,
