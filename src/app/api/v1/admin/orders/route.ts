@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         }
 
         // Check if user is super admin
-        const isSuperAdmin = user.user_metadata?.is_super_admin === true;
+        const isSuperAdmin = user.app_metadata?.is_admin === true;
         if (!isSuperAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
@@ -94,7 +94,7 @@ export async function PUT(request: Request) {
         }
 
         // Check if user is super admin
-        const isSuperAdmin = user.user_metadata?.is_super_admin === true;
+        const isSuperAdmin = user.app_metadata?.is_admin === true;
         if (!isSuperAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
