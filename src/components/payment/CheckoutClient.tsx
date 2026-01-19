@@ -310,6 +310,7 @@ export default function CheckoutClient() {
                         <List.Item
                             actions={[
                                 <Button
+                                    key="copy"
                                     icon={<CopyOutlined />}
                                     onClick={() => {
                                         navigator.clipboard.writeText(license.key_value);

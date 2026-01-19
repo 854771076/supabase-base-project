@@ -4,7 +4,7 @@ import React from 'react';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { mainnet, sepolia } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { injected, walletConnect } from '@wagmi/connectors';
+import { injected, walletConnect } from 'wagmi/connectors';
 import { env } from '@/utils/env';
 
 // Create wagmi config
