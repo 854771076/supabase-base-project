@@ -77,7 +77,7 @@ export default function AdminProductsPage() {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch('/api/v1/shop/categories?include_inactive=true');
+            const res = await fetch('/api/v1/admin/categories?include_inactive=true');
             const data = await res.json();
             if (data.success) {
                 setCategories(data.data);
@@ -114,7 +114,7 @@ export default function AdminProductsPage() {
 
     const handleDelete = async (id: string) => {
         try {
-            await fetch(`/api/v1/shop/products/${id}`, { method: 'DELETE' });
+            await fetch(`/api/v1/admin/products/${id}`, { method: 'DELETE' });
             message.success(t('productDeleted'));
             fetchProducts();
         } catch (error) {
@@ -127,8 +127,8 @@ export default function AdminProductsPage() {
         try {
             const method = editingProduct ? 'PUT' : 'POST';
             const url = editingProduct
-                ? `/api/v1/shop/products/${editingProduct.id}`
-                : '/api/v1/shop/products';
+                ? `/api/v1/admin/products/${editingProduct.id}`
+                : '/api/v1/admin/products';
 
             const res = await fetch(url, {
                 method,
@@ -153,7 +153,7 @@ export default function AdminProductsPage() {
 
     const handleStatusChange = async (product: Product, newStatus: string) => {
         try {
-            await fetch(`/api/v1/shop/products/${product.id}`, {
+            await fetch(`/api/v1/admin/products/${product.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus }),

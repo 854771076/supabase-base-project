@@ -24,15 +24,9 @@ ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public can view active categories" ON public.categories
     FOR SELECT USING (is_active = true);
 
--- Super admin can manage categories
-CREATE POLICY "Super admin can manage categories" ON public.categories
-    USING (
-        EXISTS (
-            SELECT 1 FROM auth.users 
-            WHERE auth.users.id = auth.uid() 
-            AND (auth.users.raw_user_meta_data->>'is_super_admin')::boolean = true
-        )
-    );
+-- Service role can manage categories
+CREATE POLICY "Service role can manage categories" ON public.categories
+    USING (current_setting('role', true) = 'service_role');
 
 -- Indexes
 CREATE INDEX idx_categories_parent_id ON public.categories(parent_id);
@@ -68,15 +62,9 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public can view published products" ON public.products
     FOR SELECT USING (status = 'published');
 
--- Super admin can manage products
-CREATE POLICY "Super admin can manage products" ON public.products
-    USING (
-        EXISTS (
-            SELECT 1 FROM auth.users 
-            WHERE auth.users.id = auth.uid() 
-            AND (auth.users.raw_user_meta_data->>'is_super_admin')::boolean = true
-        )
-    );
+-- Service role can manage products
+CREATE POLICY "Service role can manage products" ON public.products
+    FOR ALL USING (current_setting('role', true) = 'service_role');
 
 -- Indexes
 CREATE INDEX idx_products_category_id ON public.products(category_id);
@@ -172,15 +160,9 @@ CREATE POLICY "Users can view own order items" ON public.order_items
         )
     );
 
--- Super admin can view all order items
-CREATE POLICY "Super admin can view all order items" ON public.order_items
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM auth.users 
-            WHERE auth.users.id = auth.uid() 
-            AND (auth.users.raw_user_meta_data->>'is_super_admin')::boolean = true
-        )
-    );
+-- Service role can manage order items
+CREATE POLICY "Service role can manage order items" ON public.order_items
+    FOR ALL USING (current_setting('role', true) = 'service_role');
 
 -- Indexes
 CREATE INDEX idx_order_items_order_id ON public.order_items(order_id);
@@ -198,25 +180,6 @@ ALTER TABLE public.orders
 ALTER TABLE public.orders DROP CONSTRAINT IF EXISTS orders_type_check;
 ALTER TABLE public.orders ADD CONSTRAINT orders_type_check 
     CHECK (type IN ('subscription', 'credits', 'product'));
-
--- Add admin policy for orders
-CREATE POLICY "Super admin can view all orders" ON public.orders
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM auth.users 
-            WHERE auth.users.id = auth.uid() 
-            AND (auth.users.raw_user_meta_data->>'is_super_admin')::boolean = true
-        )
-    );
-
-CREATE POLICY "Super admin can update all orders" ON public.orders
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM auth.users 
-            WHERE auth.users.id = auth.uid() 
-            AND (auth.users.raw_user_meta_data->>'is_super_admin')::boolean = true
-        )
-    );
 
 -- ============================================================================
 -- TRIGGERS

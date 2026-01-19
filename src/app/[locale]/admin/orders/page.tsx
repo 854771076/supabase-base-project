@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Tag, Space, Typography, Card, Select, Modal, Descriptions, App, DatePicker } from 'antd';
+import { Table, Button, Tag, Space, Typography, Card, Select, Modal, Descriptions, App, DatePicker, Input } from 'antd';
 import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
 
@@ -44,7 +44,7 @@ export default function AdminOrdersPage() {
     const [typeFilter, setTypeFilter] = useState<string | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
-
+    const [searchId, setSearchId] = useState('');
     const pageSize = 10;
 
     const fetchOrders = React.useCallback(async () => {
@@ -56,10 +56,13 @@ export default function AdminOrdersPage() {
             });
             if (statusFilter) params.set('status', statusFilter);
             if (typeFilter) params.set('type', typeFilter);
+            if (searchId) params.set('id', searchId);
 
             const res = await fetch(`/api/v1/admin/orders?${params}`);
             const data = await res.json();
             if (data.success) {
+                // If searching by ID, it might return a single object or list depending on API implementation
+                // Our API returns a list for the main endpoint, so this is fine.
                 setOrders(data.data);
                 setTotal(data.pagination.total);
             }
@@ -68,7 +71,7 @@ export default function AdminOrdersPage() {
         } finally {
             setLoading(false);
         }
-    }, [page, statusFilter, typeFilter]);
+    }, [page, statusFilter, typeFilter, searchId, pageSize]);
 
     useEffect(() => {
         fetchOrders();
@@ -76,10 +79,10 @@ export default function AdminOrdersPage() {
 
     const handleStatusChange = async (orderId: string, newStatus: string) => {
         try {
-            const res = await fetch('/api/v1/admin/orders', {
+            const res = await fetch(`/api/v1/admin/orders/${orderId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: orderId, status: newStatus }),
+                body: JSON.stringify({ status: newStatus }),
             });
             const data = await res.json();
             if (data.success) {
@@ -197,7 +200,15 @@ export default function AdminOrdersPage() {
             </div>
 
             <Card style={{ marginBottom: '16px' }}>
-                <Space>
+                <Space wrap>
+                    <Input
+                        placeholder={t('searchOrderId')}
+                        prefix={<SearchOutlined />}
+                        allowClear
+                        value={searchId}
+                        onChange={(e) => { setSearchId(e.target.value); setPage(1); }}
+                        style={{ width: 200 }}
+                    />
                     <Select
                         placeholder={t('filterByStatus')}
                         value={statusFilter}

@@ -2,14 +2,19 @@ import { NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 
+interface RouteParams {
+    params: Promise<{ id: string }>;
+}
+
 const updateOrderSchema = z.object({
     status: z.enum(['pending', 'processing', 'completed', 'failed', 'cancelled']).optional(),
     shipping_info: z.record(z.any()).optional(),
 });
 
-// GET: List all orders (admin only)
-export async function GET(request: Request) {
+// GET: Get order by ID (Admin)
+export async function GET(request: Request, { params }: RouteParams) {
     try {
+        const { id } = await params;
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -17,22 +22,15 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check if user is super admin
-        const isSuperAdmin = user.app_metadata?.is_admin === true;
-        if (!isSuperAdmin) {
+        // Check if user is admin
+        const isAdmin = user.app_metadata?.is_admin === true;
+        if (!isAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
-        const { searchParams } = new URL(request.url);
-        const status = searchParams.get('status');
-        const type = searchParams.get('type');
-        const user_id = searchParams.get('user_id');
-        const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
-        const offset = parseInt(searchParams.get('offset') || '0');
-
         const adminSupabase = await createAdminClient();
 
-        let query = adminSupabase
+        const { data: order, error } = await adminSupabase
             .from('orders')
             .select(`
                 *,
@@ -45,52 +43,28 @@ export async function GET(request: Request) {
                     total_price_cents
                 ),
                 shipping_address:shipping_addresses(*)
-            `, { count: 'exact' })
-            .order('created_at', { ascending: false })
-            .range(offset, offset + limit - 1);
+            `)
+            .eq('id', id)
+            .single();
 
-        if (status) {
-            query = query.eq('status', status);
-        }
-
-        if (type) {
-            query = query.eq('type', type);
-        }
-
-        if (user_id) {
-            query = query.eq('user_id', user_id);
-        }
-
-        const id = searchParams.get('id');
-        if (id) {
-            query = query.eq('id', id);
-        }
-
-        const { data: orders, error, count } = await query;
-
-        if (error) {
-            console.error('Error fetching orders:', error);
-            return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
+        if (error || !order) {
+            return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
         return NextResponse.json({
             success: true,
-            data: orders,
-            pagination: {
-                limit,
-                offset,
-                total: count || 0,
-            },
+            data: order,
         });
     } catch (error) {
-        console.error('Admin orders GET error:', error);
+        console.error('Admin Order GET error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
 
-// PUT: Update order status (admin only)
-export async function PUT(request: Request) {
+// PUT: Update order status (Admin)
+export async function PUT(request: Request, { params }: RouteParams) {
     try {
+        const { id } = await params;
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -98,20 +72,14 @@ export async function PUT(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check if user is super admin
-        const isSuperAdmin = user.app_metadata?.is_admin === true;
-        if (!isSuperAdmin) {
+        // Check if user is admin
+        const isAdmin = user.app_metadata?.is_admin === true;
+        if (!isAdmin) {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
         const body = await request.json();
-        const { id, ...updateData } = body;
-
-        if (!id) {
-            return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
-        }
-
-        const validatedData = updateOrderSchema.parse(updateData);
+        const validatedData = updateOrderSchema.parse(body);
 
         const adminSupabase = await createAdminClient();
 
@@ -146,7 +114,7 @@ export async function PUT(request: Request) {
             data: order,
         });
     } catch (error: any) {
-        console.error('Admin orders PUT error:', error);
+        console.error('Admin Order PUT error:', error);
         if (error instanceof z.ZodError) {
             return NextResponse.json({ error: error.errors }, { status: 400 });
         }

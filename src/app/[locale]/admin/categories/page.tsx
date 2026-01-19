@@ -35,7 +35,7 @@ export default function AdminCategoriesPage() {
     const fetchCategories = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/v1/shop/categories?include_inactive=true');
+            const res = await fetch('/api/v1/admin/categories');
             const data = await res.json();
             if (data.success) {
                 setCategories(data.data);
@@ -60,19 +60,38 @@ export default function AdminCategoriesPage() {
         setModalOpen(true);
     };
 
+    const handleDelete = async (id: string) => {
+        try {
+            const res = await fetch(`/api/v1/admin/categories/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                message.success(t('categoryDeleted'));
+                fetchCategories();
+            } else {
+                message.error(data.error || t('error'));
+            }
+        } catch (error) {
+            message.error(t('error'));
+        }
+    };
+
     const handleSubmit = async (values: any) => {
         setSaving(true);
         try {
-            // For now, only support create (API doesn't have PUT for categories yet)
-            const res = await fetch('/api/v1/shop/categories', {
-                method: 'POST',
+            const method = editingCategory ? 'PUT' : 'POST';
+            const url = editingCategory
+                ? `/api/v1/admin/categories/${editingCategory.id}`
+                : '/api/v1/admin/categories';
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(values),
             });
             const data = await res.json();
 
             if (data.success) {
-                message.success(t('categoryCreated'));
+                message.success(editingCategory ? t('categoryUpdated') : t('categoryCreated'));
                 setModalOpen(false);
                 fetchCategories();
             } else {
@@ -124,6 +143,12 @@ export default function AdminCategoriesPage() {
             render: (_: any, record: Category) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+                    <Popconfirm
+                        title={t('confirmDelete')}
+                        onConfirm={() => handleDelete(record.id)}
+                    >
+                        <Button size="small" danger icon={<DeleteOutlined />} />
+                    </Popconfirm>
                 </Space>
             ),
         },
