@@ -196,26 +196,30 @@ export default function ShopPage() {
                                 >
                                     <Card
                                         hoverable
+                                        className="product-card"
                                         onClick={() => handleProductClick(product.slug)}
                                         cover={
                                             <div style={{
-                                                height: '200px',
-                                                background: '#f5f5f5',
+                                                height: '240px',
+                                                background: '#f9f9f9',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 overflow: 'hidden',
-                                                position: 'relative'
+                                                position: 'relative',
+                                                borderRadius: '8px 8px 0 0'
                                             }}>
                                                 {product.thumbnail_url ? (
-                                                    <img
+                                                    <Image
                                                         src={product.thumbnail_url}
                                                         alt={product.name}
+                                                        fill
+                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                                                         style={{
-                                                            maxWidth: '100%',
-                                                            maxHeight: '100%',
-                                                            objectFit: 'cover'
+                                                            objectFit: 'cover',
+                                                            transition: 'transform 0.3s ease'
                                                         }}
+                                                        className="product-image"
                                                     />
                                                 ) : (
                                                     <ShoppingCartOutlined style={{ fontSize: '48px', color: '#ccc' }} />
@@ -228,6 +232,7 @@ export default function ShopPage() {
                                                 type="text"
                                                 icon={<ShoppingCartOutlined />}
                                                 onClick={(e) => handleAddToCart(product, e)}
+                                                className="action-btn"
                                             >
                                                 {t('addToCart')}
                                             </Button>,
@@ -236,26 +241,42 @@ export default function ShopPage() {
                                                 type="text"
                                                 icon={favorites.has(product.id) ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
                                                 onClick={(e) => handleToggleFavorite(product.id, e)}
+                                                className="action-btn"
                                             />
                                         ]}
+                                        style={{
+                                            borderRadius: '12px',
+                                            overflow: 'hidden',
+                                            border: '1px solid #f0f0f0',
+                                            transition: 'all 0.3s ease'
+                                        }}
                                     >
                                         <Card.Meta
-                                            title={product.name}
+                                            title={<div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{product.name}</div>}
                                             description={
                                                 <div>
-                                                    {product.category && (
-                                                        <Tag color="blue" style={{ marginBottom: '8px' }}>
-                                                            {product.category.name}
-                                                        </Tag>
-                                                    )}
-                                                    <div style={{ marginTop: '8px' }}>
-                                                        <Text strong style={{ fontSize: '18px', color: '#1677ff' }}>
-                                                            ${(product.price_cents / 100).toFixed(2)}
+                                                    <div style={{ height: '40px', overflow: 'hidden', marginBottom: '12px' }}>
+                                                        <Text type="secondary" style={{ fontSize: '13px' }}>
+                                                            {product.short_description || '-'}
                                                         </Text>
-                                                        {product.compare_at_price_cents && (
-                                                            <Text delete type="secondary" style={{ marginLeft: '8px' }}>
-                                                                ${(product.compare_at_price_cents / 100).toFixed(2)}
-                                                            </Text>
+                                                    </div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                                        <div>
+                                                            <div style={{ marginBottom: '4px' }}>
+                                                                <Text strong style={{ fontSize: '20px', color: '#1677ff' }}>
+                                                                    ${(product.price_cents / 100).toFixed(2)}
+                                                                </Text>
+                                                            </div>
+                                                            {product.compare_at_price_cents && (
+                                                                <Text delete type="secondary" style={{ fontSize: '12px' }}>
+                                                                    ${(product.compare_at_price_cents / 100).toFixed(2)}
+                                                                </Text>
+                                                            )}
+                                                        </div>
+                                                        {product.category && (
+                                                            <Tag color="blue" style={{ margin: 0, borderRadius: '4px' }}>
+                                                                {product.category.name}
+                                                            </Tag>
                                                         )}
                                                     </div>
                                                 </div>
@@ -266,6 +287,20 @@ export default function ShopPage() {
                             </Col>
                         ))}
                     </Row>
+
+                    <style jsx global>{`
+                        .product-card:hover {
+                            transform: translateY(-8px);
+                            box-shadow: 0 12px 24px rgba(0,0,0,0.1) !important;
+                        }
+                        .product-card:hover .product-image {
+                            transform: scale(1.05);
+                        }
+                        .action-btn:hover {
+                            color: #1677ff !important;
+                            background: rgba(22, 119, 255, 0.05) !important;
+                        }
+                    `}</style>
 
                     {/* Pagination */}
                     <div style={{ textAlign: 'center', marginTop: '40px' }}>

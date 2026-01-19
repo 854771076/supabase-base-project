@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Tag, Space, Typography, Card, Input, Select, Modal, Form, InputNumber, Switch, App, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
 
 const { Title, Paragraph } = Typography;
@@ -13,7 +13,11 @@ interface Product {
     name: string;
     slug: string;
     price_cents: number;
+    compare_at_price_cents: number | null;
+    thumbnail_url: string | null;
+    images: string[];
     stock_quantity: number;
+    sku: string | null;
     status: 'draft' | 'published' | 'archived';
     category: { id: string; name: string } | null;
     featured: boolean;
@@ -57,10 +61,6 @@ export default function AdminProductsPage() {
             });
             if (search) params.set('search', search);
             if (statusFilter) params.set('status', statusFilter);
-            else {
-                // Admin wants to see all statuses, so we need to call separately
-                // For simplicity, we'll just not filter
-            }
 
             const res = await fetch(`/api/v1/admin/products?${params}`);
             const data = await res.json();
@@ -108,6 +108,7 @@ export default function AdminProductsPage() {
         form.setFieldsValue({
             ...product,
             category_id: product.category?.id,
+            images: product.images?.join('\n'),
         });
         setModalOpen(true);
     };
@@ -125,6 +126,11 @@ export default function AdminProductsPage() {
     const handleSubmit = async (values: any) => {
         setSaving(true);
         try {
+            const formattedValues = {
+                ...values,
+                images: values.images ? values.images.split('\n').map((url: string) => url.trim()).filter(Boolean) : [],
+            };
+
             const method = editingProduct ? 'PUT' : 'POST';
             const url = editingProduct
                 ? `/api/v1/admin/products/${editingProduct.id}`
@@ -133,7 +139,7 @@ export default function AdminProductsPage() {
             const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(values),
+                body: JSON.stringify(formattedValues),
             });
             const data = await res.json();
 
@@ -203,27 +209,24 @@ export default function AdminProductsPage() {
             title: t('status'),
             dataIndex: 'status',
             key: 'status',
-            render: (status: string, record: Product) => {
-                const colors = { draft: 'default', published: 'green', archived: 'red' };
-                return (
-                    <Select
-                        value={status}
-                        size="small"
-                        style={{ width: 100 }}
-                        onChange={(val) => handleStatusChange(record, val)}
-                    >
-                        <Select.Option value="draft">
-                            <Tag color="default">{t('draft')}</Tag>
-                        </Select.Option>
-                        <Select.Option value="published">
-                            <Tag color="green">{t('published')}</Tag>
-                        </Select.Option>
-                        <Select.Option value="archived">
-                            <Tag color="red">{t('archived')}</Tag>
-                        </Select.Option>
-                    </Select>
-                );
-            },
+            render: (status: string, record: Product) => (
+                <Select
+                    value={status}
+                    size="small"
+                    style={{ width: 100 }}
+                    onChange={(val) => handleStatusChange(record, val)}
+                >
+                    <Select.Option value="draft">
+                        <Tag color="default">{t('draft')}</Tag>
+                    </Select.Option>
+                    <Select.Option value="published">
+                        <Tag color="green">{t('published')}</Tag>
+                    </Select.Option>
+                    <Select.Option value="archived">
+                        <Tag color="red">{t('archived')}</Tag>
+                    </Select.Option>
+                </Select>
+            ),
         },
         {
             title: t('featured'),
@@ -342,6 +345,9 @@ export default function AdminProductsPage() {
                     </Form.Item>
                     <Form.Item name="thumbnail_url" label={t('thumbnailUrl')}>
                         <Input placeholder="https://..." />
+                    </Form.Item>
+                    <Form.Item name="images" label={t('productImages')} tooltip={t('imagesTooltip')}>
+                        <TextArea rows={4} placeholder="Enter image URLs, one per line" />
                     </Form.Item>
                     <Form.Item name="status" label={t('status')}>
                         <Select>

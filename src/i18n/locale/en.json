@@ -294,6 +294,8 @@
         "stockQuantity": "Stock Quantity",
         "sku": "SKU",
         "thumbnailUrl": "Thumbnail URL",
+        "productImages": "Product Images",
+        "imagesTooltip": "Enter multiple image URLs, one per line. These will be shown in the product detail gallery.",
         "status": "Status",
         "draft": "Draft",
         "published": "Published",
