@@ -34,6 +34,8 @@ INSERT INTO public.credit_products (name, credits_amount, price_cents, type, dur
 ('Monthly Pro License', 0, 990, 'license', 30),
 ('Yearly Pro License', 0, 8900, 'license', 365),
 ('Lifetime Pro License', 0, 19900, 'license', 0);
-
+ALTER TABLE public.orders DROP CONSTRAINT IF EXISTS orders_type_check;
+ALTER TABLE public.orders ADD CONSTRAINT orders_type_check 
+    CHECK (type IN ('subscription', 'credits', 'product','license'));
 -- Update existing products to ensure they have the 'credits' type
 UPDATE public.credit_products SET type = 'credits' WHERE type IS NULL;

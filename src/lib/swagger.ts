@@ -1,6 +1,6 @@
 import { createSwaggerSpec } from 'next-swagger-doc';
 import { getURL } from '@/utils/url';
-import { userPaths, paymentPaths, subscriptionPaths, demoPaths, authPaths, cronPaths } from './doc';
+import { userPaths, paymentPaths, subscriptionPaths, demoPaths, authPaths, cronPaths, licensePaths } from './doc';
 
 export const getApiDocs = async () => {
   // 合并所有API路径
@@ -11,6 +11,7 @@ export const getApiDocs = async () => {
     ...demoPaths,
     ...authPaths,
     ...cronPaths,
+    ...licensePaths,
   };
 
   const spec = createSwaggerSpec({
@@ -64,7 +65,7 @@ export const getApiDocs = async () => {
               },
               type: {
                 type: 'string',
-                enum: ['subscription', 'credits'],
+                enum: ['subscription', 'credits', 'product', 'license'],
                 description: 'Order type',
               },
               provider: {
@@ -120,6 +121,18 @@ export const getApiDocs = async () => {
                 format: 'date-time',
                 description: 'Order completion timestamp',
               },
+            },
+          },
+          License: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid', description: 'License ID' },
+              key_value: { type: 'string', description: 'The license key' },
+              status: { type: 'string', enum: ['active', 'expired', 'revoked'], description: 'Current status' },
+              expires_at: { type: 'string', format: 'date-time', nullable: true, description: 'Expiration timestamp' },
+              created_at: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
+              product_id: { type: 'string', format: 'uuid', description: 'Associated product ID' },
+              order_id: { type: 'string', format: 'uuid', description: 'Associated order ID' },
             },
           },
         },
