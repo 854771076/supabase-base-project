@@ -34,8 +34,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         fetch('/api/v1/user')
             .then(res => res.json())
             .then(data => {
-                if (data.success && data.user) {
-                    setIsAdmin(data.user.is_admin === true);
+                if (data) {
+                    setIsAdmin(data.is_admin === true);
                 } else {
                     setIsAdmin(false);
                 }
