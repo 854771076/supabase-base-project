@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, Button, Card, Typography, Space, Radio, Empty, App } from 'antd';
 import { PlusOutlined, HomeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
+import { COUNTRIES } from '@/lib/constants/countries';
 
 const { Text, Title } = Typography;
 
@@ -24,17 +25,6 @@ interface ShippingAddressFormProps {
     onSelect: (addressId: string | null) => void;
     selectedAddressId: string | null;
 }
-
-const COUNTRIES = [
-    { code: 'CN', name: '中国' },
-    { code: 'US', name: 'United States' },
-    { code: 'GB', name: 'United Kingdom' },
-    { code: 'JP', name: '日本' },
-    { code: 'KR', name: '한국' },
-    { code: 'SG', name: 'Singapore' },
-    { code: 'HK', name: 'Hong Kong' },
-    { code: 'TW', name: 'Taiwan' },
-];
 
 export default function ShippingAddressForm({ onSelect, selectedAddressId }: ShippingAddressFormProps) {
     const t = useTranslations('ShippingAddress');
@@ -257,7 +247,15 @@ export default function ShippingAddressForm({ onSelect, selectedAddressId }: Shi
                         label={t('country')}
                         rules={[{ required: true, message: t('required') }]}
                     >
-                        <Select>
+                        <Select
+                            showSearch
+                            placeholder={t('countryPlaceholder')}
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                                (option?.children as unknown as string).toLowerCase().includes(input.toLowerCase()) ||
+                                (option?.value as string).toLowerCase().includes(input.toLowerCase())
+                            }
+                        >
                             {COUNTRIES.map(c => (
                                 <Select.Option key={c.code} value={c.code}>{c.name}</Select.Option>
                             ))}
