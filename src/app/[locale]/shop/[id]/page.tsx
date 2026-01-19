@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, use } from 'react';
-import { Row, Col, Card, Typography, Button, InputNumber, Spin, Tag, Breadcrumb, Divider, App, Carousel, Image as AntImage, Space } from 'antd';
+import { Row, Col, Card, Typography, Button, InputNumber, Spin, Tag, Breadcrumb, Divider, App, Carousel, Image as AntImage, Space, Badge } from 'antd';
 import { ShoppingCartOutlined, HeartOutlined, HeartFilled, HomeOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
@@ -130,35 +130,42 @@ export default function ProductDetailPage({ params }: PageProps) {
 
     return (
         <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-            {/* Breadcrumb */}
-            <Breadcrumb
-                style={{ marginBottom: '24px' }}
-                items={[
-                    { title: <Link href={`/${locale}`}><HomeOutlined /></Link> },
-                    { title: <Link href={`/${locale}/shop`}>{t('title')}</Link> },
-                    { title: product.name },
-                ]}
-            />
-
-            <Button
-                type="link"
-                icon={<ArrowLeftOutlined />}
-                onClick={() => router.back()}
-                style={{ marginBottom: '24px', paddingLeft: 0 }}
-            >
-                {t('backToShop')}
-            </Button>
+            {/* Breadcrumb & Navigation */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                <Breadcrumb
+                    items={[
+                        { title: <Link href={`/${locale}`}><HomeOutlined /></Link> },
+                        { title: <Link href={`/${locale}/shop`}>{t('title')}</Link> },
+                        { title: <Text type="secondary" style={{ maxWidth: '150px' }} ellipsis>{product.name}</Text> },
+                    ]}
+                />
+                <Button
+                    type="text"
+                    icon={<ArrowLeftOutlined />}
+                    onClick={() => router.back()}
+                    style={{ color: '#1677ff', fontWeight: 500 }}
+                >
+                    {t('backToShop')}
+                </Button>
+            </div>
 
             <Row gutter={[48, 48]}>
-                {/* Images */}
+                {/* Images Section */}
                 <Col xs={24} md={12}>
                     <div style={{ position: 'sticky', top: '24px' }}>
-                        <Card styles={{ body: { padding: 0 } }} style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #f0f0f0' }}>
+                        <div style={{
+                            borderRadius: '24px',
+                            overflow: 'hidden',
+                            background: '#fff',
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
+                            border: '1px solid #f0f0f0'
+                        }}>
                             {images.length > 0 ? (
                                 <Carousel
                                     autoplay
                                     dots={false}
                                     ref={(node) => { (window as any).carousel = node; }}
+                                    effect="fade"
                                 >
                                     {images.map((img, index) => (
                                         <div key={index} className="carousel-image-container">
@@ -166,34 +173,41 @@ export default function ProductDetailPage({ params }: PageProps) {
                                                 src={img}
                                                 alt={`${product.name} - ${index + 1}`}
                                                 className="main-product-image"
-                                                preview
+                                                preview={true}
                                             />
                                         </div>
                                     ))}
                                 </Carousel>
                             ) : (
                                 <div className="empty-image-container">
-                                    <ShoppingCartOutlined style={{ fontSize: '64px', color: '#ccc' }} />
+                                    <ShoppingCartOutlined style={{ fontSize: '64px', color: '#f0f0f0' }} />
                                 </div>
                             )}
-                        </Card>
+                        </div>
 
                         {/* Thumbnails */}
                         {images.length > 1 && (
-                            <div style={{ display: 'flex', gap: '12px', marginTop: '16px', overflowX: 'auto', paddingBottom: '8px' }}>
+                            <div style={{
+                                display: 'flex',
+                                gap: '12px',
+                                marginTop: '20px',
+                                overflowX: 'auto',
+                                padding: '4px 0',
+                                scrollbarWidth: 'none'
+                            }}>
                                 {images.map((img, index) => (
                                     <div
                                         key={index}
                                         onClick={() => (window as any).carousel?.goTo(index)}
                                         style={{
-                                            width: '80px',
-                                            height: '80px',
-                                            borderRadius: '8px',
+                                            width: '72px',
+                                            height: '72px',
+                                            borderRadius: '12px',
                                             overflow: 'hidden',
                                             cursor: 'pointer',
                                             border: '2px solid #f0f0f0',
                                             flexShrink: 0,
-                                            transition: 'all 0.3s ease'
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                                         }}
                                         className="thumbnail-item"
                                     >
@@ -205,114 +219,126 @@ export default function ProductDetailPage({ params }: PageProps) {
                     </div>
                 </Col>
 
-                {/* Product Info */}
+                {/* Product Info Section */}
                 <Col xs={24} md={12}>
-                    <div style={{ padding: '12px 0' }}>
-                        <Space size={[0, 8]} wrap style={{ marginBottom: '16px' }}>
+                    <div style={{ padding: '8px 0' }}>
+                        <Space size={8} wrap style={{ marginBottom: '20px' }}>
                             {product.category && (
-                                <Tag color="blue" style={{ borderRadius: '4px', padding: '2px 8px' }}>{product.category.name}</Tag>
+                                <Tag bordered={false} color="blue" style={{ borderRadius: '6px', fontSize: '13px' }}>
+                                    {product.category.name}
+                                </Tag>
                             )}
                             {product.featured && (
-                                <Tag color="gold" style={{ borderRadius: '4px', padding: '2px 8px' }}>{t('featured')}</Tag>
-                            )}
-                            {product.stock_quantity > 0 ? (
-                                <Tag color="green" style={{ borderRadius: '4px', padding: '2px 8px' }}>{t('inStock')}</Tag>
-                            ) : (
-                                <Tag color="red" style={{ borderRadius: '4px', padding: '2px 8px' }}>{t('outOfStock')}</Tag>
+                                <Tag bordered={false} color="gold" style={{ borderRadius: '6px', fontSize: '13px' }}>
+                                    {t('featured')}
+                                </Tag>
                             )}
                         </Space>
 
-                        <Title level={1} style={{ marginBottom: '16px', fontSize: '36px', fontWeight: 700 }}>{product.name}</Title>
+                        <Title level={1} style={{ marginBottom: '16px', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, lineHeight: 1.2 }}>
+                            {product.name}
+                        </Title>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+                            {product.stock_quantity > 0 ? (
+                                <Badge status="success" text={<Text type="secondary">{t('inStock')}</Text>} />
+                            ) : (
+                                <Badge status="error" text={<Text type="danger">{t('outOfStock')}</Text>} />
+                            )}
+                            <Divider type="vertical" />
+                            <Text type="secondary" style={{ fontSize: '14px' }}>SKU: {product.sku || 'N/A'}</Text>
+                        </div>
 
                         {product.short_description && (
-                            <Paragraph style={{ fontSize: '18px', color: '#666', lineHeight: 1.6, marginBottom: '24px' }}>
+                            <Paragraph style={{ fontSize: '16px', color: '#595959', lineHeight: 1.7, marginBottom: '32px' }}>
                                 {product.short_description}
                             </Paragraph>
                         )}
 
                         <div style={{
-                            background: '#f0f7ff',
-                            padding: '24px',
-                            borderRadius: '12px',
-                            marginBottom: '32px'
+                            background: '#fafafa',
+                            padding: '32px',
+                            borderRadius: '20px',
+                            marginBottom: '40px',
+                            border: '1px solid #f0f0f0'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                                <Text strong style={{ fontSize: '40px', color: '#1677ff' }}>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px', flexWrap: 'wrap' }}>
+                                <Text strong style={{ fontSize: '42px', color: '#1a1a1a', lineHeight: 1 }}>
                                     ${(product.price_cents / 100).toFixed(2)}
                                 </Text>
                                 {product.compare_at_price_cents && (
-                                    <>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <Text delete type="secondary" style={{ fontSize: '20px' }}>
                                             ${(product.compare_at_price_cents / 100).toFixed(2)}
                                         </Text>
-                                        <Tag color="red" style={{ fontSize: '14px', fontWeight: 600 }}>
-                                            -{discount}% OFF
+                                        <Tag color="#ff4d4f" style={{ margin: 0, borderRadius: '4px', fontWeight: 700, border: 'none' }}>
+                                            {discount}% OFF
                                         </Tag>
-                                    </>
+                                    </div>
                                 )}
                             </div>
-                            {product.sku && (
-                                <div style={{ marginTop: '8px' }}>
-                                    <Text type="secondary">SKU: {product.sku}</Text>
-                                </div>
-                            )}
                         </div>
 
                         {/* Quantity & Actions */}
-                        <div style={{ marginBottom: '32px' }}>
-                            <div style={{ marginBottom: '12px' }}>
-                                <Text strong style={{ fontSize: '16px' }}>{t('quantity')}:</Text>
+                        <div style={{ marginBottom: '40px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <Text strong style={{ fontSize: '16px' }}>{t('quantity')}</Text>
+                                <Text type="secondary" style={{ fontSize: '14px' }}>
+                                    {product.stock_quantity} {t('itemsAvailable')}
+                                </Text>
                             </div>
-                            <Space size={16} align="center">
+                            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                                 <InputNumber
                                     min={1}
                                     max={product.stock_quantity || 99}
                                     value={quantity}
                                     onChange={(val) => setQuantity(val || 1)}
                                     size="large"
-                                    style={{ width: '120px', borderRadius: '8px' }}
+                                    style={{
+                                        width: '140px',
+                                        borderRadius: '12px',
+                                        height: '56px',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
                                 />
-                                <Text type="secondary">
-                                    {product.stock_quantity} {t('itemsAvailable')}
-                                </Text>
-                            </Space>
-                        </div>
-
-                        <div className="product-actions-container">
-                            <Button
-                                type="primary"
-                                size="large"
-                                icon={<ShoppingCartOutlined />}
-                                onClick={handleAddToCart}
-                                disabled={product.stock_quantity === 0}
-                                className="add-to-cart-btn"
-                            >
-                                {t('addToCart')}
-                            </Button>
-                            <Button
-                                size="large"
-                                icon={isFavorite ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
-                                onClick={handleToggleFavorite}
-                                className="favorite-btn"
-                            >
-                                {isFavorite ? t('inFavorites') : t('addToFavorites')}
-                            </Button>
+                                <div className="product-actions-group">
+                                    <Button
+                                        type="primary"
+                                        size="large"
+                                        icon={<ShoppingCartOutlined />}
+                                        onClick={handleAddToCart}
+                                        disabled={product.stock_quantity === 0}
+                                        className="primary-cta-btn"
+                                    >
+                                        {t('addToCart')}
+                                    </Button>
+                                    <Button
+                                        size="large"
+                                        icon={isFavorite ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
+                                        onClick={handleToggleFavorite}
+                                        className="secondary-cta-btn"
+                                    >
+                                        {isFavorite ? t('inFavorites') : t('addToFavorites')}
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
 
                         <Divider />
 
-                        {/* Description */}
+                        {/* Description Section */}
                         {product.description && (
-                            <div style={{ marginTop: '32px' }}>
-                                <Title level={4} style={{ marginBottom: '16px' }}>{t('description')}</Title>
-                                <Paragraph style={{
-                                    whiteSpace: 'pre-wrap',
+                            <div style={{ marginTop: '40px' }}>
+                                <Title level={4} style={{ marginBottom: '20px', fontSize: '20px' }}>{t('description')}</Title>
+                                <div style={{
                                     fontSize: '16px',
                                     lineHeight: 1.8,
-                                    color: '#444'
+                                    color: '#434343',
+                                    whiteSpace: 'pre-wrap'
                                 }}>
                                     {product.description}
-                                </Paragraph>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -322,65 +348,64 @@ export default function ProductDetailPage({ params }: PageProps) {
             <style jsx global>{`
                 .thumbnail-item:hover {
                     border-color: #1677ff !important;
-                    transform: scale(1.05);
-                }
-                .ant-carousel .slick-slide {
-                    border-radius: 12px;
-                    overflow: hidden;
+                    transform: translateY(-2px);
                 }
                 .carousel-image-container {
                     width: 100%;
-                    aspect-ratio: 1 / 1;
-                    background: #f9f9f9;
+                    background: #fff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
                 .main-product-image {
                     width: 100% !important;
-                    height: 100% !important;
-                    object-fit: cover !important;
+                    height: auto !important;
+                    aspect-ratio: 1 / 1;
+                    object-fit: contain !important;
                 }
                 .empty-image-container {
                     aspect-ratio: 1 / 1;
                     display: flex;
-                    alignItems: center;
-                    justifyContent: center;
-                    background: #f9f9f9;
+                    align-items: center;
+                    justify-content: center;
+                    background: #fdfdfd;
                 }
-                @media (min-width: 768px) {
-                    .carousel-image-container, .empty-image-container {
-                        height: 500px;
-                        aspect-ratio: auto;
-                    }
-                }
-                @media (max-width: 767px) {
-                    .thumbnail-item {
-                        width: 60px !important;
-                        height: 60px !important;
-                    }
-                    .product-actions-container {
-                        flex-direction: column !important;
-                    }
-                    .add-to-cart-btn, .favorite-btn {
-                        width: 100% !important;
-                    }
-                }
-                .product-actions-container {
+                .product-actions-group {
                     display: flex;
-                    gap: 16px;
-                    margin-bottom: 40px;
+                    gap: 12px;
+                    flex: 1;
+                    min-width: 300px;
                 }
-                .add-to-cart-btn {
+                .primary-cta-btn {
                     flex: 2;
                     height: 56px !important;
                     font-size: 18px !important;
                     font-weight: 600 !important;
                     border-radius: 12px !important;
-                    box-shadow: 0 4px 12px rgba(22, 119, 255, 0.2) !important;
+                    box-shadow: 0 8px 16px rgba(22, 119, 255, 0.15) !important;
                 }
-                .favorite-btn {
+                .secondary-cta-btn {
                     flex: 1;
                     height: 56px !important;
-                    font-size: 18px !important;
+                    font-size: 16px !important;
                     border-radius: 12px !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                @media (max-width: 767px) {
+                    .product-actions-group {
+                        width: 100%;
+                        flex-direction: column;
+                        min-width: auto;
+                    }
+                    .primary-cta-btn, .secondary-cta-btn {
+                        width: 100% !important;
+                        flex: none;
+                    }
+                    .main-product-image {
+                        aspect-ratio: 1 / 1;
+                    }
                 }
             `}</style>
         </div>

@@ -27,7 +27,7 @@
         "credits": "Credits Store",
         "orderHistory": "Order History",
         "language": "Language",
-        "title":"Menu",
+        "title": "Menu",
         "network": "Network",
         "shop": "Shop",
         "favorites": "Favorites",
@@ -125,7 +125,7 @@
         "unknown": "Unknown"
     },
     "OrderHistory": {
-        "orderId":"orderId",
+        "orderId": "orderId",
         "title": "Billing & Records",
         "subtitle": "Manage your subscription plans and consumption records",
         "exportReport": "Export Report",
@@ -226,7 +226,8 @@
         "description": "Description",
         "quantity": "Quantity",
         "inStock": "In Stock",
-        "outOfStock": "Out of Stock"
+        "outOfStock": "Out of Stock",
+        "itemsAvailable": "Items Available"
     },
     "Favorites": {
         "title": "My Favorites",

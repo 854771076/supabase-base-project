@@ -27,7 +27,7 @@
         "credits": "点数商城",
         "orderHistory": "订单历史",
         "language": "语言",
-        "title":"菜单",
+        "title": "菜单",
         "network": "网络",
         "shop": "商城",
         "favorites": "收藏夹",
@@ -117,7 +117,7 @@
         "verifying": "验证中...",
         "error": "连接失败",
         "orWallet": "或使用钱包登录",
-        "SelectWallet":"选择钱包"
+        "SelectWallet": "选择钱包"
     },
     "Network": {
         "switchNetwork": "切换网络",
@@ -125,7 +125,7 @@
         "unknown": "未知"
     },
     "OrderHistory": {
-        "orderId":"订单ID",
+        "orderId": "订单ID",
         "title": "账单与记录",
         "subtitle": "管理您的订阅方案及消费记录",
         "exportReport": "导出报告",
@@ -226,7 +226,8 @@
         "description": "商品描述",
         "quantity": "数量",
         "inStock": "有货",
-        "outOfStock": "缺货"
+        "outOfStock": "缺货",
+        "itemsAvailable": "库存数量"
     },
     "Favorites": {
         "title": "我的收藏",

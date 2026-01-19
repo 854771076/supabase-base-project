@@ -147,35 +147,47 @@ export default function ShopPage() {
     };
 
     return (
-        <div style={{ padding: '40px 24px', maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ padding: '40px 24px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
             <Title level={2}>{t('title')}</Title>
             <Paragraph type="secondary">{t('subtitle')}</Paragraph>
 
             {/* Filters */}
-            <Row gutter={16} style={{ marginBottom: '32px' }}>
-                <Col xs={24} sm={12} md={8}>
-                    <Input
-                        placeholder={t('searchPlaceholder')}
-                        prefix={<SearchOutlined />}
-                        value={search}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        allowClear
-                    />
-                </Col>
-                <Col xs={24} sm={12} md={6}>
-                    <Select
-                        placeholder={t('allCategories')}
-                        value={selectedCategory}
-                        onChange={(value) => { setSelectedCategory(value); setPage(1); }}
-                        allowClear
-                        style={{ width: '100%' }}
-                    >
-                        {categories.map(cat => (
-                            <Select.Option key={cat.id} value={cat.id}>{cat.name}</Select.Option>
-                        ))}
-                    </Select>
-                </Col>
-            </Row>
+            <div style={{
+                background: '#f8f9fa',
+                padding: '24px',
+                borderRadius: '16px',
+                marginBottom: '40px',
+                border: '1px solid #f0f2f5'
+            }}>
+                <Row gutter={[16, 16]} align="middle">
+                    <Col xs={24} md={12} lg={8}>
+                        <Input
+                            placeholder={t('searchPlaceholder')}
+                            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+                            value={search}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            allowClear
+                            size="large"
+                            style={{ borderRadius: '8px' }}
+                        />
+                    </Col>
+                    <Col xs={24} md={8} lg={6}>
+                        <Select
+                            placeholder={t('allCategories')}
+                            value={selectedCategory}
+                            onChange={(value) => { setSelectedCategory(value); setPage(1); }}
+                            allowClear
+                            style={{ width: '100%' }}
+                            size="large"
+                            className="custom-select"
+                        >
+                            {categories.map(cat => (
+                                <Select.Option key={cat.id} value={cat.id}>{cat.name}</Select.Option>
+                            ))}
+                        </Select>
+                    </Col>
+                </Row>
+            </div>
 
             {/* Products Grid */}
             {loading ? (
@@ -186,13 +198,13 @@ export default function ShopPage() {
                 <Empty description={t('noProducts')} />
             ) : (
                 <>
-                    <Row gutter={[24, 32]}>
+                    <Row gutter={[{ xs: 16, sm: 24, md: 24 }, { xs: 16, sm: 32, md: 32 }]}>
                         {products.map(product => (
-                            <Col xs={12} sm={12} md={8} lg={6} xl={4} key={product.id}>
+                            <Col xs={24} sm={12} md={8} lg={6} xl={4} xxl={4} key={product.id}>
                                 <Badge.Ribbon
                                     text={t('featured')}
-                                    color="gold"
-                                    style={{ display: product.featured ? 'block' : 'none' }}
+                                    color="#1677ff"
+                                    style={{ display: product.featured ? 'block' : 'none', borderRadius: '0 4px 0 4px' }}
                                 >
                                     <Card
                                         hoverable
@@ -201,88 +213,85 @@ export default function ShopPage() {
                                         cover={
                                             <div style={{
                                                 height: '240px',
-                                                background: '#f9f9f9',
+                                                background: '#fff',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 overflow: 'hidden',
                                                 position: 'relative',
-                                                borderRadius: '8px 8px 0 0'
+                                                borderRadius: '12px 12px 0 0',
+                                                borderBottom: '1px solid #f0f0f0'
                                             }}>
                                                 {product.thumbnail_url ? (
                                                     <Image
                                                         src={product.thumbnail_url}
                                                         alt={product.name}
                                                         fill
-                                                        sizes="(max-width: 576px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
+                                                        sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                                                         priority={products.indexOf(product) < 4}
                                                         style={{
                                                             objectFit: 'cover',
-                                                            transition: 'transform 0.3s ease'
+                                                            transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                                                         }}
                                                         className="product-image"
                                                     />
                                                 ) : (
-                                                    <ShoppingCartOutlined style={{ fontSize: '48px', color: '#ccc' }} />
+                                                    <ShoppingCartOutlined style={{ fontSize: '48px', color: '#f0f0f0' }} />
                                                 )}
+                                                <div className="card-overlay">
+                                                    <Button
+                                                        type="primary"
+                                                        shape="round"
+                                                        icon={<ShoppingCartOutlined />}
+                                                        onClick={(e) => handleAddToCart(product, e)}
+                                                    >
+                                                        {t('addToCart')}
+                                                    </Button>
+                                                </div>
                                             </div>
                                         }
-                                        actions={[
-                                            <Button
-                                                key="cart"
-                                                type="text"
-                                                icon={<ShoppingCartOutlined />}
-                                                onClick={(e) => handleAddToCart(product, e)}
-                                                className="action-btn"
-                                            >
-                                                {t('addToCart')}
-                                            </Button>,
-                                            <Button
-                                                key="favorite"
-                                                type="text"
-                                                icon={favorites.has(product.id) ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
-                                                onClick={(e) => handleToggleFavorite(product.id, e)}
-                                                className="action-btn"
-                                            />
-                                        ]}
                                         style={{
                                             borderRadius: '12px',
                                             overflow: 'hidden',
                                             border: '1px solid #f0f0f0',
-                                            transition: 'all 0.3s ease'
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column'
                                         }}
+                                        bodyStyle={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}
                                     >
-                                        <Card.Meta
-                                            title={<div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>{product.name}</div>}
-                                            description={
-                                                <div>
-                                                    <div style={{ height: '40px', overflow: 'hidden', marginBottom: '12px' }}>
-                                                        <Text type="secondary" style={{ fontSize: '13px' }}>
-                                                            {product.short_description || '-'}
-                                                        </Text>
-                                                    </div>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                                                        <div>
-                                                            <div style={{ marginBottom: '4px' }}>
-                                                                <Text strong style={{ fontSize: '20px', color: '#1677ff' }}>
-                                                                    ${(product.price_cents / 100).toFixed(2)}
-                                                                </Text>
-                                                            </div>
-                                                            {product.compare_at_price_cents && (
-                                                                <Text delete type="secondary" style={{ fontSize: '12px' }}>
-                                                                    ${(product.compare_at_price_cents / 100).toFixed(2)}
-                                                                </Text>
-                                                            )}
-                                                        </div>
-                                                        {product.category && (
-                                                            <Tag color="blue" style={{ margin: 0, borderRadius: '4px' }}>
-                                                                {product.category.name}
-                                                            </Tag>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            }
-                                        />
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                                {product.category && (
+                                                    <Text type="secondary" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                                        {product.category.name}
+                                                    </Text>
+                                                )}
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    icon={favorites.has(product.id) ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}
+                                                    onClick={(e) => handleToggleFavorite(product.id, e)}
+                                                    style={{ height: 'auto', padding: 0 }}
+                                                />
+                                            </div>
+                                            <Title level={5} style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600, height: '48px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                                {product.name}
+                                            </Title>
+                                        </div>
+
+                                        <div style={{ marginTop: 'auto' }}>
+                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                                                <Text strong style={{ fontSize: '20px', color: '#1a1a1a' }}>
+                                                    ${(product.price_cents / 100).toFixed(2)}
+                                                </Text>
+                                                {product.compare_at_price_cents && (
+                                                    <Text delete type="secondary" style={{ fontSize: '13px' }}>
+                                                        ${(product.compare_at_price_cents / 100).toFixed(2)}
+                                                    </Text>
+                                                )}
+                                            </div>
+                                        </div>
                                     </Card>
                                 </Badge.Ribbon>
                             </Col>
@@ -290,21 +299,46 @@ export default function ShopPage() {
                     </Row>
 
                     <style jsx global>{`
+                        .product-card {
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                        }
                         .product-card:hover {
-                            transform: translateY(-8px);
-                            box-shadow: 0 12px 24px rgba(0,0,0,0.1) !important;
+                            transform: translateY(-4px);
+                            box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
                         }
                         .product-card:hover .product-image {
-                            transform: scale(1.05);
+                            transform: scale(1.08);
                         }
-                        .action-btn:hover {
-                            color: #1677ff !important;
-                            background: rgba(22, 119, 255, 0.05) !important;
+                        .card-overlay {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background: rgba(0,0,0,0.05);
+                            display: flex;
+                            alignItems: center;
+                            justifyContent: center;
+                            opacity: 0;
+                            transition: opacity 0.3s ease;
+                            z-index: 1;
+                        }
+                        .product-card:hover .card-overlay {
+                            opacity: 1;
+                        }
+                        .custom-select .ant-select-selector {
+                            border-radius: 8px !important;
                         }
                     `}</style>
 
                     {/* Pagination */}
-                    <div style={{ textAlign: 'center', marginTop: '40px' }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        marginTop: '60px',
+                        paddingTop: '32px',
+                        borderTop: '1px solid #f0f0f0'
+                    }}>
                         <Pagination
                             current={page}
                             total={total}
