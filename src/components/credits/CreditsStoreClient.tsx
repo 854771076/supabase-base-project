@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Row, Col, Typography, Button, Space, Statistic, App } from 'antd';
+import { Card, Row, Col, Typography, Button, Space, Statistic, App, Tag } from 'antd';
 import { ShoppingCartOutlined, WalletOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from '@/i18n/context';
@@ -14,6 +14,8 @@ interface CreditProduct {
     name: string;
     credits_amount: number;
     price_cents: number;
+    type: 'credits' | 'license';
+    duration_days: number;
 }
 
 interface CreditsStoreClientProps {
@@ -80,21 +82,35 @@ export default function CreditsStoreClient({
                             hoverable
                             title={
                                 <Space>
-                                    <ShoppingCartOutlined />
+                                    {product.type === 'credits' ? <WalletOutlined /> : <CreditCardOutlined />}
                                     <span>{product.name}</span>
                                 </Space>
                             }
-                            style={{ borderRadius: '12px', textAlign: 'center' }}
+                            style={{
+                                borderRadius: '12px',
+                                textAlign: 'center',
+                                border: product.type === 'license' ? '1px solid #e6f7ff' : undefined,
+                                background: product.type === 'license' ? '#fafcfe' : undefined
+                            }}
                         >
                             <Title level={3} style={{ margin: '12px 0' }}>
                                 ${(product.price_cents / 100).toFixed(2)}
                             </Title>
-                            <Paragraph>
-                                <Text strong style={{ fontSize: '18px' }}>
-                                    {product.credits_amount}
-                                </Text>
-                                <Text type="secondary"> Credits</Text>
-                            </Paragraph>
+
+                            {product.type === 'credits' ? (
+                                <Paragraph>
+                                    <Text strong style={{ fontSize: '18px' }}>
+                                        {product.credits_amount}
+                                    </Text>
+                                    <Text type="secondary"> Credits</Text>
+                                </Paragraph>
+                            ) : (
+                                <Paragraph>
+                                    <Tag color="blue" style={{ fontSize: '14px', padding: '4px 12px' }}>
+                                        {product.duration_days > 0 ? `${product.duration_days} Days Access` : 'Lifetime Access'}
+                                    </Tag>
+                                </Paragraph>
+                            )}
 
                             <div style={{ marginTop: '24px' }}>
                                 <Space direction="vertical" style={{ width: '100%' }}>
@@ -102,7 +118,7 @@ export default function CreditsStoreClient({
                                         type="primary"
                                         size="large"
                                         block
-                                        icon={<CreditCardOutlined />}
+                                        icon={product.type === 'credits' ? <CreditCardOutlined /> : <ShoppingCartOutlined />}
                                         onClick={() => handleBuyNow(product)}
                                         style={{ borderRadius: '8px', height: '48px' }}
                                     >

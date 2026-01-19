@@ -1,18 +1,19 @@
 'use client';
 
 import React from 'react';
-import { 
-    Card, Descriptions, Avatar, Tag, Button, Typography, 
-    Space, Divider, Collapse, Row, Col, Progress, Statistic, Tooltip 
+import {
+    Card, Descriptions, Avatar, Tag, Button, Typography,
+    Space, Divider, Collapse, Row, Col, Progress, Statistic, Tooltip
 } from 'antd';
-import { 
-    UserOutlined, CodeOutlined, LogoutOutlined, 
+import {
+    UserOutlined, CodeOutlined, LogoutOutlined,
     RocketOutlined, CrownOutlined, WalletOutlined,
     CheckCircleFilled, InfoCircleOutlined
 } from '@ant-design/icons';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { User, Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import UserLicenses from './UserLicenses';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -38,12 +39,12 @@ export default function ProfileContent({ user, session, subscription, usage, cre
     return (
         <div style={{ padding: 'clamp(12px, 5vw, 40px)', backgroundColor: '#f9fafb', minHeight: '100vh' }}>
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-                
+
                 {/* 顶部个人资料卡片 */}
-                <Card 
-                    bordered={false} 
-                    style={{ 
-                        borderRadius: '20px', 
+                <Card
+                    bordered={false}
+                    style={{
+                        borderRadius: '20px',
                         boxShadow: '0 10px 25px rgba(0,0,0,0.03)',
                         marginBottom: '24px',
                         overflow: 'hidden'
@@ -52,15 +53,15 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                 >
                     <Row gutter={[24, 24]} align="middle">
                         <Col xs={24} sm={4}>
-                            <Avatar 
-                                size={88} 
-                                icon={<UserOutlined />} 
-                                src={user.user_metadata?.avatar_url} 
-                                style={{ 
+                            <Avatar
+                                size={88}
+                                icon={<UserOutlined />}
+                                src={user.user_metadata?.avatar_url}
+                                style={{
                                     backgroundColor: '#1677ff',
                                     boxShadow: '0 4px 10px rgba(22, 119, 255, 0.3)',
                                     border: '4px solid #fff'
-                                }} 
+                                }}
                             />
                         </Col>
                         <Col xs={24} sm={14}>
@@ -94,7 +95,7 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                     {/* 左侧：账户与配额 */}
                     <Col xs={24} md={15}>
                         <Space direction="vertical" size={24} style={{ width: '100%' }}>
-                            
+
                             {/* 配额可视化 */}
                             <Card title={<Space><RocketOutlined />{t('planFeatures')}</Space>} bordered={false} style={{ borderRadius: '16px' }}>
                                 <div style={{ marginBottom: '24px' }}>
@@ -102,29 +103,29 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                                         <Text strong>{t('dailyRequests')}</Text>
                                         <Text type="secondary">{apiUsage} / {apiLimit}</Text>
                                     </div>
-                                    <Progress 
-                                        percent={usagePercent} 
+                                    <Progress
+                                        percent={usagePercent}
                                         status={usagePercent >= 100 ? 'exception' : 'active'}
                                         strokeColor={usagePercent >= 90 ? '#ff4d4f' : '#1677ff'}
-                                        showInfo={false} 
+                                        showInfo={false}
                                     />
                                 </div>
-                                
+
                                 <Row gutter={16}>
                                     <Col span={12}>
                                         <Card size="small" bordered style={{ backgroundColor: '#fcfcfc' }}>
-                                            <Statistic 
-                                                title={t('apiAccess')} 
-                                                value={subscription?.plans?.features?.api_access ? "Enabled" : "Disabled"} 
+                                            <Statistic
+                                                title={t('apiAccess')}
+                                                value={subscription?.plans?.features?.api_access ? "Enabled" : "Disabled"}
                                                 valueStyle={{ fontSize: '16px', color: subscription?.plans?.features?.api_access ? '#52c41a' : '#d9d9d9' }}
                                             />
                                         </Card>
                                     </Col>
                                     <Col span={12}>
                                         <Card size="small" bordered style={{ backgroundColor: '#fcfcfc' }}>
-                                            <Statistic 
-                                                title="Plan Status" 
-                                                value={subscription?.status === 'active' ? "Active" : "Expired"} 
+                                            <Statistic
+                                                title="Plan Status"
+                                                value={subscription?.status === 'active' ? "Active" : "Expired"}
                                                 valueStyle={{ fontSize: '16px' }}
                                             />
                                         </Card>
@@ -162,31 +163,34 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                                     }
                                 ]} />
                             </Card>
+
+                            {/* 用户授权码 */}
+                            <UserLicenses />
                         </Space>
                     </Col>
 
                     {/* 右侧：钱包与升级 */}
                     <Col xs={24} md={9}>
                         <Space direction="vertical" size={24} style={{ width: '100%' }}>
-                            
+
                             {/* 余额卡片 */}
-                            <Card 
-                                bordered={false} 
-                                style={{ 
-                                    borderRadius: '16px', 
+                            <Card
+                                bordered={false}
+                                style={{
+                                    borderRadius: '16px',
                                     background: 'linear-gradient(135deg, #1677ff 0%, #0958d9 100%)',
                                     color: '#fff'
                                 }}
                             >
-                                <Statistic 
-                                    title={<Text style={{ color: 'rgba(255,255,255,0.8)' }}>{t('creditsBalance')}</Text>} 
-                                    value={creditsBalance} 
-                                    prefix={<WalletOutlined />} 
+                                <Statistic
+                                    title={<Text style={{ color: 'rgba(255,255,255,0.8)' }}>{t('creditsBalance')}</Text>}
+                                    value={creditsBalance}
+                                    prefix={<WalletOutlined />}
                                     valueStyle={{ color: '#fff', fontSize: '32px', fontWeight: 700 }}
                                 />
-                                <Button 
-                                    block 
-                                    style={{ marginTop: '20px', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff' }} 
+                                <Button
+                                    block
+                                    style={{ marginTop: '20px', backgroundColor: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff' }}
                                     onClick={() => router.push(`/${locale}/credits`)}
                                 >
                                     {t('buyCredits')}
@@ -202,10 +206,10 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                                 <Paragraph type="secondary">
                                     Upgrade to Pro for higher limits and priority API access.
                                 </Paragraph>
-                                <Button 
-                                    type="primary" 
-                                    block 
-                                    size="large" 
+                                <Button
+                                    type="primary"
+                                    block
+                                    size="large"
                                     style={{ borderRadius: '8px' }}
                                     onClick={() => router.push(`/${locale}/pricing`)}
                                 >

@@ -165,6 +165,8 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
         await processCreditsPayment(adminSupabase, userId, productId, amountCents);
     } else if (type === 'subscription') {
         await processSubscriptionPayment(adminSupabase, userId, productId, amountCents);
+    } else if (type === 'license' || (productId && await isLicenseProduct(adminSupabase, productId))) {
+        await processLicensePayment(adminSupabase, userId, productId);
     }
 
     const { data: order, error } = await adminSupabase
@@ -264,6 +266,61 @@ async function processSubscriptionPayment(adminSupabase: any, userId: string, pl
     }
 
     return subscription;
+}
+
+async function isLicenseProduct(adminSupabase: any, productId: string) {
+    const { data } = await adminSupabase
+        .from('credit_products')
+        .select('type')
+        .eq('id', productId)
+        .single();
+    return data?.type === 'license';
+}
+
+async function processLicensePayment(adminSupabase: any, userId: string, productId: string) {
+    const { data: product, error: productError } = await adminSupabase
+        .from('credit_products')
+        .select('duration_days, name')
+        .eq('id', productId)
+        .single();
+
+    if (productError || !product) {
+        throw new Error('License product not found');
+    }
+
+    // Generate a unique license key: XXXX-XXXX-XXXX-XXXX
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const generateSegment = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const key = `${generateSegment()}-${generateSegment()}-${generateSegment()}-${generateSegment()}`;
+
+    let expiresAt = null;
+    if (product.duration_days > 0) {
+        const date = new Date();
+        date.setDate(date.getDate() + product.duration_days);
+        expiresAt = date.toISOString();
+    }
+
+    const { data: license, error: licenseError } = await adminSupabase
+        .from('license_keys')
+        .insert({
+            user_id: userId,
+            product_id: productId,
+            key_value: key,
+            expires_at: expiresAt,
+            status: 'active'
+        })
+        .select()
+        .single();
+
+    if (licenseError) {
+        console.error('License key generation error:', licenseError);
+        throw new Error('Failed to generate license key');
+    }
+
+    // TODO: Trigger email notification here if service is available
+    console.log(`Generated license key for user ${userId}: ${key}`);
+
+    return license;
 }
 
 export async function getUserOrders(userId: string, options?: { type?: PaymentType; limit?: number; offset?: number }) {
