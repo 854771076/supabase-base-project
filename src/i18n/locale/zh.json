@@ -227,7 +227,14 @@
         "quantity": "数量",
         "inStock": "有货",
         "outOfStock": "缺货",
-        "itemsAvailable": "库存数量"
+        "itemsAvailable": "库存数量",
+        "sku": "SKU",
+        "na": "暂无",
+        "off": "{percent}% 优惠",
+        "previewImage": "点击放大查看",
+        "unauthorizedFavorite": "请先登录以收藏商品",
+        "share": "分享",
+        "loading": "加载中..."
     },
     "Favorites": {
         "title": "我的收藏",

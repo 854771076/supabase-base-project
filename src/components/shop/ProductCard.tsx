@@ -73,7 +73,7 @@ export default function ProductCard({
             >
                 <div className="card-content">
                     <div className="card-top">
-                        <Text className="category-tag">{product.category?.name || 'General'}</Text>
+                        <Text className="category-tag">{product.category?.name || t('na')}</Text>
                         <Button
                             type="text"
                             className="fav-btn"

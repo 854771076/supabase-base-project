@@ -42,14 +42,16 @@ export default function ProductInfo({
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Title level={1} className="product-title">{product.name}</Title>
-                <Button type="text" icon={<ShareAltOutlined />} style={{ marginTop: 8 }} />
+                <Tooltip title={t('share')}>
+                    <Button type="text" icon={<ShareAltOutlined />} style={{ marginTop: 8 }} />
+                </Tooltip>
             </div>
 
             <div className="meta-info">
                 <Badge status={product.stock_quantity > 0 ? 'success' : 'error'}
                     text={product.stock_quantity > 0 ? t('inStock') : t('outOfStock')} />
                 <Divider type="vertical" />
-                <Text type="secondary">SKU: {product.sku || 'N/A'}</Text>
+                <Text type="secondary">{t('sku')}: {product.sku || t('na')}</Text>
             </div>
 
             {product.short_description && (
@@ -64,7 +66,7 @@ export default function ProductInfo({
                             <Text delete type="secondary" className="old-price">
                                 ${(product.compare_at_price_cents / 100).toFixed(2)}
                             </Text>
-                            <Tag color="#ff4d4f" className="discount-tag">{discount}% OFF</Tag>
+                            <Tag color="#ff4d4f" className="discount-tag">{t('off').replace('{percent}', discount.toString())}</Tag>
                         </Space>
                     )}
                 </div>
@@ -93,7 +95,7 @@ export default function ProductInfo({
                     >
                         {t('addToCart')}
                     </Button>
-                    <Tooltip title={isFavorite ? '取消收藏' : '加入收藏'}>
+                    <Tooltip title={isFavorite ? t('inFavorites') : t('addToFavorites')}>
                         <Button
                             size="large"
                             icon={isFavorite ? <HeartFilled style={{ color: '#ff4d4f' }} /> : <HeartOutlined />}

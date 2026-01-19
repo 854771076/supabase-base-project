@@ -138,7 +138,7 @@ export default function ShopListClient() {
 
             {loading ? (
                 <div className="loading-state">
-                    <Spin size="large" tip="Loading Excellence..." />
+                    <Spin size="large" tip={t('loading')} />
                 </div>
             ) : products.length === 0 ? (
                 <Empty className="empty-state" description={<span>{t('noProducts')}</span>} />

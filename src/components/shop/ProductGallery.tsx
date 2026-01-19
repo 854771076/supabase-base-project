@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react';
 import { Carousel, Image as AntImage } from 'antd';
 import type { CarouselRef } from 'antd/es/carousel';
 import { ShoppingCartOutlined } from '@ant-design/icons';
+import { useTranslations } from '@/i18n/context';
 
 interface ProductGalleryProps {
     images: string[];
@@ -13,6 +14,8 @@ interface ProductGalleryProps {
 export default function ProductGallery({ images, productName }: ProductGalleryProps) {
     const carouselRef = useRef<CarouselRef>(null);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+    const t = useTranslations('Shop');
 
     return (
         <div className="gallery-section">
@@ -29,8 +32,8 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                                 <AntImage
                                     src={img}
                                     alt={`${productName} - ${index + 1}`}
-                                    preview={{ mask: '点击放大查看' }}
-                                    style={{ width: '100%', height: '100%' }}
+                                    preview={{ mask: t('previewImage') }}
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                 />
                             </div>
                         ))}

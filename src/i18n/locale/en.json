@@ -227,7 +227,14 @@
         "quantity": "Quantity",
         "inStock": "In Stock",
         "outOfStock": "Out of Stock",
-        "itemsAvailable": "Items Available"
+        "itemsAvailable": "Items Available",
+        "sku": "SKU",
+        "na": "N/A",
+        "off": "{percent}% OFF",
+        "previewImage": "Click to zoom",
+        "unauthorizedFavorite": "Please login to add to favorites",
+        "share": "Share",
+        "loading": "Loading..."
     },
     "Favorites": {
         "title": "My Favorites",
