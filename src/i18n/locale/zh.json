@@ -206,7 +206,13 @@
         "close": "关闭",
         "iHavePaid": "我已支付",
         "verifying": "正在验证支付状态...",
-        "paymentNotDetected": "尚未检测到支付，请稍后再试或等待确认。"
+        "paymentNotDetected": "尚未检测到支付，请稍后再试或等待确认。",
+        "licenseGenerated": "授权码已生成",
+        "licenseNotice": "请复制并妥善保存您的授权码。您也可以稍后在个人资料中查看它们。",
+        "expiresAt": "过期时间",
+        "lifetime": "永久可用",
+        "copied": "已复制到剪贴板！",
+        "copy": "复制"
     },
     "Shop": {
         "title": "商品商城",

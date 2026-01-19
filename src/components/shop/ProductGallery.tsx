@@ -33,7 +33,10 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                                     src={img}
                                     alt={`${productName} - ${index + 1}`}
                                     preview={{ mask: t('previewImage') }}
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    width='100%'
+                                    height='100%'
+
                                 />
                             </div>
                         ))}

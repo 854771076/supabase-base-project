@@ -206,7 +206,13 @@
         "close": "Close",
         "iHavePaid": "I Have Paid",
         "verifying": "Verifying payment...",
-        "paymentNotDetected": "Payment not detected yet. Please wait a moment or try again."
+        "paymentNotDetected": "Payment not detected yet. Please wait a moment or try again.",
+        "licenseGenerated": "License Keys Generated",
+        "licenseNotice": "Please copy and save your license keys. You can also view them in your profile later.",
+        "expiresAt": "Expires at",
+        "lifetime": "Lifetime",
+        "copied": "Copied to clipboard!",
+        "copy": "Copy"
     },
     "Shop": {
         "title": "Shop",

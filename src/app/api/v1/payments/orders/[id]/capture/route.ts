@@ -64,7 +64,11 @@ export async function POST(
         });
 
         return NextResponse.json(
-            { success: true, data: result.order },
+            {
+                success: true,
+                data: result.order,
+                licenses: result.licenses
+            },
             { status: 200 }
         );
     } catch (error: any) {

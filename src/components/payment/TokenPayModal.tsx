@@ -13,7 +13,7 @@ interface TokenPayModalProps {
     onCancel: () => void;
     orderId: string;
     metadata: any;
-    onSuccess?: () => void;
+    onSuccess?: (data?: any) => void;
 }
 
 export default function TokenPayModal({ visible, onCancel, orderId, metadata, onSuccess }: TokenPayModalProps) {
@@ -56,7 +56,7 @@ export default function TokenPayModal({ visible, onCancel, orderId, metadata, on
             if (data.success && data.order.status === 'completed') {
                 message.success(t('successTitle'));
                 if (onSuccess) {
-                    onSuccess();
+                    onSuccess(data);
                 } else {
                     onCancel();
                     router.push(`/${locale}/orders/${orderId}`);

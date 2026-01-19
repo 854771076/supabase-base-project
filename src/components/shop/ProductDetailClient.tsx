@@ -118,7 +118,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
         return (
             <div style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
                 <Row gutter={[48, 48]}>
-                    <Col xs={24} md={12}><Skeleton.Image active style={{ width: '100%', height: 500 }} /></Col>
+                    <Col xs={24} md={12}><Skeleton active paragraph={{ width: '100%', rows: 12 }} /></Col>
                     <Col xs={24} md={12}><Skeleton active paragraph={{ width: '100%', rows: 12 }} /></Col>
                 </Row>
             </div>

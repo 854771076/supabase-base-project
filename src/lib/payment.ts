@@ -161,12 +161,15 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
         throw new Error(`Payment not completed: ${captureResult.status}`);
     }
 
+    let licenses: any[] = [];
+
     if (type === 'credits') {
         await processCreditsPayment(adminSupabase, userId, productId, amountCents);
     } else if (type === 'subscription') {
         await processSubscriptionPayment(adminSupabase, userId, productId, amountCents);
     } else if (type === 'license' || (productId && await isLicenseProduct(adminSupabase, productId))) {
-        await processLicensePayment(adminSupabase, userId, productId);
+        const license = await processLicensePayment(adminSupabase, userId, productId);
+        if (license) licenses.push(license);
     }
 
     const { data: order, error } = await adminSupabase
@@ -185,7 +188,7 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
         throw new Error('Failed to update order');
     }
 
-    return { order, captureResult };
+    return { order, captureResult, licenses };
 }
 
 async function processCreditsPayment(adminSupabase: any, userId: string, productId: string, amountCents: number) {

@@ -42,7 +42,7 @@ export default function CreditsStoreClient({
             id: product.id,
             name: product.name,
             price_cents: product.price_cents,
-            type: 'credits',
+            type: product.type as any,
         });
         message.success(tCart('addedToCart'));
     };
@@ -52,7 +52,7 @@ export default function CreditsStoreClient({
             id: product.id,
             name: product.name,
             price_cents: product.price_cents,
-            type: 'credits',
+            type: product.type as any,
         });
         router.push(`/${currentLocale}/checkout`);
     };
