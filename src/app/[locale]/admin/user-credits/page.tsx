@@ -12,7 +12,7 @@ interface UserCredit {
     user_id: string;
     balance: number;
     updated_at: string;
-    user: { id: string; email: string } | null;
+    profile: { id: string; email: string } | null;
 }
 
 export default function AdminUserCreditsPage() {
@@ -102,7 +102,7 @@ export default function AdminUserCreditsPage() {
             key: 'user',
             render: (_: any, record: UserCredit) => (
                 <div>
-                    <div>{record.user?.email || '-'}</div>
+                    <div>{record.profile?.email || '-'}</div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>{record.user_id}</Text>
                 </div>
             ),

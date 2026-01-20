@@ -36,7 +36,7 @@ export async function GET(request: Request) {
             .from('license_keys')
             .select(`
                 *,
-                user:user_id(id, email),
+                profile:user_id(id, email, full_name),
                 product:product_id(id, name)
             `, { count: 'exact' })
             .order('created_at', { ascending: false })

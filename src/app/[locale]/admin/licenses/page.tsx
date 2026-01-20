@@ -16,7 +16,7 @@ interface LicenseKey {
     status: string;
     expires_at: string | null;
     created_at: string;
-    user: { id: string; email: string } | null;
+    profile: { id: string; email: string } | null;
     product: { id: string; name: string } | null;
 }
 
@@ -150,7 +150,7 @@ export default function AdminLicensesPage() {
             responsive: ['sm'] as any,
             render: (_: any, record: LicenseKey) => (
                 <div>
-                    <div>{record.user?.email || '-'}</div>
+                    <div>{record.profile?.email || '-'}</div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>{record.user_id}</Text>
                 </div>
             ),
