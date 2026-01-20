@@ -27,7 +27,7 @@ export async function GET(request: Request) {
             .select(`
                 *,
                 plans(id, name),
-                user:user_id(id, email)
+                profile:user_id(id, email, full_name)
             `, { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(offset, offset + limit - 1);

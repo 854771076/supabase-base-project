@@ -16,7 +16,7 @@ interface Subscription {
     current_period_end: string | null;
     created_at: string;
     plans: { id: string; name: string } | null;
-    user: { id: string; email: string } | null;
+    profile: { id: string; email: string } | null;
 }
 
 interface Plan {
@@ -146,7 +146,7 @@ export default function AdminSubscriptionsPage() {
             key: 'user',
             render: (_: any, record: Subscription) => (
                 <div>
-                    <div>{record.user?.email || '-'}</div>
+                    <div>{record.profile?.email || '-'}</div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>{record.user_id}</Text>
                 </div>
             ),
