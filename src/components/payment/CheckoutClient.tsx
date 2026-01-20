@@ -323,7 +323,7 @@ export default function CheckoutClient() {
                         >
                             <List.Item.Meta
                                 title={license.key_value}
-                                description={license.expires_at ? `${t('expiresAt') || 'Expires at'}: ${new Date(license.expires_at).toLocaleDateString()}` : (t('lifetime') || 'Lifetime')}
+                                description={license.expires_at ? <span suppressHydrationWarning>{`${t('expiresAt') || 'Expires at'}: ${new Date(license.expires_at).toLocaleDateString()}`}</span> : (t('lifetime') || 'Lifetime')}
                             />
                         </List.Item>
                     )}

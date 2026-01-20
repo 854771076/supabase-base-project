@@ -137,13 +137,13 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                             <Card bordered={false} style={{ borderRadius: '16px' }}>
                                 <Descriptions title={t('basicInfo')} column={1} size="middle">
                                     <Descriptions.Item label={t('lastSignIn')}>
-                                        {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : '-'}
+                                        <span suppressHydrationWarning>{user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : '-'}</span>
                                     </Descriptions.Item>
                                     <Descriptions.Item label={t('subscription')}>
                                         <Tag color={isPro ? 'gold' : 'blue'}>{subscription?.plans?.name || 'Free'}</Tag>
                                         {subscription?.current_period_end && (
                                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                                                Expires: {new Date(subscription.current_period_end).toLocaleDateString()}
+                                                Expires: <span suppressHydrationWarning>{new Date(subscription.current_period_end).toLocaleDateString()}</span>
                                             </Text>
                                         )}
                                     </Descriptions.Item>

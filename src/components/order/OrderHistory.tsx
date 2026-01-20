@@ -181,7 +181,7 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
             dataIndex: 'created_at',
             render: (date: string) => (
                 <Tooltip title={new Date(date).toString()}>
-                    <Text type="secondary">{new Date(date).toLocaleDateString()}</Text>
+                    <Text type="secondary" suppressHydrationWarning>{new Date(date).toLocaleDateString()}</Text>
                 </Tooltip>
             ),
         },

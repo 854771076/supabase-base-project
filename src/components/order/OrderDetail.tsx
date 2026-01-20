@@ -120,7 +120,7 @@ export function OrderDetail({ order, locale: propLocale }: OrderDetailProps) {
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h1 style={{ margin: 0, color: '#1890ff' }}>INVOICE</h1>
             <p style={{ margin: '10px 0' }}>Order Number: {order.id}</p>
-            <p style={{ margin: '5px 0' }}>Date: {new Date(order.created_at).toLocaleDateString()}</p>
+            <p style={{ margin: '5px 0' }}>Date: <span suppressHydrationWarning>{new Date(order.created_at).toLocaleDateString()}</span></p>
           </div>
 
           <div style={{ marginBottom: '30px' }}>

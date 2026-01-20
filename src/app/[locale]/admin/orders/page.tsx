@@ -179,7 +179,7 @@ export default function AdminOrdersPage() {
             title: t('createdAt'),
             dataIndex: 'created_at',
             key: 'created_at',
-            render: (date: string) => new Date(date).toLocaleString(),
+            render: (date: string) => <span suppressHydrationWarning>{new Date(date).toLocaleString()}</span>,
         },
         {
             title: t('actions'),
@@ -278,10 +278,10 @@ export default function AdminOrdersPage() {
                             {selectedOrder.provider}
                         </Descriptions.Item>
                         <Descriptions.Item label={t('createdAt')}>
-                            {new Date(selectedOrder.created_at).toLocaleString()}
+                            <span suppressHydrationWarning>{new Date(selectedOrder.created_at).toLocaleString()}</span>
                         </Descriptions.Item>
                         <Descriptions.Item label={t('completedAt')}>
-                            {selectedOrder.completed_at ? new Date(selectedOrder.completed_at).toLocaleString() : '-'}
+                            <span suppressHydrationWarning>{selectedOrder.completed_at ? new Date(selectedOrder.completed_at).toLocaleString() : '-'}</span>
                         </Descriptions.Item>
                         {selectedOrder.order_items?.length > 0 && (
                             <Descriptions.Item label={t('orderItems')} span={2}>
