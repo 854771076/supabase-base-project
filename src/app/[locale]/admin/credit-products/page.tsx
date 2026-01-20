@@ -28,6 +28,15 @@ export default function AdminCreditProductsPage() {
     const [saving, setSaving] = useState(false);
     const [form] = Form.useForm();
 
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     const fetchProducts = async () => {
         setLoading(true);
         try {
@@ -70,13 +79,13 @@ export default function AdminCreditProductsPage() {
             const res = await fetch(`/api/v1/admin/credit-products/${id}`, { method: 'DELETE' });
             const data = await res.json();
             if (data.success) {
-                message.success('Product deleted successfully');
+                message.success(t('deleteSuccess'));
                 fetchProducts();
             } else {
-                message.error(data.error || 'Failed to delete product');
+                message.error(data.error || t('error'));
             }
         } catch (error) {
-            message.error('An error occurred');
+            message.error(t('error'));
         }
     };
 
@@ -94,14 +103,14 @@ export default function AdminCreditProductsPage() {
             const data = await res.json();
 
             if (data.success) {
-                message.success(editingProduct ? 'Product updated successfully' : 'Product created successfully');
+                message.success(editingProduct ? t('updateSuccess') : t('createSuccess'));
                 setModalOpen(false);
                 fetchProducts();
             } else {
-                message.error(data.error || 'Operation failed');
+                message.error(data.error || t('error'));
             }
         } catch (error) {
-            message.error('An error occurred');
+            message.error(t('error'));
         } finally {
             setSaving(false);
         }
@@ -109,37 +118,40 @@ export default function AdminCreditProductsPage() {
 
     const columns = [
         {
-            title: 'Name',
+            title: t('name'),
             dataIndex: 'name',
             key: 'name',
             render: (name: string) => <strong>{name}</strong>,
         },
         {
-            title: 'Type',
+            title: t('type'),
             dataIndex: 'type',
             key: 'type',
             render: (type: string) => <Tag color={type === 'license' ? 'purple' : 'blue'}>{type.toUpperCase()}</Tag>,
         },
         {
-            title: 'Credits',
+            title: t('credits'),
             dataIndex: 'credits_amount',
             key: 'credits',
+            responsive: ['sm'] as any,
         },
         {
-            title: 'Price',
+            title: t('price'),
             dataIndex: 'price_cents',
             key: 'price',
             render: (cents: number) => `$${(cents / 100).toFixed(2)}`,
         },
         {
-            title: 'Duration (Days)',
+            title: t('duration'),
             dataIndex: 'duration_days',
             key: 'duration',
-            render: (days: number, record: CreditProduct) => record.type === 'license' ? (days === 0 ? 'Lifetime' : days) : '-',
+            responsive: ['md'] as any,
+            render: (days: number, record: CreditProduct) => record.type === 'license' ? (days === 0 ? t('never') : days) : '-',
         },
         {
             title: t('actions'),
             key: 'actions',
+            fixed: 'right' as any,
             render: (_: any, record: CreditProduct) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
@@ -153,41 +165,44 @@ export default function AdminCreditProductsPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                     <Title level={3} style={{ margin: 0 }}>{t('creditProducts')}</Title>
                     <Paragraph type="secondary">{t('creditProductsSubtitle')}</Paragraph>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-                    Add Product
+                    {t('addProduct')}
                 </Button>
             </div>
 
-            <Card>
+            <Card styles={{ body: { padding: isMobile ? '12px' : '24px' } }}>
                 <Table
                     columns={columns}
                     dataSource={products}
                     rowKey="id"
                     loading={loading}
                     pagination={false}
+                    scroll={{ x: 'max-content' }}
                 />
             </Card>
 
             <Modal
-                title={editingProduct ? 'Edit Product' : 'Add Product'}
+                title={editingProduct ? t('editProduct') : t('addProduct')}
                 open={modalOpen}
                 onCancel={() => setModalOpen(false)}
-                footer={null}
-                width={500}
+                onOk={() => form.submit()}
+                confirmLoading={saving}
+                width="100%"
+                style={{ maxWidth: 500 }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                    <Form.Item name="name" label="Product Name" rules={[{ required: true }]}>
+                    <Form.Item name="name" label={t('productName')} rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="type" label="Type" rules={[{ required: true }]}>
+                    <Form.Item name="type" label={t('type')} rules={[{ required: true }]}>
                         <Select>
-                            <Select.Option value="credits">Credits</Select.Option>
-                            <Select.Option value="license">License</Select.Option>
+                            <Select.Option value="credits">{t('credits')}</Select.Option>
+                            <Select.Option value="license">{t('license')}</Select.Option>
                         </Select>
                     </Form.Item>
                     <Form.Item
@@ -197,26 +212,18 @@ export default function AdminCreditProductsPage() {
                         {({ getFieldValue }) => {
                             const type = getFieldValue('type');
                             return type === 'credits' ? (
-                                <Form.Item name="credits_amount" label="Credits Amount" rules={[{ required: true }]}>
+                                <Form.Item name="credits_amount" label={t('creditsAmount')} rules={[{ required: true }]}>
                                     <InputNumber min={0} style={{ width: '100%' }} />
                                 </Form.Item>
                             ) : (
-                                <Form.Item name="duration_days" label="Duration (Days, 0 for lifetime)" rules={[{ required: true }]}>
+                                <Form.Item name="duration_days" label={t('durationDays')} rules={[{ required: true }]}>
                                     <InputNumber min={0} style={{ width: '100%' }} />
                                 </Form.Item>
                             );
                         }}
                     </Form.Item>
-                    <Form.Item name="price_cents" label="Price (cents)" rules={[{ required: true }]}>
+                    <Form.Item name="price_cents" label={t('priceCents')} rules={[{ required: true }]}>
                         <InputNumber min={0} style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item>
-                        <Space>
-                            <Button type="primary" htmlType="submit" loading={saving}>
-                                {editingProduct ? t('update') : t('create')}
-                            </Button>
-                            <Button onClick={() => setModalOpen(false)}>{t('cancel')}</Button>
-                        </Space>
                     </Form.Item>
                 </Form>
             </Modal>

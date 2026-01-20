@@ -45,7 +45,15 @@ export default function AdminOrdersPage() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [searchId, setSearchId] = useState('');
+    const [isMobile, setIsMobile] = useState(false);
     const pageSize = 10;
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const fetchOrders = React.useCallback(async () => {
         setLoading(true);
@@ -61,8 +69,6 @@ export default function AdminOrdersPage() {
             const res = await fetch(`/api/v1/admin/orders?${params}`);
             const data = await res.json();
             if (data.success) {
-                // If searching by ID, it might return a single object or list depending on API implementation
-                // Our API returns a list for the main endpoint, so this is fine.
                 setOrders(data.data);
                 setTotal(data.pagination.total);
             }
@@ -117,6 +123,7 @@ export default function AdminOrdersPage() {
             subscription: 'purple',
             credits: 'cyan',
             product: 'blue',
+            license: 'gold',
         };
         return colors[type] || 'default';
     };
@@ -126,6 +133,7 @@ export default function AdminOrdersPage() {
             title: t('orderId'),
             dataIndex: 'id',
             key: 'id',
+            responsive: ['md'] as any,
             render: (id: string) => <Text copyable code style={{ fontSize: '12px' }}>{id}</Text>,
         },
         {
@@ -137,6 +145,7 @@ export default function AdminOrdersPage() {
         {
             title: t('product'),
             key: 'product',
+            responsive: ['sm'] as any,
             render: (_: any, record: Order) => {
                 if (record.order_items?.length > 0) {
                     return record.order_items.map(item => item.product_name).join(', ');
@@ -173,20 +182,23 @@ export default function AdminOrdersPage() {
             title: t('provider'),
             dataIndex: 'provider',
             key: 'provider',
+            responsive: ['md'] as any,
             render: (provider: string) => <Tag>{provider}</Tag>,
         },
         {
             title: t('createdAt'),
             dataIndex: 'created_at',
             key: 'created_at',
+            responsive: ['lg'] as any,
             render: (date: string) => <span suppressHydrationWarning>{new Date(date).toLocaleString()}</span>,
         },
         {
             title: t('actions'),
             key: 'actions',
+            fixed: 'right' as any,
             render: (_: any, record: Order) => (
                 <Button size="small" icon={<EyeOutlined />} onClick={() => handleViewDetails(record)}>
-                    {t('viewDetails')}
+                    {isMobile ? '' : t('viewDetails')}
                 </Button>
             ),
         },
@@ -194,9 +206,11 @@ export default function AdminOrdersPage() {
 
     return (
         <div>
-            <div style={{ marginBottom: '24px' }}>
-                <Title level={3} style={{ margin: 0 }}>{t('orders')}</Title>
-                <Paragraph type="secondary">{t('ordersSubtitle')}</Paragraph>
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                    <Title level={3} style={{ margin: 0 }}>{t('orders')}</Title>
+                    <Paragraph type="secondary">{t('ordersSubtitle')}</Paragraph>
+                </div>
             </div>
 
             <Card style={{ marginBottom: '16px' }}>
@@ -232,22 +246,24 @@ export default function AdminOrdersPage() {
                         <Select.Option value="subscription">{tOrder('subscription')}</Select.Option>
                         <Select.Option value="credits">{tOrder('credits')}</Select.Option>
                         <Select.Option value="product">{t('product')}</Select.Option>
+                        <Select.Option value="license">{tOrder('license')}</Select.Option>
                     </Select>
                 </Space>
             </Card>
 
-            <Card>
+            <Card styles={{ body: { padding: isMobile ? '12px' : '24px' } }}>
                 <Table
                     columns={columns}
                     dataSource={orders}
                     rowKey="id"
                     loading={loading}
-                    scroll={{ x: 1000 }}
+                    scroll={{ x: 'max-content' }}
                     pagination={{
                         current: page,
                         pageSize,
                         total,
                         onChange: setPage,
+                        size: isMobile ? 'small' : 'default',
                     }}
                 />
             </Card>

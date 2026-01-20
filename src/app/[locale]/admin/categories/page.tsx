@@ -28,14 +28,18 @@ export default function AdminCategoriesPage() {
     const [saving, setSaving] = useState(false);
     const [form] = Form.useForm();
 
+    const [isMobile, setIsMobile] = useState(false);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchCategories();
-    }, [search, statusFilter]);
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
-    const fetchCategories = async () => {
+    const fetchCategories = React.useCallback(async () => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
@@ -52,7 +56,11 @@ export default function AdminCategoriesPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [search, statusFilter]);
+
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
 
     const handleCreate = () => {
         setEditingCategory(null);
@@ -113,9 +121,10 @@ export default function AdminCategoriesPage() {
 
     const columns = [
         {
-            title: 'ID',
+            title: t('id'),
             dataIndex: 'id',
             key: 'id',
+            responsive: ['md'] as any,
             render: (id: string) => <Typography.Text copyable code style={{ fontSize: '12px' }}>{id}</Typography.Text>,
         },
         {
@@ -127,12 +136,14 @@ export default function AdminCategoriesPage() {
             title: t('slug'),
             dataIndex: 'slug',
             key: 'slug',
+            responsive: ['sm'] as any,
             render: (slug: string) => <code>{slug}</code>,
         },
         {
             title: t('description'),
             dataIndex: 'description',
             key: 'description',
+            responsive: ['md'] as any,
             render: (desc: string) => desc || '-',
         },
         {
@@ -149,10 +160,12 @@ export default function AdminCategoriesPage() {
             title: t('sortOrder'),
             dataIndex: 'sort_order',
             key: 'sort_order',
+            responsive: ['sm'] as any,
         },
         {
             title: t('actions'),
             key: 'actions',
+            fixed: 'right' as any,
             render: (_: any, record: Category) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
@@ -169,7 +182,7 @@ export default function AdminCategoriesPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                     <Title level={3} style={{ margin: 0 }}>{t('categories')}</Title>
                     <Paragraph type="secondary">{t('categoriesSubtitle')}</Paragraph>
@@ -182,7 +195,7 @@ export default function AdminCategoriesPage() {
             <Card style={{ marginBottom: '16px' }}>
                 <Space wrap>
                     <Input
-                        placeholder={t('searchCategories')} // You might need to add this key or use generic 'Search'
+                        placeholder={t('searchCategories')}
                         prefix={<SearchOutlined />}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -202,14 +215,14 @@ export default function AdminCategoriesPage() {
                 </Space>
             </Card>
 
-            <Card>
+            <Card styles={{ body: { padding: isMobile ? '12px' : '24px' } }}>
                 <Table
                     columns={columns}
                     dataSource={categories}
                     rowKey="id"
                     loading={loading}
                     pagination={false}
-                    scroll={{ x: 800 }}
+                    scroll={{ x: 'max-content' }}
                 />
             </Card>
 
