@@ -19,7 +19,7 @@ interface OrderItem {
 interface Order {
     id: string;
     user_id: string;
-    type: 'subscription' | 'credits' | 'product';
+    type: 'subscription' | 'credits' | 'product' | 'license';
     status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
     amount_cents: number;
     currency: string;

@@ -157,6 +157,7 @@
         "unknown": "未知"
     },
     "OrderHistory": {
+        "searchOrderId":"搜索订单ID",
         "orderId": "订单ID",
         "title": "账单与记录",
         "subtitle": "管理您的订阅方案及消费记录",
@@ -168,6 +169,7 @@
         "allTypes": "全部类型",
         "subscription": "订阅方案",
         "credits": "点数充值",
+        "license": "授权码",
         "orderInfo": "订单信息",
         "category": "分类",
         "amount": "金额",
