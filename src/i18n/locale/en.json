@@ -126,6 +126,7 @@
         "unknown": "Unknown"
     },
     "OrderHistory": {
+        "searchOrderId":"searchOrderId",
         "orderId": "orderId",
         "title": "Billing & Records",
         "subtitle": "Manage your subscription plans and consumption records",
@@ -135,6 +136,7 @@
         "successRate": "Payment Success Rate",
         "filterRecords": "Filter Records",
         "allTypes": "All Types",
+        "license":"License",
         "subscription": "Subscription",
         "credits": "Credits Purchase",
         "orderInfo": "Order Info",
