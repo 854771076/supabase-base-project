@@ -188,7 +188,7 @@ export default function AdminLicensesPage() {
             render: (_: any, record: LicenseKey) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
-                        {isMobile ? '' : t('edit')}
+                        {isMobile ? '' : t('editLicense')}
                     </Button>
                     <Popconfirm title={t('confirmDelete')} onConfirm={() => handleDelete(record.id)}>
                         <Button size="small" danger icon={<DeleteOutlined />} />

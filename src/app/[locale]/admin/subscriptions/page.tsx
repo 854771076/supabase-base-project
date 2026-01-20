@@ -186,7 +186,7 @@ export default function AdminSubscriptionsPage() {
             render: (_: any, record: Subscription) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
-                        {isMobile ? '' : t('edit')}
+                        {isMobile ? '' : t('editSubscription')}
                     </Button>
                     <Popconfirm title={t('confirmDelete')} onConfirm={() => handleDelete(record.id)}>
                         <Button size="small" danger icon={<DeleteOutlined />} />
