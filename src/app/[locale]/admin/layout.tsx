@@ -61,19 +61,73 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             label: <Link href={`/${locale}/admin`}>{t('dashboard')}</Link>,
         },
         {
-            key: 'products',
-            icon: <ShoppingOutlined />,
-            label: <Link href={`/${locale}/admin/products`}>{t('products')}</Link>,
+            type: 'group' as const,
+            label: t('products'),
+            children: [
+                {
+                    key: 'products',
+                    icon: <ShoppingOutlined />,
+                    label: <Link href={`/${locale}/admin/products`}>{t('products')}</Link>,
+                },
+                {
+                    key: 'categories',
+                    icon: <AppstoreOutlined />,
+                    label: <Link href={`/${locale}/admin/categories`}>{t('categories')}</Link>,
+                },
+            ]
         },
         {
-            key: 'categories',
-            icon: <AppstoreOutlined />,
-            label: <Link href={`/${locale}/admin/categories`}>{t('categories')}</Link>,
+            type: 'group' as const,
+            label: t('subscriptions'),
+            children: [
+                {
+                    key: 'plans',
+                    icon: <AppstoreOutlined />,
+                    label: <Link href={`/${locale}/admin/plans`}>{t('plans')}</Link>,
+                },
+                {
+                    key: 'subscriptions',
+                    icon: <OrderedListOutlined />,
+                    label: <Link href={`/${locale}/admin/subscriptions`}>{t('subscriptions')}</Link>,
+                },
+            ]
         },
         {
-            key: 'orders',
+            type: 'group' as const,
+            label: t('creditProducts'),
+            children: [
+                {
+                    key: 'credit-products',
+                    icon: <ShoppingOutlined />,
+                    label: <Link href={`/${locale}/admin/credit-products`}>{t('creditProducts')}</Link>,
+                },
+                {
+                    key: 'user-credits',
+                    icon: <DashboardOutlined />,
+                    label: <Link href={`/${locale}/admin/user-credits`}>{t('userCredits')}</Link>,
+                },
+            ]
+        },
+        {
+            type: 'group' as const,
+            label: t('orders'),
+            children: [
+                {
+                    key: 'orders',
+                    icon: <OrderedListOutlined />,
+                    label: <Link href={`/${locale}/admin/orders`}>{t('orders')}</Link>,
+                },
+                {
+                    key: 'licenses',
+                    icon: <AppstoreOutlined />,
+                    label: <Link href={`/${locale}/admin/licenses`}>{t('licenses')}</Link>,
+                },
+            ]
+        },
+        {
+            key: 'logs',
             icon: <OrderedListOutlined />,
-            label: <Link href={`/${locale}/admin/orders`}>{t('orders')}</Link>,
+            label: <Link href={`/${locale}/admin/logs`}>{t('logs')}</Link>,
         },
     ];
 
@@ -82,6 +136,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         if (pathname.includes('/products')) return 'products';
         if (pathname.includes('/categories')) return 'categories';
         if (pathname.includes('/orders')) return 'orders';
+        if (pathname.includes('/plans')) return 'plans';
+        if (pathname.includes('/subscriptions')) return 'subscriptions';
+        if (pathname.includes('/credit-products')) return 'credit-products';
+        if (pathname.includes('/user-credits')) return 'user-credits';
+        if (pathname.includes('/licenses')) return 'licenses';
+        if (pathname.includes('/logs')) return 'logs';
         return 'dashboard';
     };
 

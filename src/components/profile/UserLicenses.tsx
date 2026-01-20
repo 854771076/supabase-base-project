@@ -81,7 +81,7 @@ export default function UserLicenses() {
             title: 'Expires At',
             dataIndex: 'expires_at',
             key: 'expires',
-            render: (date: string | null) => date ? new Date(date).toLocaleDateString() : 'Lifetime',
+            render: (date: string | null) => <span suppressHydrationWarning>{date ? new Date(date).toLocaleDateString() : 'Lifetime'}</span>,
         },
     ];
 
