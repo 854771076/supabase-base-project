@@ -28,6 +28,8 @@ ALTER TABLE public.license_keys ENABLE ROW LEVEL SECURITY;
 -- RLS Policies
 CREATE POLICY "Users can view own license keys" ON public.license_keys 
     FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "service role can manage license keys" ON public.license_keys 
+    FOR ALL USING (current_setting('role', true) = 'service_role');
 
 -- Insert some license products for demonstration
 INSERT INTO public.credit_products (name, credits_amount, price_cents, type, duration_days) VALUES
