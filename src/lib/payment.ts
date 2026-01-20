@@ -170,6 +170,8 @@ export async function capturePaymentOrder(params: CapturePaymentParams) {
     } else if (type === 'license' || (productId && await isLicenseProduct(adminSupabase, productId))) {
         const license = await processLicensePayment(adminSupabase, userId, productId);
         if (license) licenses.push(license);
+    } else if (type === 'product') {
+        await processProductPayment(adminSupabase, orderId);
     }
 
     const { data: order, error } = await adminSupabase
@@ -324,6 +326,47 @@ async function processLicensePayment(adminSupabase: any, userId: string, product
     console.log(`Generated license key for user ${userId}: ${key}`);
 
     return license;
+}
+
+async function processProductPayment(adminSupabase: any, orderId: string) {
+    // Fetch order items to know what to deduct
+    const { data: items, error: itemsError } = await adminSupabase
+        .from('order_items')
+        .select('product_id, quantity')
+        .eq('order_id', orderId);
+
+    if (itemsError || !items) {
+        console.error('Error fetching order items for stock deduction:', itemsError);
+        return; // Or throw error if critical
+    }
+
+    // Deduct stock for each item
+    for (const item of items) {
+        if (!item.product_id) continue;
+
+        const { error: rpcError } = await adminSupabase.rpc('decrement_product_stock', {
+            p_product_id: item.product_id,
+            p_quantity: item.quantity
+        });
+
+        if (rpcError) {
+            console.error(`Error calling decrement_product_stock for product ${item.product_id}:`, rpcError);
+
+            // Fallback to manual update if RPC fails (e.g. not yet deployed)
+            const { data: product } = await adminSupabase
+                .from('products')
+                .select('stock_quantity')
+                .eq('id', item.product_id)
+                .single();
+
+            if (product) {
+                await adminSupabase
+                    .from('products')
+                    .update({ stock_quantity: Math.max(0, product.stock_quantity - item.quantity) })
+                    .eq('id', item.product_id);
+            }
+        }
+    }
 }
 
 export async function getUserOrders(userId: string, options?: { type?: PaymentType; limit?: number; offset?: number }) {

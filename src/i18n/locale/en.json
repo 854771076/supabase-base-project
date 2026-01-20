@@ -31,7 +31,8 @@
         "network": "Network",
         "shop": "Shop",
         "favorites": "Favorites",
-        "admin": "Admin"
+        "admin": "Admin",
+        "menu":"Menu"
     },
     "Profile": {
         "title": "User Profile",
@@ -246,7 +247,8 @@
         "title": "My Favorites",
         "subtitle": "Your saved products",
         "empty": "You haven't saved any products yet",
-        "goShopping": "Go Shopping"
+        "goShopping": "Go Shopping",
+        "emptyDescription":"Go shopping and save your favorite products!"
     },
     "ShippingAddress": {
         "title": "Shipping Address",

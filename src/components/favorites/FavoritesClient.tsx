@@ -28,6 +28,7 @@ interface FavoriteItem {
         compare_at_price_cents: number | null;
         thumbnail_url: string | null;
         status: string; // 假设 'active' 为上架状态
+        stock_quantity: number;
     } | null;
 }
 
@@ -120,7 +121,7 @@ export default function FavoritesClient() {
             {[1, 2, 3, 4].map((i) => (
                 <Col xs={24} sm={12} md={8} lg={6} key={i}>
                     <Card bordered={false} style={{ borderRadius: 12 }}>
-                        <Skeleton.Image active style={{ width: '100%', height: 250, marginBottom: 16 }} />
+                        <Skeleton active paragraph={{ rows: 2 }} />
                         <Skeleton active paragraph={{ rows: 2 }} />
                     </Card>
                 </Col>
@@ -154,7 +155,7 @@ export default function FavoritesClient() {
                         description={
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                                 <Text type="secondary" style={{ fontSize: 16 }}>{t('empty')}</Text>
-                                <Text type="secondary" style={{ fontSize: 14 }}>去挑选一些喜欢的商品吧</Text>
+                                <Text type="secondary" style={{ fontSize: 14 }}>{t("emptyDescription")}</Text>
                             </div>
                         }
                         style={{ padding: '80px 0', background: '#fff', borderRadius: 16 }}
@@ -284,9 +285,9 @@ export default function FavoritesClient() {
                                                         marginTop: '8px',
                                                         borderRadius: '6px'
                                                     }}
-                                                    disabled={product.status !== 'active'}
+                                                    disabled={product.stock_quantity === 0}
                                                 >
-                                                    {product.status === 'active' ? tShop('addToCart') : 'Sold Out'}
+                                                    {product.stock_quantity > 0 ? tShop('addToCart') : 'Sold Out'}
                                                 </Button>
                                             </div>
                                         </Card>

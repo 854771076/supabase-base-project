@@ -32,7 +32,8 @@ export async function GET(request: Request) {
                     price_cents,
                     compare_at_price_cents,
                     thumbnail_url,
-                    status
+                    status,
+                    stock_quantity
                 )
             `, { count: 'exact' })
             .eq('user_id', user.id)

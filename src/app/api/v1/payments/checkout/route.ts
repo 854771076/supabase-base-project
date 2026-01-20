@@ -18,11 +18,43 @@ export async function POST(request: NextRequest) {
         }
 
         // Determine if this is a product order
-        const isProductOrder = items.some((item: any) => item.type === 'product');
+        const productItems = items.filter((item: any) => item.type === 'product');
+        const isProductOrder = productItems.length > 0;
 
         // Validate shipping address for product orders
         if (isProductOrder && !shipping_address_id) {
             return NextResponse.json({ error: 'Shipping address is required for product orders' }, { status: 400 });
+        }
+
+        const adminSupabase = await createAdminClient();
+
+        // Pre-payment stock validation
+        if (isProductOrder) {
+            const productIds = productItems.map((item: any) => item.id);
+            const { data: products, error: stockError } = await adminSupabase
+                .from('products')
+                .select('id, name, stock_quantity, status')
+                .in('id', productIds);
+
+            if (stockError) {
+                console.error('Error checking stock:', stockError);
+                return NextResponse.json({ error: 'Failed to verify stock' }, { status: 500 });
+            }
+
+            for (const item of productItems) {
+                const product = products?.find(p => p.id === item.id);
+                if (!product) {
+                    return NextResponse.json({ error: `Product ${item.name} not found` }, { status: 400 });
+                }
+                if (product.status !== 'published') {
+                    return NextResponse.json({ error: `Product ${item.name} is no longer available` }, { status: 400 });
+                }
+                if (product.stock_quantity < item.quantity) {
+                    return NextResponse.json({
+                        error: `Insufficient stock for ${item.name}. Available: ${product.stock_quantity}`
+                    }, { status: 400 });
+                }
+            }
         }
 
         // For simplicity, we create one order for the entire cart
