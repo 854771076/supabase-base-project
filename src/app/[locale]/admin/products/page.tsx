@@ -44,7 +44,15 @@ export default function AdminProductsPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [saving, setSaving] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [form] = Form.useForm();
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const pageSize = 10;
 
@@ -173,9 +181,10 @@ export default function AdminProductsPage() {
 
     const columns = [
         {
-            title: 'ID',
+            title: t('id'),
             dataIndex: 'id',
             key: 'id',
+            responsive: ['md'] as any,
             render: (id: string) => <Typography.Text copyable code style={{ fontSize: '12px' }}>{id}</Typography.Text>,
         },
         {
@@ -198,6 +207,7 @@ export default function AdminProductsPage() {
         {
             title: t('category'),
             key: 'category',
+            responsive: ['sm'] as any,
             render: (_: any, record: Product) => record.category?.name || '-',
         },
         {
@@ -210,6 +220,7 @@ export default function AdminProductsPage() {
             title: t('stock'),
             dataIndex: 'stock_quantity',
             key: 'stock',
+            responsive: ['md'] as any,
         },
         {
             title: t('status'),
@@ -238,11 +249,13 @@ export default function AdminProductsPage() {
             title: t('featured'),
             dataIndex: 'featured',
             key: 'featured',
+            responsive: ['lg'] as any,
             render: (featured: boolean) => featured ? <Tag color="gold">{t('yes')}</Tag> : '-',
         },
         {
             title: t('actions'),
             key: 'actions',
+            fixed: 'right' as any,
             render: (_: any, record: Product) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
@@ -259,7 +272,7 @@ export default function AdminProductsPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                     <Title level={3} style={{ margin: 0 }}>{t('products')}</Title>
                     <Paragraph type="secondary">{t('productsSubtitle')}</Paragraph>
@@ -293,18 +306,19 @@ export default function AdminProductsPage() {
                 </Space>
             </Card>
 
-            <Card>
+            <Card styles={{ body: { padding: isMobile ? '12px' : '24px' } }}>
                 <Table
                     columns={columns}
                     dataSource={products}
                     rowKey="id"
                     loading={loading}
-                    scroll={{ x: 1000 }}
+                    scroll={{ x: 'max-content' }}
                     pagination={{
                         current: page,
                         pageSize,
                         total,
                         onChange: setPage,
+                        size: isMobile ? 'small' : 'default',
                     }}
                 />
             </Card>

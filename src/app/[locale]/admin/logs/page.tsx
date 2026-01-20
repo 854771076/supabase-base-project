@@ -29,6 +29,15 @@ export default function AdminLogsPage() {
 
     const pageSize = 20;
 
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     const fetchLogs = React.useCallback(async () => {
         setLoading(true);
         try {
@@ -58,20 +67,21 @@ export default function AdminLogsPage() {
 
     const columns = [
         {
-            title: 'Time',
+            title: t('time'),
             dataIndex: 'created_at',
             key: 'time',
             render: (date: string) => <span suppressHydrationWarning>{new Date(date).toLocaleString()}</span>,
             width: 180,
         },
         {
-            title: 'Job Name',
+            title: t('jobName'),
             dataIndex: 'job_name',
             key: 'job_name',
+            responsive: ['sm'] as any,
             render: (name: string) => <Tag color="blue">{name}</Tag>,
         },
         {
-            title: 'Status',
+            title: t('status'),
             dataIndex: 'status',
             key: 'status',
             render: (status: string) => {
@@ -79,34 +89,38 @@ export default function AdminLogsPage() {
                 if (status === 'success') color = 'green';
                 if (status === 'failed') color = 'red';
                 if (status === 'started') color = 'processing';
-                return <Tag color={color}>{status.toUpperCase()}</Tag>;
+                return <Tag color={color}>{t(status)}</Tag>;
             },
         },
         {
-            title: 'Duration',
+            title: t('duration'),
             dataIndex: 'duration_ms',
             key: 'duration',
+            responsive: ['md'] as any,
             render: (ms: number | null) => ms ? `${ms}ms` : '-',
         },
         {
-            title: 'Message',
+            title: t('message'),
             dataIndex: 'message',
             key: 'message',
+            responsive: ['lg'] as any,
             ellipsis: true,
         },
     ];
 
     return (
         <div>
-            <div style={{ marginBottom: '24px' }}>
-                <Title level={3} style={{ margin: 0 }}>{t('logs')}</Title>
-                <Paragraph type="secondary">{t('logsSubtitle')}</Paragraph>
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                    <Title level={3} style={{ margin: 0 }}>{t('logs')}</Title>
+                    <Paragraph type="secondary">{t('logsSubtitle')}</Paragraph>
+                </div>
             </div>
 
             <Card style={{ marginBottom: '16px' }}>
                 <Space wrap>
                     <Select
-                        placeholder="Filter by Job"
+                        placeholder={t('filterByJob')}
                         value={jobFilter}
                         onChange={(val) => { setJobFilter(val); setPage(1); }}
                         style={{ width: 200 }}
@@ -116,15 +130,15 @@ export default function AdminLogsPage() {
                         <Select.Option value="cleanup-expired-subscriptions">Cleanup Expired Subscriptions</Select.Option>
                     </Select>
                     <Select
-                        placeholder="Filter by Status"
+                        placeholder={t('filterByStatus')}
                         value={statusFilter}
                         onChange={(val) => { setStatusFilter(val); setPage(1); }}
                         style={{ width: 150 }}
                         allowClear
                     >
-                        <Select.Option value="started">Started</Select.Option>
-                        <Select.Option value="success">Success</Select.Option>
-                        <Select.Option value="failed">Failed</Select.Option>
+                        <Select.Option value="started">{t('started')}</Select.Option>
+                        <Select.Option value="success">{t('success')}</Select.Option>
+                        <Select.Option value="failed">{t('failed')}</Select.Option>
                     </Select>
                 </Space>
             </Card>

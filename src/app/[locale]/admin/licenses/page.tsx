@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Tag, Space, Typography, Card, Input, Modal, Form, Select, App, Popconfirm, DatePicker } from 'antd';
+import { Table, Button, Tag, Space, Typography, Card, Input, Modal, Form, Select, message, Popconfirm, DatePicker, App } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
 import dayjs from 'dayjs';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 interface LicenseKey {
     id: string;
@@ -35,7 +35,16 @@ export default function AdminLicensesPage() {
     const [saving, setSaving] = useState(false);
     const [form] = Form.useForm();
 
+    const [isMobile, setIsMobile] = useState(false);
+
     const pageSize = 10;
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const fetchLicenses = React.useCallback(async () => {
         setLoading(true);
@@ -58,19 +67,15 @@ export default function AdminLicensesPage() {
         } finally {
             setLoading(false);
         }
-    }, [page, search, statusFilter]);
+    }, [page, search, statusFilter, pageSize]);
 
     useEffect(() => {
         fetchLicenses();
     }, [fetchLicenses]);
 
-    const handleCreate = () => {
+    const handleIssue = () => {
         setEditingLicense(null);
         form.resetFields();
-        form.setFieldsValue({
-            status: 'active',
-            key_value: Math.random().toString(36).substring(2, 15).toUpperCase(),
-        });
         setModalOpen(true);
     };
 
@@ -78,6 +83,7 @@ export default function AdminLicensesPage() {
         setEditingLicense(license);
         form.setFieldsValue({
             ...license,
+            key: license.key_value,
             expires_at: license.expires_at ? dayjs(license.expires_at) : null,
         });
         setModalOpen(true);
@@ -88,13 +94,13 @@ export default function AdminLicensesPage() {
             const res = await fetch(`/api/v1/admin/licenses/${id}`, { method: 'DELETE' });
             const data = await res.json();
             if (data.success) {
-                message.success('License deleted successfully');
+                message.success(t('deleteSuccess'));
                 fetchLicenses();
             } else {
-                message.error(data.error || 'Failed to delete license');
+                message.error(data.error || t('error'));
             }
         } catch (error) {
-            message.error('An error occurred');
+            message.error(t('error'));
         }
     };
 
@@ -103,6 +109,7 @@ export default function AdminLicensesPage() {
         try {
             const formattedValues = {
                 ...values,
+                key_value: values.key,
                 expires_at: values.expires_at ? values.expires_at.toISOString() : null,
             };
 
@@ -117,14 +124,14 @@ export default function AdminLicensesPage() {
             const data = await res.json();
 
             if (data.success) {
-                message.success(editingLicense ? 'License updated successfully' : 'License created successfully');
+                message.success(editingLicense ? t('updateSuccess') : t('createSuccess'));
                 setModalOpen(false);
                 fetchLicenses();
             } else {
-                message.error(data.error || 'Operation failed');
+                message.error(data.error || t('error'));
             }
         } catch (error) {
-            message.error('An error occurred');
+            message.error(t('error'));
         } finally {
             setSaving(false);
         }
@@ -132,50 +139,57 @@ export default function AdminLicensesPage() {
 
     const columns = [
         {
-            title: 'Key',
+            title: t('key'),
             dataIndex: 'key_value',
             key: 'key',
-            render: (key: string) => <Typography.Text copyable code>{key}</Typography.Text>,
+            render: (key: string) => <Text copyable code style={{ fontSize: '12px' }}>{key}</Text>,
         },
         {
-            title: 'User',
+            title: t('user'),
             key: 'user',
+            responsive: ['sm'] as any,
             render: (_: any, record: LicenseKey) => (
                 <div>
-                    <div>{record.user?.email || 'Unknown'}</div>
-                    <div style={{ fontSize: '11px', color: '#999' }}>{record.user_id}</div>
+                    <div>{record.user?.email || '-'}</div>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>{record.user_id}</Text>
                 </div>
             ),
         },
         {
-            title: 'Product',
+            title: t('product'),
             key: 'product',
-            render: (_: any, record: LicenseKey) => record.product?.name || '-',
+            responsive: ['md'] as any,
+            render: (_: any, record: LicenseKey) => record.product?.name || record.product_id || '-',
         },
         {
-            title: 'Status',
+            title: t('status'),
             dataIndex: 'status',
             key: 'status',
             render: (status: string) => {
-                let color = 'default';
-                if (status === 'active') color = 'green';
-                if (status === 'revoked') color = 'red';
-                if (status === 'expired') color = 'orange';
-                return <Tag color={color}>{status.toUpperCase()}</Tag>;
+                const colors: Record<string, string> = {
+                    active: 'green',
+                    revoked: 'red',
+                    expired: 'orange',
+                };
+                return <Tag color={colors[status] || 'default'}>{t(status)}</Tag>;
             },
         },
         {
-            title: 'Expires At',
+            title: t('expiresAt'),
             dataIndex: 'expires_at',
-            key: 'expires',
-            render: (date: string) => <span suppressHydrationWarning>{date ? new Date(date).toLocaleString() : 'Lifetime'}</span>,
+            key: 'expires_at',
+            responsive: ['lg'] as any,
+            render: (date: string) => date ? <span suppressHydrationWarning>{new Date(date).toLocaleDateString()}</span> : t('never'),
         },
         {
             title: t('actions'),
             key: 'actions',
+            fixed: 'right' as any,
             render: (_: any, record: LicenseKey) => (
                 <Space>
-                    <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+                    <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+                        {isMobile ? '' : t('edit')}
+                    </Button>
                     <Popconfirm title={t('confirmDelete')} onConfirm={() => handleDelete(record.id)}>
                         <Button size="small" danger icon={<DeleteOutlined />} />
                     </Popconfirm>
@@ -186,93 +200,85 @@ export default function AdminLicensesPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                     <Title level={3} style={{ margin: 0 }}>{t('licenses')}</Title>
                     <Paragraph type="secondary">{t('licensesSubtitle')}</Paragraph>
                 </div>
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-                    Issue License
+                <Button type="primary" icon={<PlusOutlined />} onClick={handleIssue}>
+                    {t('issueLicense')}
                 </Button>
             </div>
 
             <Card style={{ marginBottom: '16px' }}>
                 <Space wrap>
                     <Input
-                        placeholder="Search by Key or User ID..."
+                        placeholder={t('searchLicense')}
                         prefix={<SearchOutlined />}
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                        style={{ width: 300 }}
+                        style={{ width: 250 }}
                         allowClear
                     />
                     <Select
-                        placeholder="Filter by Status"
+                        placeholder={t('filterByStatus')}
                         value={statusFilter}
                         onChange={(val) => { setStatusFilter(val); setPage(1); }}
                         style={{ width: 150 }}
                         allowClear
                     >
-                        <Select.Option value="active">Active</Select.Option>
-                        <Select.Option value="revoked">Revoked</Select.Option>
-                        <Select.Option value="expired">Expired</Select.Option>
+                        <Select.Option value="active">{t('active')}</Select.Option>
+                        <Select.Option value="revoked">{t('revoked')}</Select.Option>
+                        <Select.Option value="expired">{t('expired')}</Select.Option>
                     </Select>
                 </Space>
             </Card>
 
-            <Card>
+            <Card styles={{ body: { padding: isMobile ? '12px' : '24px' } }}>
                 <Table
                     columns={columns}
                     dataSource={licenses}
                     rowKey="id"
                     loading={loading}
+                    scroll={{ x: 'max-content' }}
                     pagination={{
                         current: page,
                         pageSize,
                         total,
                         onChange: setPage,
+                        size: isMobile ? 'small' : 'default',
                     }}
                 />
             </Card>
 
             <Modal
-                title={editingLicense ? 'Edit License' : 'Issue License'}
+                title={editingLicense ? t('editLicense') : t('issueLicense')}
                 open={modalOpen}
                 onCancel={() => setModalOpen(false)}
-                footer={null}
-                width={500}
+                onOk={() => form.submit()}
+                confirmLoading={saving}
+                width="100%"
+                style={{ maxWidth: 500 }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                    {!editingLicense && (
-                        <>
-                            <Form.Item name="user_id" label="User ID" rules={[{ required: true }]}>
-                                <Input placeholder="UUID of the user" />
-                            </Form.Item>
-                            <Form.Item name="product_id" label="Product ID (Optional)">
-                                <Input placeholder="UUID of the credit product" />
-                            </Form.Item>
-                        </>
-                    )}
-                    <Form.Item name="key_value" label="License Key" rules={[{ required: true }]}>
+                    <Form.Item name="user_id" label={t('userId')} rules={[{ required: true }]}>
+                        <Input placeholder="UUID" />
+                    </Form.Item>
+                    <Form.Item name="product_id" label={t('productIdOptional')}>
+                        <Input placeholder="UUID" />
+                    </Form.Item>
+                    <Form.Item name="key" label={t('licenseKey')} rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+                    <Form.Item name="status" label={t('status')} rules={[{ required: true }]} initialValue="active">
                         <Select>
-                            <Select.Option value="active">Active</Select.Option>
-                            <Select.Option value="revoked">Revoked</Select.Option>
-                            <Select.Option value="expired">Expired</Select.Option>
+                            <Select.Option value="active">{t('active')}</Select.Option>
+                            <Select.Option value="revoked">{t('revoked')}</Select.Option>
+                            <Select.Option value="expired">{t('expired')}</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="expires_at" label="Expires At (Optional)">
+                    <Form.Item name="expires_at" label={t('expiresAtOptional')}>
                         <DatePicker showTime style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item>
-                        <Space>
-                            <Button type="primary" htmlType="submit" loading={saving}>
-                                {editingLicense ? t('update') : t('create')}
-                            </Button>
-                            <Button onClick={() => setModalOpen(false)}>{t('cancel')}</Button>
-                        </Space>
                     </Form.Item>
                 </Form>
             </Modal>

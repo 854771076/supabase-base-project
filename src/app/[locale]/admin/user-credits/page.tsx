@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Typography, Card, Input, Modal, Form, InputNumber, App, Popconfirm } from 'antd';
-import { EditOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Card, Typography, Tag, Space, Button, Input, Modal, Form, InputNumber, message, App } from 'antd';
+import { SearchOutlined, EditOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 interface UserCredit {
     id: string;
@@ -23,13 +23,22 @@ export default function AdminUserCreditsPage() {
     const [loading, setLoading] = useState(true);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const [search, setSearch] = useState('');
+    const [searchId, setSearchId] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
-    const [editingCredit, setEditingCredit] = useState<UserCredit | null>(null);
+    const [selectedUser, setSelectedUser] = useState<UserCredit | null>(null);
     const [saving, setSaving] = useState(false);
     const [form] = Form.useForm();
 
+    const [isMobile, setIsMobile] = useState(false);
+
     const pageSize = 10;
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const fetchCredits = React.useCallback(async () => {
         setLoading(true);
@@ -38,7 +47,7 @@ export default function AdminUserCreditsPage() {
                 limit: pageSize.toString(),
                 offset: ((page - 1) * pageSize).toString(),
             });
-            if (search) params.set('search', search);
+            if (searchId) params.set('user_id', searchId);
 
             const res = await fetch(`/api/v1/admin/user-credits?${params}`);
             const data = await res.json();
@@ -47,41 +56,41 @@ export default function AdminUserCreditsPage() {
                 setTotal(data.pagination.total);
             }
         } catch (error) {
-            console.error('Error fetching user credits:', error);
+            console.error('Error fetching credits:', error);
         } finally {
             setLoading(false);
         }
-    }, [page, search]);
+    }, [page, searchId, pageSize]);
 
     useEffect(() => {
         fetchCredits();
     }, [fetchCredits]);
 
-    const handleEdit = (credit: UserCredit) => {
-        setEditingCredit(credit);
-        form.setFieldsValue(credit);
+    const handleAdjust = (record: UserCredit) => {
+        setSelectedUser(record);
+        form.setFieldsValue({ balance: record.balance });
         setModalOpen(true);
     };
 
     const handleSubmit = async (values: any) => {
+        if (!selectedUser) return;
         setSaving(true);
         try {
-            const res = await fetch(`/api/v1/admin/user-credits/${editingCredit?.id}`, {
+            const res = await fetch(`/api/v1/admin/user-credits/${selectedUser.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(values),
             });
             const data = await res.json();
-
             if (data.success) {
-                message.success('Balance updated successfully');
+                message.success(t('updateSuccess'));
                 setModalOpen(false);
                 fetchCredits();
             } else {
-                message.error(data.error || 'Operation failed');
+                message.error(data.error || t('error'));
             }
         } catch (error) {
-            message.error('An error occurred');
+            message.error(t('error'));
         } finally {
             setSaving(false);
         }
@@ -89,41 +98,43 @@ export default function AdminUserCreditsPage() {
 
     const columns = [
         {
-            title: 'User',
+            title: t('user'),
             key: 'user',
             render: (_: any, record: UserCredit) => (
                 <div>
-                    <div>{record.user?.email || 'Unknown'}</div>
-                    <div style={{ fontSize: '11px', color: '#999' }}>{record.user_id}</div>
+                    <div>{record.user?.email || '-'}</div>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>{record.user_id}</Text>
                 </div>
             ),
         },
         {
-            title: 'Balance',
+            title: t('balance'),
             dataIndex: 'balance',
             key: 'balance',
-            render: (balance: number) => <strong>{balance}</strong>,
+            render: (balance: number) => <Tag color="blue">{balance}</Tag>,
         },
         {
-            title: 'Last Updated',
+            title: t('lastUpdated'),
             dataIndex: 'updated_at',
             key: 'updated_at',
+            responsive: ['sm'] as any,
             render: (date: string) => <span suppressHydrationWarning>{new Date(date).toLocaleString()}</span>,
         },
         {
             title: t('actions'),
             key: 'actions',
+            fixed: 'right' as any,
             render: (_: any, record: UserCredit) => (
-                <Space>
-                    <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-                </Space>
+                <Button size="small" icon={<EditOutlined />} onClick={() => handleAdjust(record)}>
+                    {isMobile ? '' : t('adjustBalance')}
+                </Button>
             ),
         },
     ];
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                     <Title level={3} style={{ margin: 0 }}>{t('userCredits')}</Title>
                     <Paragraph type="secondary">{t('userCreditsSubtitle')}</Paragraph>
@@ -132,48 +143,44 @@ export default function AdminUserCreditsPage() {
 
             <Card style={{ marginBottom: '16px' }}>
                 <Input
-                    placeholder="Search by User ID..."
+                    placeholder={t('searchByUserId')}
                     prefix={<SearchOutlined />}
-                    value={search}
-                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    style={{ width: 300 }}
                     allowClear
+                    value={searchId}
+                    onChange={(e) => { setSearchId(e.target.value); setPage(1); }}
+                    style={{ width: 300, maxWidth: '100%' }}
                 />
             </Card>
 
-            <Card>
+            <Card styles={{ body: { padding: isMobile ? '12px' : '24px' } }}>
                 <Table
                     columns={columns}
                     dataSource={credits}
                     rowKey="id"
                     loading={loading}
+                    scroll={{ x: 'max-content' }}
                     pagination={{
                         current: page,
                         pageSize,
                         total,
                         onChange: setPage,
+                        size: isMobile ? 'small' : 'default',
                     }}
                 />
             </Card>
 
             <Modal
-                title="Adjust Balance"
+                title={t('adjustBalance')}
                 open={modalOpen}
                 onCancel={() => setModalOpen(false)}
-                footer={null}
-                width={400}
+                onOk={() => form.submit()}
+                confirmLoading={saving}
+                width="100%"
+                style={{ maxWidth: 400 }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                    <Form.Item name="balance" label="Credit Balance" rules={[{ required: true }]}>
-                        <InputNumber min={0} style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item>
-                        <Space>
-                            <Button type="primary" htmlType="submit" loading={saving}>
-                                {t('update')}
-                            </Button>
-                            <Button onClick={() => setModalOpen(false)}>{t('cancel')}</Button>
-                        </Space>
+                    <Form.Item name="balance" label={t('creditBalance')} rules={[{ required: true }]}>
+                        <InputNumber style={{ width: '100%' }} min={0} />
                     </Form.Item>
                 </Form>
             </Modal>

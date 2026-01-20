@@ -29,6 +29,15 @@ export default function AdminPlansPage() {
     const [saving, setSaving] = useState(false);
     const [form] = Form.useForm();
 
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     const fetchPlans = async () => {
         setLoading(true);
         try {
@@ -74,13 +83,13 @@ export default function AdminPlansPage() {
             const res = await fetch(`/api/v1/admin/plans/${id}`, { method: 'DELETE' });
             const data = await res.json();
             if (data.success) {
-                message.success('Plan deleted successfully');
+                message.success(t('deleteSuccess'));
                 fetchPlans();
             } else {
-                message.error(data.error || 'Failed to delete plan');
+                message.error(data.error || t('error'));
             }
         } catch (error) {
-            message.error('An error occurred');
+            message.error(t('error'));
         }
     };
 
@@ -104,14 +113,14 @@ export default function AdminPlansPage() {
             const data = await res.json();
 
             if (data.success) {
-                message.success(editingPlan ? 'Plan updated successfully' : 'Plan created successfully');
+                message.success(editingPlan ? t('updateSuccess') : t('createSuccess'));
                 setModalOpen(false);
                 fetchPlans();
             } else {
-                message.error(data.error || 'Operation failed');
+                message.error(data.error || t('error'));
             }
         } catch (error) {
-            message.error('Invalid JSON format in features or quotas');
+            message.error(t('invalidJson'));
         } finally {
             setSaving(false);
         }
@@ -119,26 +128,28 @@ export default function AdminPlansPage() {
 
     const columns = [
         {
-            title: 'Name',
+            title: t('name'),
             dataIndex: 'name',
             key: 'name',
             render: (name: string) => <strong>{name}</strong>,
         },
         {
-            title: 'Price',
+            title: t('price'),
             dataIndex: 'price_cents',
             key: 'price',
             render: (cents: number) => `$${(cents / 100).toFixed(2)}`,
         },
         {
-            title: 'Created At',
+            title: t('createdAt'),
             dataIndex: 'created_at',
             key: 'created_at',
+            responsive: ['sm'] as any,
             render: (date: string) => <span suppressHydrationWarning>{new Date(date).toLocaleString()}</span>,
         },
         {
             title: t('actions'),
             key: 'actions',
+            fixed: 'right' as any,
             render: (_: any, record: Plan) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
@@ -158,7 +169,7 @@ export default function AdminPlansPage() {
                     <Paragraph type="secondary">{t('plansSubtitle')}</Paragraph>
                 </div>
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-                    Add Plan
+                    {t('addPlan')}
                 </Button>
             </div>
 
@@ -173,35 +184,29 @@ export default function AdminPlansPage() {
             </Card>
 
             <Modal
-                title={editingPlan ? 'Edit Plan' : 'Add Plan'}
+                title={editingPlan ? t('editPlan') : t('addPlan')}
                 open={modalOpen}
                 onCancel={() => setModalOpen(false)}
-                footer={null}
-                width={600}
+                onOk={() => form.submit()}
+                confirmLoading={saving}
+                width="100%"
+                style={{ maxWidth: 600 }}
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                    <Form.Item name="name" label="Plan Name" rules={[{ required: true }]}>
+                    <Form.Item name="name" label={t('planName')} rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="description" label="Description">
+                    <Form.Item name="description" label={t('description')}>
                         <TextArea rows={2} />
                     </Form.Item>
-                    <Form.Item name="price_cents" label="Price (cents)" rules={[{ required: true }]}>
+                    <Form.Item name="price_cents" label={t('priceCents')} rules={[{ required: true }]}>
                         <InputNumber min={0} style={{ width: '100%' }} />
                     </Form.Item>
-                    <Form.Item name="features" label="Features (JSON)" rules={[{ required: true }]}>
+                    <Form.Item name="features" label={t('featuresJson')} rules={[{ required: true }]}>
                         <TextArea rows={6} placeholder='{"api_access": true}' />
                     </Form.Item>
-                    <Form.Item name="quotas" label="Quotas (JSON)" rules={[{ required: true }]}>
+                    <Form.Item name="quotas" label={t('quotasJson')} rules={[{ required: true }]}>
                         <TextArea rows={6} placeholder='{"daily_requests": 100}' />
-                    </Form.Item>
-                    <Form.Item>
-                        <Space>
-                            <Button type="primary" htmlType="submit" loading={saving}>
-                                {editingPlan ? t('update') : t('create')}
-                            </Button>
-                            <Button onClick={() => setModalOpen(false)}>{t('cancel')}</Button>
-                        </Space>
                     </Form.Item>
                 </Form>
             </Modal>
