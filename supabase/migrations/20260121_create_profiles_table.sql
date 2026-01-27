@@ -20,8 +20,8 @@ CREATE POLICY "Users can view own profile" ON public.profiles
 CREATE POLICY "Users can update own profile" ON public.profiles
     FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "Service role can view all profiles" ON public.profiles
-    FOR SELECT USING (current_setting('role', true) = 'service_role');
+CREATE POLICY "Service role can manage all profiles" ON public.profiles
+    FOR ALL USING (current_setting('role', true) = 'service_role');
 
 -- Trigger to update updated_at
 CREATE TRIGGER update_profiles_modtime
@@ -44,7 +44,9 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger for new user
-CREATE TRIGGER on_auth_user_created_profile
+-- Use a name that sorts before other triggers (e.g. credits, subscription) to ensure profile exists first
+DROP TRIGGER IF EXISTS on_auth_user_0_created_profile ON auth.users;
+CREATE TRIGGER on_auth_user_0_created_profile
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user_profile();
 
