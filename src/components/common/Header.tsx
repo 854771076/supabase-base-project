@@ -112,10 +112,10 @@ export default function Header({ user }: HeaderProps) {
             key: 'shop',
             label: <Link href={`/${currentLocale}/shop`} onClick={() => setDrawerVisible(false)}>{t('shop')}</Link>,
         },
-        // {
-        //     key: 'pricing',
-        //     label: <Link href={`/${currentLocale}/pricing`} onClick={() => setDrawerVisible(false)}>{t('pricing')}</Link>,
-        // },
+        {
+            key: 'pricing',
+            label: <Link href={`/${currentLocale}/pricing`} onClick={() => setDrawerVisible(false)}>{t('pricing')}</Link>,
+        },
         // {
         //     key: 'docs',
         //     label: <Link href={`/${currentLocale}/api-docs`} onClick={() => setDrawerVisible(false)}>{t('apiDocs')}</Link>,

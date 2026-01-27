@@ -62,7 +62,7 @@
     },
     "Login": {
         "title": "Welcome Back",
-        "subtitle": "Sign in to your account with a magic link",
+        "subtitle": "Sign in to your account",
         "magicLinkSuccess": "Check your email for the login link!"
     },
     "Pricing": {
@@ -100,6 +100,37 @@
         "paymentCaptureFailed": "Payment capture failed, please contact customer service"
     },
     "Auth": {
+        "sign_in": {
+            "email_label": "Email address",
+            "password_label": "Password",
+            "email_input_placeholder": "Your email address",
+            "password_input_placeholder": "Your password",
+            "button_label": "Sign in",
+            "loading_button_label": "Signing in ...",
+            "social_provider_text": "Sign in with {{provider}}",
+            "link_text": "Already have an account? Sign in",
+            "forgot_password_link": "Forgot your password?"
+        },
+        "sign_up": {
+            "email_label": "Email address",
+            "password_label": "Create a Password",
+            "email_input_placeholder": "Your email address",
+            "password_input_placeholder": "Your password",
+            "button_label": "Sign up",
+            "loading_button_label": "Signing up ...",
+            "social_provider_text": "Sign up with {{provider}}",
+            "link_text": "Don't have an account? Sign up",
+            "confirmation_text": "Check your email for the confirmation link"
+        },
+        "forgotten_password": {
+            "email_label": "Email address",
+            "password_label": "Password",
+            "email_input_placeholder": "Your email address",
+            "button_label": "Send reset password instructions",
+            "loading_button_label": "Sending reset instructions ...",
+            "link_text": "Forgot your password?",
+            "confirmation_text": "Check your email for the password reset link"
+        },
         "magic_link": {
             "email_input_label": "Email address",
             "email_input_placeholder": "Your email address",

@@ -321,7 +321,7 @@ export default function AdminProductsPage() {
                     <Form.Item name="name" label={t('productName')} rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="slug" label={t('slug')} rules={[{ required: true, pattern: /^[a-z0-9-]+$/ }]}>
+                    <Form.Item name="slug" label={t('slug')} >
                         <Input placeholder="product-url-slug" />
                     </Form.Item>
                     <Form.Item name="short_description" label={t('shortDescription')}>

@@ -43,7 +43,7 @@ export default function LoginContent() {
                     <WalletLogin />
 
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                        &copy; {new Date().getFullYear()} Supabase Project
+                        &copy; {new Date().getFullYear()} shineyouny
                     </Text>
                 </Space>
             </Card>
