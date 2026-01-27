@@ -95,12 +95,11 @@ export default function HomeClient() {
             <div className="hero-section">
                 <div className="hero-content">
                     <Title className="hero-title">
-                        Discover Premium <br />
-                        <span className="highlight">Digital Assets</span>
+                        ShineYouny <br />
+                        <span className="highlight">Beauty</span>
                     </Title>
                     <Paragraph className="hero-desc">
-                        Elevate your projects with our curated collection of high-quality resources. 
-                        From templates to plugins, find everything you need to build faster.
+                        {t('heroDescription') || "Discover your natural radiance with our curated collection of premium skincare and beauty essentials. Elevate your daily ritual with products designed to make you shine from within."}
                     </Paragraph>
                     <Link href="/shop">
                         <Button type="primary" size="large" icon={<ShoppingOutlined />} className="hero-btn">
