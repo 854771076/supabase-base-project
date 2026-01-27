@@ -6,16 +6,29 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/utils/supabase/client'
 import { useTranslations } from '@/i18n/context';
 import { getURL } from '@/utils/url';
+import { useRouter } from 'next/navigation';
 
 export default function AuthForm() {
     const supabase = createClient()
     const t = useTranslations('Auth');
     const [mounted, setMounted] = useState(false);
+    const router = useRouter();
 
     // Prevent hydration mismatch and style flickering
     useEffect(() => {
         setMounted(true);
-    }, []);
+        
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((event) => {
+            if (event === 'SIGNED_IN') {
+                router.refresh();
+                router.push('/');
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [supabase, router]);
 
     const authTranslations = {
         sign_in: {
