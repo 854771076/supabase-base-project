@@ -112,18 +112,18 @@ export default function Header({ user }: HeaderProps) {
             key: 'shop',
             label: <Link href={`/${currentLocale}/shop`} onClick={() => setDrawerVisible(false)}>{t('shop')}</Link>,
         },
-        {
-            key: 'pricing',
-            label: <Link href={`/${currentLocale}/pricing`} onClick={() => setDrawerVisible(false)}>{t('pricing')}</Link>,
-        },
-        {
-            key: 'docs',
-            label: <Link href={`/${currentLocale}/api-docs`} onClick={() => setDrawerVisible(false)}>{t('apiDocs')}</Link>,
-        },
-        {
-            key: 'demo',
-            label: <Link href={`/${currentLocale}/dashboard/demo`} onClick={() => setDrawerVisible(false)}>{t('demo')}</Link>,
-        },
+        // {
+        //     key: 'pricing',
+        //     label: <Link href={`/${currentLocale}/pricing`} onClick={() => setDrawerVisible(false)}>{t('pricing')}</Link>,
+        // },
+        // {
+        //     key: 'docs',
+        //     label: <Link href={`/${currentLocale}/api-docs`} onClick={() => setDrawerVisible(false)}>{t('apiDocs')}</Link>,
+        // },
+        // {
+        //     key: 'demo',
+        //     label: <Link href={`/${currentLocale}/dashboard/demo`} onClick={() => setDrawerVisible(false)}>{t('demo')}</Link>,
+        // },
         {
             key: 'credits',
             label: <Link href={`/${currentLocale}/credits`} onClick={() => setDrawerVisible(false)}>{t('credits')}</Link>,
@@ -134,8 +134,8 @@ export default function Header({ user }: HeaderProps) {
         if (pathname === '/') return 'home';
         if (pathname.startsWith('/shop')) return 'shop';
         if (pathname.startsWith('/pricing')) return 'pricing';
-        if (pathname.startsWith('/api-docs')) return 'docs';
-        if (pathname.startsWith('/dashboard')) return 'demo';
+        // if (pathname.startsWith('/api-docs')) return 'docs';
+        // if (pathname.startsWith('/dashboard')) return 'demo';
         if (pathname.startsWith('/credits')) return 'credits';
         return '';
     };
@@ -157,7 +157,7 @@ export default function Header({ user }: HeaderProps) {
         >
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                 <Link href="/" style={{ marginRight: (mounted && isMobile) ? '12px' : '24px', fontSize: (mounted && isMobile) ? '16px' : '18px', fontWeight: 'bold', color: 'inherit', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                    ⚡ {(mounted && isMobile) ? 'Supabase' : 'Supabase Project'}
+                    ⚡ {(mounted && isMobile) ? 'ShineYouny' : 'ShineYouny Beauty'}
                 </Link>
                 {mounted && !isMobile && (
                     <Menu

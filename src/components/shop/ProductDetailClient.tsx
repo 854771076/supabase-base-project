@@ -170,7 +170,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
             <style jsx global>{`
                 .product-detail-container {
                     padding: 40px 24px;
-                    maxWidth: 1200px;
+                    max-width: 1200px;
                     margin: 0 auto;
                     width: 100%;
                 }

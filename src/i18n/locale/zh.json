@@ -31,7 +31,8 @@
         "network": "网络",
         "shop": "商城",
         "favorites": "收藏夹",
-        "admin": "管理后台"
+        "admin": "管理后台",
+        "nemu":"菜单"
     },
     "Profile": {
         "title": "个人资料",

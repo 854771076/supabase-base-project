@@ -10,7 +10,7 @@ export default function Footer() {
     return (
         <AntFooter style={{ textAlign: 'center' }}>
             <Text type="secondary">
-                Supabase Base Project ©{new Date().getFullYear()} Created with Next.js & Ant Design
+                ©{new Date().getFullYear()} ShineYouny Beauty All rights reserved.
             </Text>
         </AntFooter>
     );

@@ -31,7 +31,8 @@
         "network": "Network",
         "shop": "Shop",
         "favorites": "Favorites",
-        "admin": "Admin"
+        "admin": "Admin",
+        "nemu":"Nemu"
     },
     "Profile": {
         "title": "User Profile",
