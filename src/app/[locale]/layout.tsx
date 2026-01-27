@@ -19,8 +19,8 @@ export async function generateStaticParams() {
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: {
-    template: '%s | Supabase Base Project',
-    default: 'Supabase Base Project',
+    template: '%s | ShineYouny Beauty',
+    default: 'ShineYouny Beauty',
   },
   description: "Enterprise-grade starter kit with Next.js 15, Supabase, and Ant Design",
   icons: {
@@ -28,10 +28,10 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
   openGraph: {
-    title: 'Supabase Base Project',
-    description: 'Build your project faster with our full-stack template.',
+    title: 'ShineYouny Beauty',
+    description: 'ShineYouny Beauty',
     url: getURL(),
-    siteName: 'Supabase Base Project',
+    siteName: 'ShineYouny Beauty',
     locale: 'en_US',
     type: 'website',
   },
