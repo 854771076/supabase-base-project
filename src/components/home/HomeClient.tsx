@@ -99,7 +99,7 @@ export default function HomeClient() {
                         <span className="highlight">Beauty</span>
                     </Title>
                     <Paragraph className="hero-desc">
-                        {t('heroDescription') || "Discover your natural radiance with our curated collection of premium skincare and beauty essentials. Elevate your daily ritual with products designed to make you shine from within."}
+                        Discover your natural radiance with our curated collection of premium skincare and beauty essentials. Elevate your daily ritual with products designed to make you shine from within.
                     </Paragraph>
                     <Link href="/shop">
                         <Button type="primary" size="large" icon={<ShoppingOutlined />} className="hero-btn">
