@@ -186,7 +186,7 @@ export default function Header({ user }: HeaderProps) {
                                 </Button>
                             </Dropdown>
 
-                            <NetworkSwitcher />
+                            {/* <NetworkSwitcher /> */}
 
                             {user ? (
                                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
@@ -231,12 +231,12 @@ export default function Header({ user }: HeaderProps) {
                                                 { key: 'zh', label: '中文', onClick: () => handleLanguageChange({ key: 'zh' }) },
                                             ]
                                         },
-                                        {
-                                            key: 'network',
-                                            label: t('network'),
-                                            icon: <SwapOutlined />,
-                                            children: networkItems
-                                        },
+                                        // {
+                                        //     key: 'network',
+                                        //     label: t('network'),
+                                        //     icon: <SwapOutlined />,
+                                        //     children: networkItems
+                                        // },
                                         ...(user ? [
                                             { type: 'divider' as const },
                                             ...userMenuItems
