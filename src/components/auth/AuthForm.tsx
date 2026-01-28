@@ -22,8 +22,9 @@ export default function AuthForm() {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((event) => {
             if (event === 'SIGNED_IN') {
-                router.refresh();
-                router.push('/');
+                //刷新页面
+                location.reload()
+
             }
         });
 
