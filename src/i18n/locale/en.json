@@ -32,7 +32,7 @@
         "shop": "Shop",
         "favorites": "Favorites",
         "admin": "Admin",
-        "nemu":"Nemu"
+        "menu":"Menu"
     },
     "Profile": {
         "title": "User Profile",
