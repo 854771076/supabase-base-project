@@ -16,6 +16,21 @@
             "i18nDesc": "Built-in multi-language support."
         }
     },
+    "Home": {
+        "heroTitle": "ShineYouny",
+        "heroTitleHighlight": "Beauty",
+        "heroDescription": "Discover your natural radiance with our curated collection of premium skincare and beauty essentials. Elevate your daily ritual with products designed to make you shine from within.",
+        "shopNow": "Shop Now",
+        "popularCategories": "Popular Categories",
+        "viewAll": "View All",
+        "featuredProducts": "Featured Products",
+        "featuredSubtitle": "Hand-picked best sellers just for you",
+        "viewAllProducts": "View All Products",
+        "newsletterTitle": "Join our Newsletter",
+        "newsletterSubtitle": "Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.",
+        "emailPlaceholder": "Enter your email",
+        "subscribe": "Subscribe"
+    },
     "Nav": {
         "home": "Home",
         "login": "Login",

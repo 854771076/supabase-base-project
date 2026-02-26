@@ -16,6 +16,21 @@
             "i18nDesc": "内置多语言支持。"
         }
     },
+    "Home": {
+        "heroTitle": "ShineYouny",
+        "heroTitleHighlight": "Beauty",
+        "heroDescription": "探索您的自然光彩，我们精心挑选的高端护肤和美容精品系列。用专为您打造的产品提升您的日常护理，让您由内而外焕发光彩。",
+        "shopNow": "立即购物",
+        "popularCategories": "热门分类",
+        "viewAll": "查看全部",
+        "featuredProducts": "精选产品",
+        "featuredSubtitle": "为您精心挑选的畅销产品",
+        "viewAllProducts": "查看所有产品",
+        "newsletterTitle": "订阅我们的新闻通讯",
+        "newsletterSubtitle": "订阅以获取特别优惠、免费赠品和限时优惠。",
+        "emailPlaceholder": "输入您的邮箱",
+        "subscribe": "订阅"
+    },
     "Nav": {
         "home": "首页",
         "login": "登录",
