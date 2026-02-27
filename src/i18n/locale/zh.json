@@ -174,6 +174,7 @@
     "OrderHistory": {
         "searchOrderId":"搜索订单ID",
         "orderId": "订单ID",
+        "product": "商品",
         "title": "账单与记录",
         "subtitle": "管理您的订阅方案及消费记录",
         "exportReport": "导出报告",
@@ -219,7 +220,16 @@
         "discount": "优惠减免",
         "actualPayment": "实付款",
         "thankYouForPurchase": "感谢您的购买",
-        "waitingForPaymentConfirmation": "等待款项确认"
+        "waitingForPaymentConfirmation": "等待款项确认",
+        "trackingNumber": "物流单号",
+        "trackingCarrier": "快递公司",
+        "shippingTracking": "物流信息",
+        "trackingNumberPlaceholder": "例如：SF1234567890",
+        "trackingCarrierPlaceholder": "例如：顺丰速运",
+        "trackingUpdated": "物流信息已更新",
+        "noTracking": "暂无物流信息",
+        "shipped": "已发货",
+        "notShippedYet": "暂未发货"
     },
     "Cart": {
         "title": "购物车",
@@ -410,6 +420,7 @@
         "orderItems": "订单商品",
         "shippingAddress": "收货地址",
         "close": "关闭",
+        "save": "保存",
         "stock": "库存",
         "price": "价格",
         "id": "ID",

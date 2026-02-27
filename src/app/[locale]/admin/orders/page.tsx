@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Tag, Space, Typography, Card, Select, Modal, Descriptions, App, DatePicker, Input } from 'antd';
-import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined, SendOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
 
 const { Title, Paragraph, Text } = Typography;
@@ -27,6 +27,8 @@ interface Order {
     product_name: string | null;
     order_items: OrderItem[];
     shipping_address: any | null;
+    tracking_number: string | null;
+    tracking_carrier: string | null;
     created_at: string;
     completed_at: string | null;
 }
@@ -46,6 +48,9 @@ export default function AdminOrdersPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [searchId, setSearchId] = useState('');
     const [isMobile, setIsMobile] = useState(false);
+    const [trackingNumber, setTrackingNumber] = useState('');
+    const [trackingCarrier, setTrackingCarrier] = useState('');
+    const [trackingLoading, setTrackingLoading] = useState(false);
     const pageSize = 10;
 
     useEffect(() => {
@@ -104,7 +109,33 @@ export default function AdminOrdersPage() {
 
     const handleViewDetails = (order: Order) => {
         setSelectedOrder(order);
+        setTrackingNumber(order.tracking_number || '');
+        setTrackingCarrier(order.tracking_carrier || '');
         setModalOpen(true);
+    };
+
+    const handleSaveTracking = async () => {
+        if (!selectedOrder) return;
+        setTrackingLoading(true);
+        try {
+            const res = await fetch(`/api/v1/admin/orders/${selectedOrder.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tracking_number: trackingNumber || null, tracking_carrier: trackingCarrier || null }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                message.success(tOrder('trackingUpdated'));
+                setSelectedOrder(prev => prev ? { ...prev, tracking_number: trackingNumber || null, tracking_carrier: trackingCarrier || null } : prev);
+                fetchOrders();
+            } else {
+                message.error(data.error || t('error'));
+            }
+        } catch {
+            message.error(t('error'));
+        } finally {
+            setTrackingLoading(false);
+        }
     };
 
     const getStatusColor = (status: string) => {
@@ -275,47 +306,83 @@ export default function AdminOrdersPage() {
                 footer={<Button onClick={() => setModalOpen(false)}>{t('close')}</Button>}
                 width="100%"
                 style={{ maxWidth: 700 }}
+                styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingTop: 8 } }}
             >
                 {selectedOrder && (
-                    <Descriptions bordered column={{ xs: 1, sm: 2 }} size="small">
-                        <Descriptions.Item label={t('orderId')} span={2}>
-                            <Text copyable>{selectedOrder.id}</Text>
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('type')}>
-                            <Tag color={getTypeColor(selectedOrder.type)}>{tOrder(selectedOrder.type)}</Tag>
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('status')}>
-                            <Tag color={getStatusColor(selectedOrder.status)}>{tOrder(selectedOrder.status)}</Tag>
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('amount')}>
-                            ${(selectedOrder.amount_cents / 100).toFixed(2)} {selectedOrder.currency}
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('provider')}>
-                            {selectedOrder.provider}
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('createdAt')}>
-                            <span suppressHydrationWarning>{new Date(selectedOrder.created_at).toLocaleString()}</span>
-                        </Descriptions.Item>
-                        <Descriptions.Item label={t('completedAt')}>
-                            <span suppressHydrationWarning>{selectedOrder.completed_at ? new Date(selectedOrder.completed_at).toLocaleString() : '-'}</span>
-                        </Descriptions.Item>
-                        {selectedOrder.order_items?.length > 0 && (
-                            <Descriptions.Item label={t('orderItems')} span={2}>
-                                <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                                    {selectedOrder.order_items.map(item => (
-                                        <li key={item.id}>
-                                            {item.product_name} × {item.quantity} = ${(item.total_price_cents / 100).toFixed(2)}
-                                        </li>
-                                    ))}
-                                </ul>
+                    <div>
+                        <Descriptions column={1} size="small" labelStyle={{ color: '#8c8c8c', width: 130 }} contentStyle={{ fontWeight: 500 }}>
+                            <Descriptions.Item label={t('orderId')}>
+                                <Text copyable style={{ fontSize: 12 }}>{selectedOrder.id}</Text>
                             </Descriptions.Item>
-                        )}
-                        {selectedOrder.shipping_address && (
-                            <Descriptions.Item label={t('shippingAddress')} span={2}>
-                                {selectedOrder.shipping_address.full_name}, {selectedOrder.shipping_address.address_line1}, {selectedOrder.shipping_address.city}
+                            <Descriptions.Item label={t('type')}>
+                                <Tag color={getTypeColor(selectedOrder.type)}>{tOrder(selectedOrder.type)}</Tag>
                             </Descriptions.Item>
+                            <Descriptions.Item label={t('status')}>
+                                <Tag color={getStatusColor(selectedOrder.status)}>{tOrder(selectedOrder.status)}</Tag>
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('amount')}>
+                                ${(selectedOrder.amount_cents / 100).toFixed(2)} {selectedOrder.currency}
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('provider')}>
+                                {selectedOrder.provider}
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('createdAt')}>
+                                <span suppressHydrationWarning>{new Date(selectedOrder.created_at).toLocaleString()}</span>
+                            </Descriptions.Item>
+                            <Descriptions.Item label={t('completedAt')}>
+                                <span suppressHydrationWarning>{selectedOrder.completed_at ? new Date(selectedOrder.completed_at).toLocaleString() : '-'}</span>
+                            </Descriptions.Item>
+                            {selectedOrder.order_items?.length > 0 && (
+                                <Descriptions.Item label={t('orderItems')}>
+                                    <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                                        {selectedOrder.order_items.map(item => (
+                                            <li key={item.id}>
+                                                {item.product_name} × {item.quantity} = ${(item.total_price_cents / 100).toFixed(2)}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Descriptions.Item>
+                            )}
+                            {selectedOrder.shipping_address && (
+                                <Descriptions.Item label={t('shippingAddress')}>
+                                    {selectedOrder.shipping_address.full_name}, {selectedOrder.shipping_address.address_line1}, {selectedOrder.shipping_address.city}
+                                </Descriptions.Item>
+                            )}
+                        </Descriptions>
+
+                        {/* Tracking section — only for product orders */}
+                        {selectedOrder.type === 'product' && (
+                            <div style={{ marginTop: 20, padding: '16px', background: '#f8f9fa', borderRadius: 8, border: '1px solid #e8e8e8' }}>
+                                <div style={{ fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <SendOutlined style={{ color: '#1677ff' }} />
+                                    {tOrder('shippingTracking')}
+                                </div>
+                                <Space direction="vertical" style={{ width: '100%' }} size={8}>
+                                    <Input
+                                        placeholder={tOrder('trackingCarrierPlaceholder')}
+                                        value={trackingCarrier}
+                                        onChange={e => setTrackingCarrier(e.target.value)}
+                                        prefix={<span style={{ color: '#8c8c8c', fontSize: 12 }}>{tOrder('trackingCarrier')}:</span>}
+                                    />
+                                    <Input
+                                        placeholder={tOrder('trackingNumberPlaceholder')}
+                                        value={trackingNumber}
+                                        onChange={e => setTrackingNumber(e.target.value)}
+                                        prefix={<span style={{ color: '#8c8c8c', fontSize: 12 }}>{tOrder('trackingNumber')}:</span>}
+                                    />
+                                    <Button
+                                        type="primary"
+                                        size="small"
+                                        loading={trackingLoading}
+                                        onClick={handleSaveTracking}
+                                        icon={<SendOutlined />}
+                                    >
+                                        {t('save')}
+                                    </Button>
+                                </Space>
+                            </div>
                         )}
-                    </Descriptions>
+                    </div>
                 )}
             </Modal>
         </div>

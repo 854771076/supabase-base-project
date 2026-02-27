@@ -9,6 +9,8 @@ interface RouteParams {
 const updateOrderSchema = z.object({
     status: z.enum(['pending', 'processing', 'completed', 'failed', 'cancelled']).optional(),
     shipping_info: z.record(z.any()).optional(),
+    tracking_number: z.string().max(100).optional().nullable(),
+    tracking_carrier: z.string().max(100).optional().nullable(),
 });
 
 // GET: Get order by ID (Admin)

@@ -11,7 +11,8 @@ import {
   CopyOutlined,
   PrinterOutlined,
   ShoppingOutlined,
-  WalletOutlined
+  WalletOutlined,
+  CarOutlined
 } from '@ant-design/icons';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
@@ -22,7 +23,7 @@ import html2canvas from 'html2canvas';
 const { Title, Text, Paragraph } = Typography;
 interface Order {
   id: string;
-  type: 'subscription' | 'credits';
+  type: 'subscription' | 'credits' | 'product';
   provider: string;
   provider_order_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
@@ -32,6 +33,8 @@ interface Order {
   created_at: string;
   completed_at?: string;
   metadata?: any;
+  tracking_number?: string | null;
+  tracking_carrier?: string | null;
 }
 interface OrderDetailProps {
   order: Order;
@@ -257,6 +260,29 @@ export function OrderDetail({ order, locale: propLocale }: OrderDetailProps) {
                   <Descriptions.Item label={t('completedAt')}>
                     {new Date(order.completed_at).toLocaleString(locale)}
                   </Descriptions.Item>
+                )}
+                {/* 物流信息 — 仅商品订单 */}
+                {order.type === 'product' && (
+                  <>
+                    <Descriptions.Item label={t('shippingTracking')}>
+                      {order.tracking_number
+                        ? <Tag color="success" icon={<CarOutlined />}>{t('shipped')}</Tag>
+                        : <Tag color="default" icon={<CarOutlined />}>{t('notShippedYet')}</Tag>
+                      }
+                    </Descriptions.Item>
+                    {order.tracking_carrier && (
+                      <Descriptions.Item label={t('trackingCarrier')}>
+                        {order.tracking_carrier}
+                      </Descriptions.Item>
+                    )}
+                    {order.tracking_number && (
+                      <Descriptions.Item label={t('trackingNumber')}>
+                        <Paragraph copyable={{ icon: <CopyOutlined /> }} style={{ margin: 0, fontWeight: 600 }}>
+                          {order.tracking_number}
+                        </Paragraph>
+                      </Descriptions.Item>
+                    )}
+                  </>
                 )}
               </Descriptions>
             </Card>

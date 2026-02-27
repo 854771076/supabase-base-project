@@ -182,6 +182,7 @@
         "successRate": "Payment Success Rate",
         "filterRecords": "Filter Records",
         "allTypes": "All Types",
+        "product": "Product",
         "license":"License",
         "subscription": "Subscription",
         "credits": "Credits Purchase",
@@ -219,7 +220,16 @@
         "discount": "Discount",
         "actualPayment": "Actual Payment",
         "thankYouForPurchase": "Thank you for your purchase",
-        "waitingForPaymentConfirmation": "Waiting for payment confirmation"
+        "waitingForPaymentConfirmation": "Waiting for payment confirmation",
+        "trackingNumber": "Tracking Number",
+        "trackingCarrier": "Carrier",
+        "shippingTracking": "Shipping Tracking",
+        "trackingNumberPlaceholder": "e.g. SF1234567890",
+        "trackingCarrierPlaceholder": "e.g. SF Express",
+        "trackingUpdated": "Tracking info updated",
+        "noTracking": "No tracking info yet",
+        "shipped": "Shipped",
+        "notShippedYet": "Not shipped yet"
     },
     "Cart": {
         "title": "Shopping Cart",
@@ -410,6 +420,7 @@
         "orderItems": "Order Items",
         "shippingAddress": "Shipping Address",
         "close": "Close",
+        "save": "Save",
         "stock": "Stock",
         "price": "Price",
         "id": "ID",
