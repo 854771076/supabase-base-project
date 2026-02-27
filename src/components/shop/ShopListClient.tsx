@@ -88,7 +88,7 @@ export default function ShopListClient() {
         addItem({
             id: product.id,
             name: product.name,
-            price_cents: product.price_cents,
+            price_cents: product.min_price_cents ?? 0,
             type: 'product',
             metadata: { image: product.thumbnail_url, slug: product.slug },
         });
