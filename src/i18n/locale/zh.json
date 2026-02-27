@@ -174,7 +174,6 @@
     "OrderHistory": {
         "searchOrderId":"搜索订单ID",
         "orderId": "订单ID",
-        "product": "商品",
         "title": "账单与记录",
         "subtitle": "管理您的订阅方案及消费记录",
         "exportReport": "导出报告",
@@ -185,7 +184,6 @@
         "allTypes": "全部类型",
         "subscription": "订阅方案",
         "credits": "点数充值",
-        "license": "授权码",
         "orderInfo": "订单信息",
         "category": "分类",
         "amount": "金额",
@@ -229,7 +227,10 @@
         "trackingUpdated": "物流信息已更新",
         "noTracking": "暂无物流信息",
         "shipped": "已发货",
-        "notShippedYet": "暂未发货"
+        "notShippedYet": "暂未发货",
+        "shipping": "物流状态",
+        "product": "实物商品",
+        "license": "授权码"
     },
     "Cart": {
         "title": "购物车",

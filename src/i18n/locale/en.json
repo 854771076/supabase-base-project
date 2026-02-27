@@ -229,7 +229,8 @@
         "trackingUpdated": "Tracking info updated",
         "noTracking": "No tracking info yet",
         "shipped": "Shipped",
-        "notShippedYet": "Not shipped yet"
+        "notShippedYet": "Not shipped yet",
+        "shipping": "Shipping"
     },
     "Cart": {
         "title": "Shopping Cart",

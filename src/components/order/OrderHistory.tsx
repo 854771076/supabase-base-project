@@ -11,7 +11,7 @@ import {
     CloseCircleOutlined, DollarOutlined,
     FilterOutlined, DownloadOutlined,
     SyncOutlined, ArrowRightOutlined,
-    WalletOutlined
+    WalletOutlined, CarOutlined
 } from '@ant-design/icons';
 import { useTranslations, useLocale } from '@/i18n/context';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,7 @@ const { Title, Text, Paragraph } = Typography;
 // --- 类型统一定义 ---
 interface Order {
     id: string;
-    type: 'subscription' | 'credits';
+    type: 'subscription' | 'credits' | 'product' | 'license';
     provider: string;
     provider_order_id: string;
     status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
@@ -32,6 +32,8 @@ interface Order {
     created_at: string;
     completed_at?: string;
     metadata?: any;
+    tracking_number?: string | null;
+    tracking_carrier?: string | null;
 }
 
 // --- 样式配置抽取 ---
@@ -132,9 +134,14 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
         {
             title: t('orderInfo'),
             key: 'product',
+            width: 220,
             render: (_: any, record: Order) => (
                 <Space direction="vertical" size={0}>
-                    <Text strong style={{ fontSize: '15px' }}>{record.product_name}</Text>
+                    <Tooltip title={record.product_name}>
+                        <Text strong style={{ fontSize: '14px', display: 'block', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {record.product_name}
+                        </Text>
+                    </Tooltip>
                     <Text type="secondary" copyable={{ text: record.id }} style={{ fontSize: '12px' }}>
                         ID: {record.id.slice(0, 8)}...
                     </Text>
@@ -144,11 +151,19 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
         {
             title: t('category'),
             dataIndex: 'type',
-            render: (type: string) => (
-                <Tag color={type === 'subscription' ? 'purple' : 'blue'} bordered={false} style={{ borderRadius: '4px' }}>
-                    {type === 'subscription' ? t('subscription') : t('credits')}
-                </Tag>
-            ),
+            render: (type: string) => {
+                const typeColors: Record<string, string> = {
+                    subscription: 'purple',
+                    credits: 'blue',
+                    product: 'cyan',
+                    license: 'gold',
+                };
+                return (
+                    <Tag color={typeColors[type] || 'default'} bordered={false} style={{ borderRadius: '4px' }}>
+                        {t(type as any)}
+                    </Tag>
+                );
+            },
         },
         {
             title: t('amount'),
@@ -175,6 +190,16 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
                     </Tag>
                 );
             }
+        },
+        {
+            title: t('shipping'),
+            key: 'shipping',
+            render: (_: any, record: Order) => {
+                if (record.type !== 'product') return <Text type="secondary" style={{ fontSize: 12 }}>—</Text>;
+                return record.tracking_number
+                    ? <Tag icon={<CarOutlined />} color="success" style={{ borderRadius: 4 }}>{t('shipped')}</Tag>
+                    : <Tag icon={<CarOutlined />} color="default" style={{ borderRadius: 4 }}>{t('notShippedYet')}</Tag>;
+            },
         },
         {
             title: t('time'),
@@ -287,11 +312,13 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
                                 defaultValue="all"
                                 variant="borderless"
                                 onChange={setFilterType}
-                                style={{ width: 120, marginLeft: '8px', color: '#1890ff', fontWeight: 600 }}
+                                style={{ width: 140, marginLeft: '8px', color: '#1890ff', fontWeight: 600 }}
                             >
                                 <Select.Option value="all">{t('allTypes')}</Select.Option>
                                 <Select.Option value="subscription">{t('subscription')}</Select.Option>
                                 <Select.Option value="credits">{t('credits')}</Select.Option>
+                                <Select.Option value="product">{t('product')}</Select.Option>
+                                <Select.Option value="license">{t('license')}</Select.Option>
                             </Select>
                         </Space>
                     }
