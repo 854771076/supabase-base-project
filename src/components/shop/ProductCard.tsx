@@ -28,12 +28,9 @@ export default function ProductCard({
     const locale = useLocale();
     const router = useRouter();
 
-    const getDiscount = (price: number, comparePrice: number | null) => {
-        if (!comparePrice || comparePrice <= price) return null;
-        return Math.round(((comparePrice - price) / comparePrice) * 100);
-    };
-
-    const discount = getDiscount(product.price_cents, product.compare_at_price_cents);
+    const discount = product.min_compare_at_price_cents && product.min_compare_at_price_cents > product.min_price_cents
+        ? Math.round(((product.min_compare_at_price_cents - product.min_price_cents) / product.min_compare_at_price_cents) * 100)
+        : null;
 
     return (
         <Badge.Ribbon
@@ -107,11 +104,14 @@ export default function ProductCard({
                     <div className="price-row">
                         <Space align="baseline" size={8}>
                             <Text className="price-current">
-                                ${(product.price_cents / 100).toFixed(2)}
+                                {product.has_variants && product.min_price_cents !== product.max_price_cents
+                                    ? `$${(product.min_price_cents / 100).toFixed(2)}+`
+                                    : `$${(product.min_price_cents / 100).toFixed(2)}`
+                                }
                             </Text>
-                            {product.compare_at_price_cents && (
+                            {product.min_compare_at_price_cents && (
                                 <Text delete className="price-old">
-                                    ${(product.compare_at_price_cents / 100).toFixed(2)}
+                                    ${(product.min_compare_at_price_cents / 100).toFixed(2)}
                                 </Text>
                             )}
                         </Space>

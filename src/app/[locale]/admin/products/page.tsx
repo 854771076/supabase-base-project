@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Tag, Space, Typography, Card, Input, Select, Modal, Form, InputNumber, Switch, App, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Tag, Space, Typography, Card, Input, Select, Modal, Form, Switch, App, Popconfirm } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
+import VariantManager from '@/components/admin/VariantManager';
+import { ProductVariant } from '@/components/shop/types';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -12,16 +14,17 @@ interface Product {
     id: string;
     name: string;
     slug: string;
-    price_cents: number;
-    compare_at_price_cents: number | null;
     thumbnail_url: string | null;
-    images: string[];
-    stock_quantity: number;
-    sku: string | null;
     status: 'draft' | 'published' | 'archived';
     category: { id: string; name: string } | null;
     featured: boolean;
     created_at: string;
+    has_variants?: boolean;
+    // Computed from variants
+    min_price_cents: number;
+    max_price_cents: number;
+    total_stock_quantity: number;
+    variant_count: number;
 }
 
 interface Category {
@@ -46,6 +49,11 @@ export default function AdminProductsPage() {
     const [saving, setSaving] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [form] = Form.useForm();
+
+    // Variant management state
+    const [variantModalOpen, setVariantModalOpen] = useState(false);
+    const [managingProductId, setManagingProductId] = useState<string | null>(null);
+    const [productVariants, setProductVariants] = useState<ProductVariant[]>([]);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -116,7 +124,6 @@ export default function AdminProductsPage() {
         form.setFieldsValue({
             ...product,
             category_id: product.category?.id,
-            images: product.images?.join('\n'),
         });
         setModalOpen(true);
     };
@@ -129,6 +136,34 @@ export default function AdminProductsPage() {
         } catch (error) {
             message.error(t('error'));
         }
+    };
+
+    const handleManageVariants = async (product: Product) => {
+        setManagingProductId(product.id);
+        try {
+            const res = await fetch(`/api/v1/admin/products/${product.id}/variants`);
+            const data = await res.json();
+            if (data.success) {
+                setProductVariants(data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching variants:', error);
+        }
+        setVariantModalOpen(true);
+    };
+
+    const handleVariantsChange = async () => {
+        if (!managingProductId) return;
+        try {
+            const res = await fetch(`/api/v1/admin/products/${managingProductId}/variants`);
+            const data = await res.json();
+            if (data.success) {
+                setProductVariants(data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching variants:', error);
+        }
+        fetchProducts(); // Refresh product list
     };
 
     const handleSubmit = async (values: any) => {
@@ -212,15 +247,24 @@ export default function AdminProductsPage() {
         },
         {
             title: t('price'),
-            dataIndex: 'price_cents',
             key: 'price',
-            render: (cents: number) => `$${(cents / 100).toFixed(2)}`,
+            render: (_: any, record: Product) => {
+                if (!record.min_price_cents) return '-';
+                const min = `$${(record.min_price_cents / 100).toFixed(2)}`;
+                return record.min_price_cents !== record.max_price_cents
+                    ? `${min} ~ $${(record.max_price_cents / 100).toFixed(2)}`
+                    : min;
+            },
         },
         {
             title: t('stock'),
-            dataIndex: 'stock_quantity',
             key: 'stock',
             responsive: ['md'] as any,
+            render: (_: any, record: Product) => (
+                <Tag color={record.total_stock_quantity > 0 ? 'success' : 'error'}>
+                    {record.total_stock_quantity}
+                </Tag>
+            ),
         },
         {
             title: t('status'),
@@ -259,6 +303,7 @@ export default function AdminProductsPage() {
             render: (_: any, record: Product) => (
                 <Space>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+                    <Button size="small" icon={<AppstoreOutlined />} onClick={() => handleManageVariants(record)} />
                     <Popconfirm
                         title={t('confirmDelete')}
                         onConfirm={() => handleDelete(record.id)}
@@ -335,20 +380,11 @@ export default function AdminProductsPage() {
                     <Form.Item name="name" label={t('productName')} rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="slug" label={t('slug')} >
-                        <Input placeholder="product-url-slug" />
-                    </Form.Item>
                     <Form.Item name="short_description" label={t('shortDescription')}>
                         <Input />
                     </Form.Item>
                     <Form.Item name="description" label={t('description')}>
                         <TextArea rows={4} />
-                    </Form.Item>
-                    <Form.Item name="price_cents" label={t('priceCents')} rules={[{ required: true }]}>
-                        <InputNumber min={0} style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item name="compare_at_price_cents" label={t('compareAtPriceCents')}>
-                        <InputNumber min={0} style={{ width: '100%' }} />
                     </Form.Item>
                     <Form.Item name="category_id" label={t('category')}>
                         <Select allowClear>
@@ -357,17 +393,8 @@ export default function AdminProductsPage() {
                             ))}
                         </Select>
                     </Form.Item>
-                    <Form.Item name="stock_quantity" label={t('stockQuantity')}>
-                        <InputNumber min={0} style={{ width: '100%' }} />
-                    </Form.Item>
-                    <Form.Item name="sku" label={t('sku')}>
-                        <Input />
-                    </Form.Item>
                     <Form.Item name="thumbnail_url" label={t('thumbnailUrl')}>
                         <Input placeholder="https://..." />
-                    </Form.Item>
-                    <Form.Item name="images" label={t('productImages')} tooltip={t('imagesTooltip')}>
-                        <TextArea rows={4} placeholder="Enter image URLs, one per line" />
                     </Form.Item>
                     <Form.Item name="status" label={t('status')}>
                         <Select>
@@ -388,6 +415,24 @@ export default function AdminProductsPage() {
                         </Space>
                     </Form.Item>
                 </Form>
+            </Modal>
+
+            {/* Variant Management Modal */}
+            <Modal
+                title={t('manageVariants') || 'Manage Product Variants'}
+                open={variantModalOpen}
+                onCancel={() => setVariantModalOpen(false)}
+                footer={null}
+                width={1000}
+            >
+                {managingProductId && (
+                    <VariantManager
+                        productId={managingProductId}
+                        variants={productVariants}
+                        onVariantsChange={handleVariantsChange}
+                        t={t}
+                    />
+                )}
             </Modal>
         </div>
     );

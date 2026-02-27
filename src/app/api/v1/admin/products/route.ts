@@ -2,44 +2,32 @@ import { NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 
-// Schema for creating/updating a product
+// sku, images, compare_at_price_cents, stock_quantity, price_cents removed —
+// those fields now live on product_variants
 const productSchema = z.object({
     name: z.string().min(1).max(200),
     slug: z.string().min(1).max(200).regex(/^[a-z0-9-]+$/),
     description: z.string().optional(),
     short_description: z.string().max(500).optional(),
-    price_cents: z.number().int().min(0),
-    compare_at_price_cents: z.number().int().min(0).optional().nullable(),
     category_id: z.string().uuid().optional().nullable(),
-    images: z.array(z.string()).optional(),
     thumbnail_url: z.string().optional().nullable(),
-    stock_quantity: z.number().int().min(0).optional(),
-    sku: z.string().max(100).optional().nullable(),
     status: z.enum(['draft', 'published', 'archived']).optional(),
     featured: z.boolean().optional(),
     metadata: z.record(z.any()).optional(),
 });
 
-// GET: List products with filters (Admin)
+// GET: List products (Admin) — uses products_with_price view for min price & stock
 export async function GET(request: Request) {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        // Check if user is admin
-        const isAdmin = user.app_metadata?.is_admin === true;
-        if (!isAdmin) {
-            return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+        if (!user || user.app_metadata?.is_admin !== true) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         const { searchParams } = new URL(request.url);
         const category_id = searchParams.get('category_id');
         const status = searchParams.get('status');
-        const featured = searchParams.get('featured');
         const search = searchParams.get('search');
         const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
         const offset = parseInt(searchParams.get('offset') || '0');
@@ -47,29 +35,21 @@ export async function GET(request: Request) {
         const adminSupabase = await createAdminClient();
 
         let query = adminSupabase
-            .from('products')
+            .from('products_with_price')
             .select(`
-                *,
+                id, name, slug, description, short_description,
+                thumbnail_url, status, featured, has_variants, metadata,
+                created_at, updated_at,
+                min_price_cents, max_price_cents, min_compare_at_price_cents,
+                total_stock_quantity, variant_count,
                 categories(id, name, slug)
             `, { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(offset, offset + limit - 1);
 
-        if (status) {
-            query = query.eq('status', status);
-        }
-
-        if (category_id) {
-            query = query.eq('category_id', category_id);
-        }
-
-        if (featured === 'true') {
-            query = query.eq('featured', true);
-        }
-
-        if (search) {
-            query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,id.eq.${search}`);
-        }
+        if (status) query = query.eq('status', status);
+        if (category_id) query = query.eq('category_id', category_id);
+        if (search) query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,id.eq.${search}`);
 
         const { data: products, error, count } = await query;
 
@@ -78,20 +58,15 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
         }
 
-        // Map categories to category for frontend compatibility
         const mappedProducts = products?.map((p: any) => ({
             ...p,
-            category: p.categories
+            category: p.categories,
         }));
 
         return NextResponse.json({
             success: true,
             data: mappedProducts,
-            pagination: {
-                limit,
-                offset,
-                total: count || 0,
-            },
+            pagination: { limit, offset, total: count || 0 },
         });
     } catch (error) {
         console.error('Admin Products GET error:', error);
@@ -99,20 +74,13 @@ export async function GET(request: Request) {
     }
 }
 
-// POST: Create a new product (Admin)
+// POST: Create product (Admin)
 export async function POST(request: Request) {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        // Check if user is admin
-        const isAdmin = user.app_metadata?.is_admin === true;
-        if (!isAdmin) {
-            return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+        if (!user || user.app_metadata?.is_admin !== true) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         const body = await request.json();
@@ -126,21 +94,15 @@ export async function POST(request: Request) {
                 slug: validatedData.slug,
                 description: validatedData.description || null,
                 short_description: validatedData.short_description || null,
-                price_cents: validatedData.price_cents,
-                compare_at_price_cents: validatedData.compare_at_price_cents || null,
                 category_id: validatedData.category_id || null,
-                images: validatedData.images || [],
                 thumbnail_url: validatedData.thumbnail_url || null,
-                stock_quantity: validatedData.stock_quantity || 0,
-                sku: validatedData.sku || null,
                 status: validatedData.status || 'draft',
                 featured: validatedData.featured || false,
                 metadata: validatedData.metadata || {},
+                has_variants: true,
+                variant_type: 'multiple',
             })
-            .select(`
-                *,
-                categories(id, name, slug)
-            `)
+            .select('*, categories(id, name, slug)')
             .single();
 
         if (error) {
@@ -151,15 +113,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
         }
 
-        // Map categories to category
-        const mappedProduct = {
-            ...product,
-            category: product.categories
-        };
-
         return NextResponse.json({
             success: true,
-            data: mappedProduct,
+            data: { ...product, category: product.categories },
         }, { status: 201 });
     } catch (error: any) {
         console.error('Admin Products POST error:', error);
@@ -169,3 +125,5 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+

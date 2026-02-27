@@ -81,6 +81,11 @@ export default function CartDrawer({ open, onClose, locale }: CartDrawerProps) {
                                 description={
                                     <Space direction="vertical" size={0}>
                                         <Text type="secondary">${(item.price_cents / 100).toFixed(2)}</Text>
+                                        {item.metadata?.attributes && Object.keys(item.metadata.attributes).length > 0 && (
+                                            <Text type="secondary" style={{ fontSize: 12 }}>
+                                                {Object.entries(item.metadata.attributes).map(([k, v]) => `${k}: ${v}`).join(' / ')}
+                                            </Text>
+                                        )}
                                         <div style={{ marginTop: '8px' }}>
                                             <InputNumber
                                                 min={1}

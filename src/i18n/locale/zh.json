@@ -235,6 +235,7 @@
         "total": "总计",
         "paymentMethod": "支付方式",
         "checkout": "结算",
+        "shippingRequired": "需要配送地址",
         "disclaimer": "点击支付即表示您同意我们的服务条款。",
         "payNow": "立即支付",
         "successTitle": "支付成功！",
@@ -455,6 +456,20 @@
         "expiresAtOptional": "过期时间 (可选)",
         "deleteSuccess": "删除成功",
         "revoked": "已撤销",
-        "expired": "已过期"
+        "expired": "已过期",
+        "manageVariants": "管理规格",
+        "productVariants": "商品规格",
+        "addVariant": "添加规格",
+        "createVariant": "创建规格",
+        "editVariant": "编辑规格",
+        "variantName": "规格名称",
+        "variantDeleted": "规格已删除",
+        "variantCreated": "规格已创建",
+        "variantUpdated": "规格已更新",
+        "attributes": "属性 (JSON)",
+        "compareAtPrice": "原价",
+        "edit": "编辑",
+        "delete": "删除",
+        "images": "图片"
     }
 }

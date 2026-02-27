@@ -25,12 +25,14 @@ export async function GET(request: Request) {
             .select(`
                 id,
                 created_at,
-                product:products(
+                product:products_with_price(
                     id,
                     name,
                     slug,
-                    price_cents,
-                    compare_at_price_cents,
+                    min_price_cents,
+                    max_price_cents,
+                    min_compare_at_price_cents,
+                    total_stock_quantity,
                     thumbnail_url,
                     status
                 )

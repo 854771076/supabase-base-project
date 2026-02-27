@@ -234,6 +234,7 @@
         "orderSummary": "Order Summary",
         "total": "Total",
         "paymentMethod": "Payment Method",
+        "shippingRequired": "Shipping Required",
         "checkout": "Checkout",
         "disclaimer": "By clicking Pay Now, you agree to our Terms of Service.",
         "payNow": "Pay Now",
@@ -455,6 +456,20 @@
         "expiresAtOptional": "Expires At (Optional)",
         "deleteSuccess": "Deleted successfully",
         "revoked": "Revoked",
-        "expired": "Expired"
+        "expired": "Expired",
+        "manageVariants": "Manage Variants",
+        "productVariants": "Product Variants",
+        "addVariant": "Add Variant",
+        "createVariant": "Create Variant",
+        "editVariant": "Edit Variant",
+        "variantName": "Variant Name",
+        "variantDeleted": "Variant deleted",
+        "variantCreated": "Variant created",
+        "variantUpdated": "Variant updated",
+        "attributes": "Attributes (JSON)",
+        "compareAtPrice": "Compare at Price",
+        "edit": "Edit",
+        "delete": "Delete",
+        "images": "Images"
     }
 }

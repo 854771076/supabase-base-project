@@ -6,22 +6,17 @@ interface RouteParams {
     params: Promise<{ id: string }>;
 }
 
-// Schema for updating a product
 const updateProductSchema = z.object({
     name: z.string().min(1).max(200).optional(),
     slug: z.string().min(1).max(200).regex(/^[a-z0-9-]+$/).optional(),
     description: z.string().optional(),
     short_description: z.string().max(500).optional(),
-    price_cents: z.number().int().min(0).optional(),
-    compare_at_price_cents: z.number().int().min(0).optional().nullable(),
     category_id: z.string().uuid().optional().nullable(),
-    images: z.array(z.string()).optional(),
     thumbnail_url: z.string().optional().nullable(),
-    stock_quantity: z.number().int().min(0).optional(),
-    sku: z.string().max(100).optional().nullable(),
     status: z.enum(['draft', 'published', 'archived']).optional(),
     featured: z.boolean().optional(),
     metadata: z.record(z.any()).optional(),
+    has_variants: z.boolean().optional(),
 });
 
 // GET: Get product by ID (Admin)
