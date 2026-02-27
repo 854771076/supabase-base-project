@@ -42,7 +42,7 @@ export default function ProductCard({
                 hoverable
                 bordered={false}
                 className="premium-product-card"
-                onClick={() => router.push(`/${locale}/shop/${product.slug}`)}
+                onClick={() => router.push(`/${locale}/shop/${product.id}`)}
                 style={{
                     borderRadius: 16,
                     overflow: 'hidden',

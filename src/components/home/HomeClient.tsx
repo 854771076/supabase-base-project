@@ -58,7 +58,7 @@ export default function HomeClient() {
             name: product.name,
             price_cents: product.min_price_cents ?? 0,
             type: 'product',
-            metadata: { image: product.thumbnail_url, slug: product.slug },
+            metadata: { image: product.thumbnail_url },
         });
         message.success(tShop('addedToCart'));
     };

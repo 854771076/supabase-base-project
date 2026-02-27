@@ -32,7 +32,6 @@ export interface VariantOption {
 export interface Product {
     id: string;
     name: string;
-    slug: string;
     description?: string | null;
     short_description?: string | null;
     thumbnail_url: string | null;

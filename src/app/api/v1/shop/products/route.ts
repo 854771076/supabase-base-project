@@ -16,7 +16,7 @@ export async function GET(request: Request) {
         let query = supabase
             .from('products_with_price')
             .select(`
-                id, name, slug, thumbnail_url, featured, has_variants,
+                id, name, thumbnail_url, featured, has_variants,
                 min_price_cents, max_price_cents, min_compare_at_price_cents,
                 total_stock_quantity, variant_count,
                 categories(id, name, slug)

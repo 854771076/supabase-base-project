@@ -6,7 +6,6 @@ import { z } from 'zod';
 // those fields now live on product_variants
 const productSchema = z.object({
     name: z.string().min(1).max(200),
-    slug: z.string().min(1).max(200).regex(/^[a-z0-9-]+$/),
     description: z.string().optional(),
     short_description: z.string().max(500).optional(),
     category_id: z.string().uuid().optional().nullable(),
@@ -37,7 +36,7 @@ export async function GET(request: Request) {
         let query = adminSupabase
             .from('products_with_price')
             .select(`
-                id, name, slug, description, short_description,
+                id, name, description, short_description,
                 thumbnail_url, status, featured, has_variants, metadata,
                 created_at, updated_at,
                 min_price_cents, max_price_cents, min_compare_at_price_cents,
@@ -91,7 +90,6 @@ export async function POST(request: Request) {
             .from('products')
             .insert({
                 name: validatedData.name,
-                slug: validatedData.slug,
                 description: validatedData.description || null,
                 short_description: validatedData.short_description || null,
                 category_id: validatedData.category_id || null,
@@ -108,7 +106,7 @@ export async function POST(request: Request) {
         if (error) {
             console.error('Error creating product:', error);
             if (error.code === '23505') {
-                return NextResponse.json({ error: 'Product slug already exists' }, { status: 409 });
+                return NextResponse.json({ error: 'Product already exists' }, { status: 409 });
             }
             return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
         }

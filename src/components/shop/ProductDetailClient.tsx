@@ -121,7 +121,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                     type: 'product',
                     metadata: {
                         image: selectedVariant.thumbnail_url || product.thumbnail_url,
-                        slug: product.slug,
                         product_id: product.id,
                         variant_id: selectedVariant.id,
                         attributes: selectedVariant.attributes,
@@ -138,7 +137,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                     type: 'product',
                     metadata: {
                         image: product.thumbnail_url,
-                        slug: product.slug,
                     },
                 });
             }

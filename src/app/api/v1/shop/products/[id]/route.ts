@@ -5,7 +5,7 @@ interface RouteParams {
     params: Promise<{ id: string }>;
 }
 
-// GET: Get product by ID or slug — async-parallel: fetch variants & options simultaneously
+// GET: Get product by ID — async-parallel: fetch variants & options simultaneously
 export async function GET(_request: Request, { params }: RouteParams) {
     try {
         const { id } = await params;
@@ -13,13 +13,15 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
-        let query = supabase
+        if (!isUUID) {
+            return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+        }
+
+        const { data: product, error } = await supabase
             .from('products')
-            .select('*, categories(id, name, slug)');
-
-        query = isUUID ? query.eq('id', id) : query.eq('slug', id);
-
-        const { data: product, error } = await query.single();
+            .select('*, categories(id, name, slug)')
+            .eq('id', id)
+            .single();
 
         if (error || !product) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });

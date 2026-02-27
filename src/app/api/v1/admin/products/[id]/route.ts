@@ -8,7 +8,6 @@ interface RouteParams {
 
 const updateProductSchema = z.object({
     name: z.string().min(1).max(200).optional(),
-    slug: z.string().min(1).max(200).regex(/^[a-z0-9-]+$/).optional(),
     description: z.string().optional(),
     short_description: z.string().max(500).optional(),
     category_id: z.string().uuid().optional().nullable(),
@@ -38,23 +37,14 @@ export async function GET(request: Request, { params }: RouteParams) {
 
         const adminSupabase = await createAdminClient();
 
-        // Try to find by UUID first, then by slug
-        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-        let query = adminSupabase
+        const { data: product, error } = await adminSupabase
             .from('products')
             .select(`
                 *,
                 categories(id, name, slug)
-            `);
-
-        if (isUUID) {
-            query = query.eq('id', id);
-        } else {
-            query = query.eq('slug', id);
-        }
-
-        const { data: product, error } = await query.single();
+            `)
+            .eq('id', id)
+            .single();
 
         if (error || !product) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });
@@ -113,7 +103,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         if (error) {
             console.error('Error updating product:', error);
             if (error.code === '23505') {
-                return NextResponse.json({ error: 'Product slug already exists' }, { status: 409 });
+                return NextResponse.json({ error: 'Product already exists' }, { status: 409 });
             }
             return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
         }

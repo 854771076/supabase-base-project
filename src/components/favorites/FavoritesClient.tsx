@@ -51,7 +51,7 @@ function FavoriteCard({
             }}
         >
             {/* Image */}
-            <Link href={`/${locale}/shop/${product.slug}`} style={{ display: 'block' }}>
+            <Link href={`/${locale}/shop/${product.id}`} style={{ display: 'block' }}>
                 <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#fafafa' }}>
                     {product.thumbnail_url ? (
                         <img
@@ -93,7 +93,7 @@ function FavoriteCard({
 
             {/* Info */}
             <div style={{ padding: '14px 16px 16px' }}>
-                <Link href={`/${locale}/shop/${product.slug}`} style={{ textDecoration: 'none' }}>
+                <Link href={`/${locale}/shop/${product.id}`} style={{ textDecoration: 'none' }}>
                     <Text strong style={{ fontSize: 14, color: '#1a1a1a', display: 'block', marginBottom: 6, lineHeight: 1.4 }}
                         ellipsis={{ tooltip: product.name }}>
                         {product.name}
@@ -166,7 +166,7 @@ export default function FavoritesClient() {
             name: product.name,
             price_cents: product.min_price_cents ?? 0,
             type: 'product',
-            metadata: { image: product.thumbnail_url, slug: product.slug },
+            metadata: { image: product.thumbnail_url },
         });
         message.success(tShop('addedToCart'));
     };

@@ -13,7 +13,6 @@ const { TextArea } = Input;
 interface Product {
     id: string;
     name: string;
-    slug: string;
     thumbnail_url: string | null;
     status: 'draft' | 'published' | 'archived';
     category: { id: string; name: string } | null;
@@ -232,12 +231,7 @@ export default function AdminProductsPage() {
             title: t('productName'),
             dataIndex: 'name',
             key: 'name',
-            render: (name: string, record: Product) => (
-                <div>
-                    <div>{name}</div>
-                    <div style={{ fontSize: '12px', color: '#999' }}>{record.slug}</div>
-                </div>
-            ),
+            render: (name: string) => <div>{name}</div>,
         },
         {
             title: t('category'),

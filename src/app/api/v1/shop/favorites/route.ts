@@ -28,7 +28,6 @@ export async function GET(request: Request) {
                 product:products_with_price(
                     id,
                     name,
-                    slug,
                     min_price_cents,
                     max_price_cents,
                     min_compare_at_price_cents,
