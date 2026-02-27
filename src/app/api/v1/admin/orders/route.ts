@@ -27,6 +27,7 @@ export async function GET(request: Request) {
         const status = searchParams.get('status');
         const type = searchParams.get('type');
         const user_id = searchParams.get('user_id');
+        const shipping = searchParams.get('shipping');
         const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
         const offset = parseInt(searchParams.get('offset') || '0');
 
@@ -58,6 +59,12 @@ export async function GET(request: Request) {
 
         if (user_id) {
             query = query.eq('user_id', user_id);
+        }
+
+        if (shipping === 'shipped') {
+            query = query.not('tracking_number', 'is', null);
+        } else if (shipping === 'notShipped') {
+            query = query.is('tracking_number', null);
         }
 
         const id = searchParams.get('id');

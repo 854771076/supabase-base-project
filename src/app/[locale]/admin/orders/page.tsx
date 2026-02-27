@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Tag, Space, Typography, Card, Select, Modal, Descriptions, App, DatePicker, Input } from 'antd';
-import { EyeOutlined, SearchOutlined, SendOutlined } from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined, SendOutlined, CarOutlined } from '@ant-design/icons';
 import { useTranslations } from '@/i18n/context';
 
 const { Title, Paragraph, Text } = Typography;
@@ -51,6 +51,7 @@ export default function AdminOrdersPage() {
     const [trackingNumber, setTrackingNumber] = useState('');
     const [trackingCarrier, setTrackingCarrier] = useState('');
     const [trackingLoading, setTrackingLoading] = useState(false);
+    const [shippingFilter, setShippingFilter] = useState<string | null>(null);
     const pageSize = 10;
 
     useEffect(() => {
@@ -70,6 +71,7 @@ export default function AdminOrdersPage() {
             if (statusFilter) params.set('status', statusFilter);
             if (typeFilter) params.set('type', typeFilter);
             if (searchId) params.set('id', searchId);
+            if (shippingFilter) params.set('shipping', shippingFilter);
 
             const res = await fetch(`/api/v1/admin/orders?${params}`);
             const data = await res.json();
@@ -82,7 +84,7 @@ export default function AdminOrdersPage() {
         } finally {
             setLoading(false);
         }
-    }, [page, statusFilter, typeFilter, searchId, pageSize]);
+    }, [page, statusFilter, typeFilter, searchId, shippingFilter, pageSize]);
 
     useEffect(() => {
         fetchOrders();
@@ -210,6 +212,17 @@ export default function AdminOrdersPage() {
             ),
         },
         {
+            title: tOrder('shipping'),
+            key: 'shipping',
+            responsive: ['sm'] as any,
+            render: (_: any, record: Order) => {
+                if (record.type !== 'product') return <span style={{ color: '#bfbfbf' }}>—</span>;
+                return record.tracking_number
+                    ? <Tag icon={<CarOutlined />} color="success">{tOrder('shipped')}</Tag>
+                    : <Tag icon={<CarOutlined />} color="default">{tOrder('notShippedYet')}</Tag>;
+            },
+        },
+        {
             title: t('provider'),
             dataIndex: 'provider',
             key: 'provider',
@@ -278,6 +291,16 @@ export default function AdminOrdersPage() {
                         <Select.Option value="credits">{tOrder('credits')}</Select.Option>
                         <Select.Option value="product">{t('product')}</Select.Option>
                         <Select.Option value="license">{tOrder('license')}</Select.Option>
+                    </Select>
+                    <Select
+                        placeholder={tOrder('filterByShipping')}
+                        value={shippingFilter}
+                        onChange={(val) => { setShippingFilter(val); setPage(1); }}
+                        style={{ width: 150 }}
+                        allowClear
+                    >
+                        <Select.Option value="shipped">{tOrder('shipped')}</Select.Option>
+                        <Select.Option value="notShipped">{tOrder('notShippedYet')}</Select.Option>
                     </Select>
                 </Space>
             </Card>

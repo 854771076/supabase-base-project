@@ -41,13 +41,19 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
     const t = useTranslations('OrderHistory');
     const locale = useLocale();
     const [filterType, setFilterType] = useState<string>('all');
+    const [filterShipping, setFilterShipping] = useState<string>('all');
     const { message } = App.useApp();
     const router = useRouter();
 
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     // 数据处理
-    const filteredOrders = orders.filter(o => filterType === 'all' || o.type === filterType);
+    const filteredOrders = orders.filter(o => {
+        if (filterType !== 'all' && o.type !== filterType) return false;
+        if (filterShipping === 'shipped' && !o.tracking_number) return false;
+        if (filterShipping === 'notShipped' && (o.type !== 'product' || o.tracking_number)) return false;
+        return true;
+    });
     const stats = {
         total: orders.length,
         spent: orders.filter(o => o.status === 'completed').reduce((s, o) => s + o.amount_cents, 0) / 100,
@@ -319,6 +325,16 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
                                 <Select.Option value="credits">{t('credits')}</Select.Option>
                                 <Select.Option value="product">{t('product')}</Select.Option>
                                 <Select.Option value="license">{t('license')}</Select.Option>
+                            </Select>
+                            <Select
+                                defaultValue="all"
+                                variant="borderless"
+                                onChange={setFilterShipping}
+                                style={{ width: 140, color: '#1890ff', fontWeight: 600 }}
+                            >
+                                <Select.Option value="all">{t('allShipping')}</Select.Option>
+                                <Select.Option value="shipped">{t('shipped')}</Select.Option>
+                                <Select.Option value="notShipped">{t('notShippedYet')}</Select.Option>
                             </Select>
                         </Space>
                     }

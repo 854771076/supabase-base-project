@@ -230,7 +230,9 @@
         "noTracking": "No tracking info yet",
         "shipped": "Shipped",
         "notShippedYet": "Not shipped yet",
-        "shipping": "Shipping"
+        "shipping": "Shipping",
+        "filterByShipping": "Filter by Shipping",
+        "allShipping": "All Shipping"
     },
     "Cart": {
         "title": "Shopping Cart",

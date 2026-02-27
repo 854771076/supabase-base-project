@@ -229,6 +229,8 @@
         "shipped": "已发货",
         "notShippedYet": "暂未发货",
         "shipping": "物流状态",
+        "filterByShipping": "按物流筛选",
+        "allShipping": "全部物流",
         "product": "实物商品",
         "license": "授权码"
     },
