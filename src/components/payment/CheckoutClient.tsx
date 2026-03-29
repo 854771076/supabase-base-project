@@ -274,7 +274,7 @@ export default function CheckoutClient() {
                 </>
             )}
 
-            <TokenPayModal
+            {/* <TokenPayModal
                 visible={isModalVisible}
                 onCancel={() => setIsModalVisible(false)}
                 orderId={orderInfo?.orderId}
@@ -287,7 +287,7 @@ export default function CheckoutClient() {
                         setShowLicenseModal(true);
                     }
                 }}
-            />
+            /> */}
 
             <Modal
                 title={<Space><CheckCircleOutlined style={{ color: '#52c41a' }} /> {t('licenseGenerated') || 'License Keys Generated'}</Space>}
