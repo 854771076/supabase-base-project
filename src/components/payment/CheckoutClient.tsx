@@ -202,7 +202,7 @@ export default function CheckoutClient() {
                                                 <Text strong>PayPal</Text>
                                             </Space>
                                         </Radio>
-                                        <Radio value="tokenpay" style={{ width: '100%', padding: '16px', border: '1px solid #f0f0f0', borderRadius: '12px' }}>
+                                        {/* <Radio value="tokenpay" style={{ width: '100%', padding: '16px', border: '1px solid #f0f0f0', borderRadius: '12px' }}>
                                             <Space direction="vertical" style={{ width: '100%' }}>
                                                 <Space>
                                                     <WalletOutlined style={{ fontSize: '20px', color: '#1677ff' }} />
@@ -246,7 +246,7 @@ export default function CheckoutClient() {
                                                     </div>
                                                 )}
                                             </Space>
-                                        </Radio>
+                                        </Radio> */}
                                     </Space>
                                 </Radio.Group>
                             </Card>

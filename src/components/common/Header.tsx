@@ -112,10 +112,10 @@ export default function Header({ user }: HeaderProps) {
             key: 'shop',
             label: <Link href={`/${currentLocale}/shop`} onClick={() => setDrawerVisible(false)}>{t('shop')}</Link>,
         },
-        {
-            key: 'pricing',
-            label: <Link href={`/${currentLocale}/pricing`} onClick={() => setDrawerVisible(false)}>{t('pricing')}</Link>,
-        },
+        // {
+        //     key: 'pricing',
+        //     label: <Link href={`/${currentLocale}/pricing`} onClick={() => setDrawerVisible(false)}>{t('pricing')}</Link>,
+        // },
         // {
         //     key: 'docs',
         //     label: <Link href={`/${currentLocale}/api-docs`} onClick={() => setDrawerVisible(false)}>{t('apiDocs')}</Link>,
@@ -124,19 +124,19 @@ export default function Header({ user }: HeaderProps) {
         //     key: 'demo',
         //     label: <Link href={`/${currentLocale}/dashboard/demo`} onClick={() => setDrawerVisible(false)}>{t('demo')}</Link>,
         // },
-        {
-            key: 'credits',
-            label: <Link href={`/${currentLocale}/credits`} onClick={() => setDrawerVisible(false)}>{t('credits')}</Link>,
-        },
+        // {
+        //     key: 'credits',
+        //     label: <Link href={`/${currentLocale}/credits`} onClick={() => setDrawerVisible(false)}>{t('credits')}</Link>,
+        // },
     ];
 
     const getActiveKey = () => {
         if (pathname === '/') return 'home';
         if (pathname.startsWith('/shop')) return 'shop';
-        if (pathname.startsWith('/pricing')) return 'pricing';
+        // if (pathname.startsWith('/pricing')) return 'pricing';
         // if (pathname.startsWith('/api-docs')) return 'docs';
         // if (pathname.startsWith('/dashboard')) return 'demo';
-        if (pathname.startsWith('/credits')) return 'credits';
+        // if (pathname.startsWith('/credits')) return 'credits';
         return '';
     };
 

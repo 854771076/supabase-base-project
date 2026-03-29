@@ -91,13 +91,13 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                     </Row>
                 </Card>
 
-                <Row gutter={[24, 24]}>
+                {/* <Row gutter={[24, 24]}> */}
                     {/* 左侧：账户与配额 */}
-                    <Col xs={24} md={15}>
-                        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+                    {/* <Col xs={24} md={15}> */}
+                        {/* <Space direction="vertical" size={24} style={{ width: '100%' }}> */}
 
                             {/* 配额可视化 */}
-                            <Card title={<Space><RocketOutlined />{t('planFeatures')}</Space>} bordered={false} style={{ borderRadius: '16px' }}>
+                            {/* <Card title={<Space><RocketOutlined />{t('planFeatures')}</Space>} bordered={false} style={{ borderRadius: '16px' }}>
                                 <div style={{ marginBottom: '24px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                         <Text strong>{t('dailyRequests')}</Text>
@@ -131,10 +131,10 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                                         </Card>
                                     </Col>
                                 </Row>
-                            </Card>
+                            </Card> */}
 
                             {/* 详情信息 */}
-                            <Card bordered={false} style={{ borderRadius: '16px' }}>
+                            {/* <Card bordered={false} style={{ borderRadius: '16px' }}>
                                 <Descriptions title={t('basicInfo')} column={1} size="middle">
                                     <Descriptions.Item label={t('lastSignIn')}>
                                         <span suppressHydrationWarning>{user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : '-'}</span>
@@ -163,18 +163,16 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                                     }
                                 ]} />
                             </Card>
-
-                            {/* 用户授权码 */}
                             <UserLicenses />
-                        </Space>
-                    </Col>
+                        </Space> */}
+                    {/* </Col> */}
 
                     {/* 右侧：钱包与升级 */}
-                    <Col xs={24} md={9}>
-                        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+                    {/* <Col xs={24} md={9}> */}
+                        {/* <Space direction="vertical" size={24} style={{ width: '100%' }}> */}
 
                             {/* 余额卡片 */}
-                            <Card
+                            {/* <Card
                                 bordered={false}
                                 style={{
                                     borderRadius: '16px',
@@ -195,10 +193,10 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                                 >
                                     {t('buyCredits')}
                                 </Button>
-                            </Card>
+                            </Card> */}
 
                             {/* 升级提示 */}
-                            <Card bordered={false} style={{ borderRadius: '16px', textAlign: 'center' }}>
+                            {/* <Card bordered={false} style={{ borderRadius: '16px', textAlign: 'center' }}>
                                 <div style={{ marginBottom: '16px' }}>
                                     <RocketOutlined style={{ fontSize: '40px', color: '#faad14' }} />
                                 </div>
@@ -215,10 +213,10 @@ export default function ProfileContent({ user, session, subscription, usage, cre
                                 >
                                     {t('upgrade')}
                                 </Button>
-                            </Card>
-                        </Space>
-                    </Col>
-                </Row>
+                            </Card> */}
+                        {/* </Space> */}
+                    {/* </Col> */}
+                {/* </Row> */}
             </div>
         </div>
     );
