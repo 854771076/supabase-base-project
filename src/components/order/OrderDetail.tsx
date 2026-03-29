@@ -326,7 +326,7 @@ export function OrderDetail({ order, locale: propLocale }: OrderDetailProps) {
           </Col>
         </Row>
 
-        <TokenPayModal
+        {/* <TokenPayModal
           visible={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           orderId={order.id}
@@ -335,7 +335,7 @@ export function OrderDetail({ order, locale: propLocale }: OrderDetailProps) {
             setIsModalVisible(false);
             router.refresh();
           }}
-        />
+        /> */}
       </div>
     </div>
   );

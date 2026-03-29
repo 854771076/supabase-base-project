@@ -357,7 +357,7 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
                     />
                 </Card>
 
-                <TokenPayModal
+                {/* <TokenPayModal
                     visible={isModalVisible}
                     onCancel={() => setIsModalVisible(false)}
                     orderId={selectedOrder?.id || ''}
@@ -366,7 +366,7 @@ export default function OrderHistory({ orders = [], locale: propLocale }: { orde
                         setIsModalVisible(false);
                         router.refresh();
                     }}
-                />
+                /> */}
             </div>
         </div>
     );
